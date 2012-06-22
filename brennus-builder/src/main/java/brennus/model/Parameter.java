@@ -1,0 +1,27 @@
+package brennus.model;
+
+public class Parameter {
+
+  private final Type type;
+  private final String name;
+  private final int index;
+
+  public Parameter(Type type, String name, int index) {
+    this.type = type;
+    this.name = name;
+    this.index = index;
+  }
+
+  public Type getType() {
+    return type;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public int getIndex() {
+    return index;
+  }
+
+}
