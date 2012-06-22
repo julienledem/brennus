@@ -1,0 +1,49 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <groupId>brennus</groupId>
+    <artifactId>brennus</artifactId>
+    <relativePath>../pom.xml</relativePath>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>brennus-asm</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Brennus ASM</name>
+  <url>https://github.com/julienledem/brennus</url>
+  
+  <properties>
+    <asm-version>3.3.1</asm-version>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>${asm-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm-tree</artifactId>
+      <version>${asm-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm-util</artifactId>
+      <version>${asm-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm-analysis</artifactId>
+      <version>${asm-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>brennus</groupId>
+      <artifactId>brennus-builder</artifactId>
+      <version>${project.version}</version>
+    </dependency>        
+  </dependencies>
+</project>
