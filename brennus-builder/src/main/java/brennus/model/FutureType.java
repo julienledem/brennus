@@ -1,5 +1,7 @@
 package brennus.model;
 
+import static brennus.model.ExceptionHandlingVisitor.wrap;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -23,7 +25,7 @@ public final class FutureType extends Type {
 
   @Override
   public void accept(TypeVisitor typeVisitor) {
-    typeVisitor.visit(this);
+    wrap(typeVisitor).visit(this);
   }
 
   public String getName() {
@@ -76,6 +78,24 @@ public final class FutureType extends Type {
       return extending.getMethod(methodName);
     }
     return null;
+  }
+
+  @Override
+  public boolean isAssignableFrom(Type type) {
+    System.out.println(this+".isAssignableFrom."+type);
+    class TypeVisitorImplementation implements TypeVisitor {
+      boolean isAssignableFrom;
+      public void visit(ExistingType other) {
+        isAssignableFrom = false;
+      }
+      public void visit(FutureType futureType) {
+        isAssignableFrom = name.equals(futureType.name) || isAssignableFrom(futureType.getExtending());
+      }
+    }
+    TypeVisitorImplementation typeVisitor = new TypeVisitorImplementation();
+    type.accept(typeVisitor);
+    System.out.println(this+".isAssignableFrom."+type+"="+typeVisitor.isAssignableFrom);
+    return typeVisitor.isAssignableFrom;
   }
 
 }

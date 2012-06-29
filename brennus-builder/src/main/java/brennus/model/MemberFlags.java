@@ -25,6 +25,10 @@ public class MemberFlags {
     return keywords;
   }
 
+  public static MemberFlags fromKeywords(Keyword... keywords) {
+    return new MemberFlags(keywords);
+  }
+
   public static MemberFlags fromReflection(java.lang.reflect.Method method) {
     // TODO: handle existingMethod
     return new MemberFlags(new Keyword[0]);

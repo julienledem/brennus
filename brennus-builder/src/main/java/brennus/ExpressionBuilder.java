@@ -2,60 +2,37 @@ package brennus;
 
 import brennus.model.CallMethodExpression;
 import brennus.model.Expression;
-import brennus.model.ExpressionStatement;
 import brennus.model.GetExpression;
-import brennus.model.ReturnStatement;
-import brennus.model.Statement;
-import brennus.model.ThrowStatement;
+import brennus.model.LiteralExpression;
 
 /**
  * builds an expression
- * TODO: revisit
  * @author Julien Le Dem
  *
  * @param <T> the type of the parent to return on completion
  */
-public class ExpressionBuilder<T extends CodeBlockBuilder<? super Statement>> {
+public class ExpressionBuilder<T> {
 
-  private Expression expression;
-
-  private final T parent;
-
-  public ExpressionBuilder(T parent) {
-    this.parent = parent;
+  public interface ExpressionHandler<T> {
+    T handleExpression(Expression e);
   }
 
-  Expression getExpression() {
-    return expression;
+  private final ExpressionHandler<T> expressionHandler;
+
+  ExpressionBuilder(ExpressionHandler<T> expressionHandler) {
+    this.expressionHandler = expressionHandler;
   }
 
-  public ExpressionBuilder<T> get(String name) {
-    expression = new GetExpression(name);
-    return this;
+  public ValueExpressionBuilder<T> get(String name) {
+    return new ValueExpressionBuilder<T>(expressionHandler, new GetExpression(name));
   }
 
-  public T returnExp() {
-    parent.addStatement(new ReturnStatement(getExpression()));
-    return parent;
+  public ValueExpressionBuilder<T> call(String methodName) {
+    return new ValueExpressionBuilder<T>(expressionHandler, new CallMethodExpression(methodName));
   }
 
-  public ExpressionBuilder<T> call(String methodName) {
-    expression = new CallMethodExpression(methodName);
-    return this;
-  }
-
-  public T done() {
-    parent.addStatement(new ExpressionStatement(getExpression()));
-    return parent;
-  }
-
-  public SwitchBuilder<T> switchOn() {
-    return new SwitchBuilder<T>(parent, getExpression());
-  }
-
-  public T throwException() {
-    parent.addStatement(new ThrowStatement(getExpression()));
-    return parent;
+  public ValueExpressionBuilder<T> literal(int i) {
+    return new ValueExpressionBuilder<T>(expressionHandler, new LiteralExpression(i));
   }
 
 }

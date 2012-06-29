@@ -3,6 +3,7 @@ package brennus;
 import static brennus.ClassBuilder.startClass;
 import static brennus.model.ExistingType.*;
 import static brennus.model.Protection.*;
+import junit.framework.Assert;
 import brennus.asm.ASMTypeGenerator;
 import brennus.model.FutureType;
 import brennus.printer.TypePrinter;
@@ -24,28 +25,55 @@ public class TestGeneration {
   public void testGeneration() throws Exception {
     FutureType testClass =
         startClass("test.TestClass").extendsType(existing(BaseTestClass.class))
+
           .field(STRING, "foo", PRIVATE)
           .field(INT, "bar", PRIVATE)
+
+          .startMethod(INT, "inc", PUBLIC).param(INT, "i")
+            .returnExp().get("i").add().literal(1).end()
+          .endMethod()
+
+          .startMethod(INT, "plus6", PUBLIC).param(INT, "i")
+            .returnExp().get("i").add().literal(1).add().literal(2).add().literal(3).end()
+          .endMethod()
+
           .startMethod(STRING, "getFoo", PUBLIC)
-            .expression().get("foo").returnExp()
+            .returnExp().get("foo").end()
           .endMethod()
+
           .startMethod(INT, "getBar", PUBLIC)
-            .expression().get("bar").returnExp()
+            .returnExp().get("bar").end()
           .endMethod()
-          .startMethod(OBJECT, "get", PUBLIC)
-            .withParameter(INT, "i")
-            .expression().get("i").switchOn()
+
+          .startMethod(OBJECT, "get", PUBLIC).param(INT, "i")
+            .switchOn().get("i").end()
               .caseBlock(0)
-                .expression().call("getFoo").returnExp()
+//                .call("println").withParam().literal("get(0)").end()
+                .returnExp().call("getFoo").end()
               .endCase()
               .caseBlock(1)
-                .expression().call("getBar").returnExp()
+                .returnExp().call("getBar").end()
               .endCase()
               .defaultCase()
-                .expression().call("error").throwException()
+                .throwExp().call("error").end()
               .endCase()
             .endSwitch()
           .endMethod()
+
+          .startMethod(VOID, "set", PUBLIC).param(INT, "i").param(OBJECT, "o")
+            .switchOn().get("i").end()
+              .caseBlock(0)
+                .set("foo").get("o").end()
+              .endCase()
+              .caseBlock(1)
+                .set("bar").get("o").end()
+              .endCase()
+              .defaultCase()
+                .throwExp().call("error").end()
+              .endCase()
+            .endSwitch()
+          .endMethod()
+
         .endClass();
 
     new TypePrinter().print(testClass);
@@ -66,7 +94,18 @@ public class TestGeneration {
     Object test = loadClass.newInstance();
     print(test.getClass());
     BaseTestClass tc = (BaseTestClass)test;
-    tc.get(1);
+    Assert.assertNull(tc.get(0));
+    Assert.assertEquals(0, tc.get(1));
+
+    Assert.assertEquals(2, tc.inc(1));
+    Assert.assertEquals(5, tc.inc(4));
+    Assert.assertEquals(10, tc.plus6(4));
+
+    tc.set(0, "test");
+    tc.set(1, 123);
+
+    Assert.assertEquals("test", tc.get(0));
+    Assert.assertEquals(123, tc.get(1));
 
   }
 

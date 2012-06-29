@@ -1,5 +1,8 @@
 package brennus.model;
 
+import static brennus.model.ExceptionHandlingVisitor.wrap;
+
+
 public class ReturnStatement extends Statement {
 
   public ReturnStatement(Expression expression) {
@@ -8,7 +11,7 @@ public class ReturnStatement extends Statement {
 
   @Override
   public void accept(StatementVisitor statementVisitor) {
-    statementVisitor.visit(this);
+    wrap(statementVisitor).visit(this);
   }
 
 }

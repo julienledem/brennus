@@ -16,34 +16,41 @@ import brennus.model.Type;
  * @author Julien Le Dem
  *
  */
-public class MethodBuilder extends CodeBlockBuilder<Statement> {
+public class MethodBuilder extends StatementBuilder<MethodBuilder> {
 
-  private final ClassBuilder classBuilder;
+  public interface MethodHandler {
+    ClassBuilder handleMethod(Method method);
+  }
+
+  private final String classIdentifier;
   private final MemberFlags memberFlags;
   private final Type returnType;
   private final String name;
-  private final List<Parameter> parameters = new ArrayList<Parameter>();
+  private final List<Parameter> parameters;
+  private final MethodHandler methodHandler;
+  private final List<Statement> statements = new ArrayList<Statement>();
 
 
-  MethodBuilder(ClassBuilder classBuilder, MemberFlags memberFlags, Type returnType, String name) {
-    this.classBuilder = classBuilder;
+  MethodBuilder(String classIdentifier, MemberFlags memberFlags, Type returnType, String name, List<Parameter> parameters, MethodHandler methodHandler) {
+    this.classIdentifier = classIdentifier;
     this.memberFlags = memberFlags;
     this.returnType = returnType;
     this.name = name;
-  }
-
-  public ExpressionBuilder<MethodBuilder> expression() {
-    return new ExpressionBuilder<MethodBuilder>(this);
+    this.parameters = parameters;
+    this.methodHandler = methodHandler;
   }
 
   public ClassBuilder endMethod() {
-    classBuilder.addMethod(new Method(classBuilder.getName().replace(".", "/"), memberFlags, returnType, name, parameters, getStatements()));
-    return classBuilder;
+    return methodHandler.handleMethod(new Method(classIdentifier, memberFlags, returnType, name, parameters, statements));
   }
 
-  public MethodBuilder withParameter(Type type, String name) {
-    parameters.add(new Parameter(type, name, parameters.size()));
-    return this;
+  protected StatementHandler<MethodBuilder> statementHandler() {
+    return new StatementHandler<MethodBuilder>() {
+      public MethodBuilder handleStatement(Statement statement) {
+        statements.add(statement);
+        return MethodBuilder.this;
+      }
+    };
   }
 
 }

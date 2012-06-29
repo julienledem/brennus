@@ -3,6 +3,7 @@ package brennus;
 import java.util.ArrayList;
 import java.util.List;
 
+import brennus.MethodBuilder.MethodHandler;
 import brennus.model.ExistingType;
 import brennus.model.Field;
 import brennus.model.FutureType;
@@ -21,10 +22,10 @@ public class ClassBuilder {
 
   private final String name;
   private Type extending;
-  private List<Field> fields = new ArrayList<Field>();
-  private List<Field> staticFields = new ArrayList<Field>();
-  private List<Method> methods = new ArrayList<Method>();
-  private List<Method> staticMethods = new ArrayList<Method>();
+  private final List<Field> fields = new ArrayList<Field>();
+  private final List<Field> staticFields = new ArrayList<Field>();
+  private final List<Method> methods = new ArrayList<Method>();
+  private final List<Method> staticMethods = new ArrayList<Method>();
 
   private ClassBuilder(String name) {
     this.name = name;
@@ -50,17 +51,24 @@ public class ClassBuilder {
     return this;
   }
 
-  public MethodBuilder startMethod(Type returnType, String name, Keyword... keywords) {
-    return new MethodBuilder(this, new MemberFlags(keywords), returnType, name);
+  public MethodDeclarationBuilder startMethod(Type returnType, String name, Keyword... keywords) {
+    return new MethodDeclarationBuilder(name.replace(".", "/"), new MemberFlags(keywords), returnType, name, new MethodHandler() {
+      public ClassBuilder handleMethod(Method method) {
+        addMethod(method);
+        return ClassBuilder.this;
+      }
+    });
   }
 
   public FutureType endClass() {
-    return new FutureType(getName(), extending == null ? ExistingType.OBJECT : extending, fields, staticFields, methods, staticMethods);
+    FutureType futureType = new FutureType(getName(), extending == null ? ExistingType.OBJECT : extending, fields, staticFields, methods, staticMethods);
+    new ClassValidator().validate(futureType);
+    return futureType;
   }
 
   // internals
 
-  void addMethod(Method method) {
+  private void addMethod(Method method) {
     (method.isStatic() ? staticMethods : methods).add(method);
   }
 

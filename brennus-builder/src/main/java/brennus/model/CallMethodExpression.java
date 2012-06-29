@@ -1,5 +1,7 @@
 package brennus.model;
 
+import static brennus.model.ExceptionHandlingVisitor.wrap;
+
 public class CallMethodExpression extends Expression {
 
   private final String methodName;
@@ -14,7 +16,7 @@ public class CallMethodExpression extends Expression {
 
   @Override
   public void accept(ExpressionVisitor expressionVisitor) {
-    expressionVisitor.visit(this);
+    wrap(expressionVisitor).visit(this);
   }
 
   @Override

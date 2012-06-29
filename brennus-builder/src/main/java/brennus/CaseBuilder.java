@@ -1,7 +1,10 @@
 package brennus;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import brennus.model.CaseStatement;
-import brennus.model.Expression;
+import brennus.model.LiteralExpression;
 import brennus.model.Statement;
 
 /**
@@ -9,30 +12,34 @@ import brennus.model.Statement;
  *
  * @author Julien Le Dem
  *
- * @param <T> the type of the parent to return on completion
+ * @param <T> the type of the parent of the switch to return on completion
  */
-public class CaseBuilder<T extends CodeBlockBuilder<? super Statement>> extends CodeBlockBuilder<Statement> {
+public class CaseBuilder<T> extends StatementBuilder<CaseBuilder<T>> {
 
-  private final Expression value;
-  private final SwitchBuilder<T> switchBuilder;
-
-  public CaseBuilder(Expression value, SwitchBuilder<T> switchBuilder) {
-    this.value = value;
-    this.switchBuilder = switchBuilder;
+  public interface CaseStatementHandler<T> {
+    SwitchBuilder<T> handleStatement(CaseStatement caseStatement);
   }
 
-  public CaseBuilder(SwitchBuilder<T> switchBuilder) {
-    this.value = null;
-    this.switchBuilder = switchBuilder;
+  private final LiteralExpression literalExpression;
+  private final CaseStatementHandler<T> statementHandler;
+  private final List<Statement> statements = new ArrayList<Statement>();
+
+  CaseBuilder(LiteralExpression literalExpression, CaseStatementHandler<T> statementHandler) {
+    this.literalExpression = literalExpression;
+    this.statementHandler = statementHandler;
   }
 
   public SwitchBuilder<T> endCase() {
-    switchBuilder.addStatement(new CaseStatement(value, getStatements()));
-    return switchBuilder;
+    return statementHandler.handleStatement(new CaseStatement(literalExpression, statements));
   }
 
-  public ExpressionBuilder<CaseBuilder<T>> expression() {
-    return new ExpressionBuilder<CaseBuilder<T>>(this);
+  protected StatementHandler<CaseBuilder<T>> statementHandler() {
+    return new StatementHandler<CaseBuilder<T>>() {
+      public CaseBuilder<T> handleStatement(Statement statement) {
+        statements.add(statement);
+        return CaseBuilder.this;
+      }
+    };
   }
 
 }

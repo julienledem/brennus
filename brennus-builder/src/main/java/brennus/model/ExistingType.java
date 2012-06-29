@@ -1,10 +1,13 @@
 package brennus.model;
 
+import static brennus.model.ExceptionHandlingVisitor.wrap;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ExistingType extends Type {
+
   private static final Map<Class<?>, PrimitiveType> primitives = new HashMap<Class<?>, PrimitiveType>();
 
   public static final PrimitiveType VOID = primitive(Void.TYPE, "V", Void.class);
@@ -63,7 +66,7 @@ public class ExistingType extends Type {
 
   @Override
   public void accept(TypeVisitor typeVisitor) {
-    typeVisitor.visit(this);
+    wrap(typeVisitor).visit(this);
   }
 
   public Class<?> getExisting() {
@@ -110,6 +113,24 @@ public class ExistingType extends Type {
       }
     }
     return null;
+  }
+
+  @Override
+  public boolean isAssignableFrom(Type type) {
+//    System.out.println(this+".isAssignableFrom."+type);
+    class TypeVisitorImplementation implements TypeVisitor {
+      boolean isAssignableFrom;
+      public void visit(ExistingType other) {
+        isAssignableFrom = existing.isAssignableFrom(other.existing);
+      }
+      public void visit(FutureType futureType) {
+        isAssignableFrom = isAssignableFrom(futureType.getExtending());
+      }
+    }
+    TypeVisitorImplementation typeVisitor = new TypeVisitorImplementation();
+    type.accept(typeVisitor);
+//    System.out.println(this+".isAssignableFrom."+type+"="+typeVisitor.isAssignableFrom);
+    return typeVisitor.isAssignableFrom;
   }
 
 }

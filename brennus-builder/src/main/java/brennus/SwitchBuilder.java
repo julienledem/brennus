@@ -1,9 +1,12 @@
 package brennus;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import brennus.CaseBuilder.CaseStatementHandler;
 import brennus.model.CaseStatement;
 import brennus.model.Expression;
 import brennus.model.LiteralExpression;
-import brennus.model.Statement;
 import brennus.model.SwitchStatement;
 
 
@@ -12,47 +15,47 @@ import brennus.model.SwitchStatement;
  *
  * @author Julien Le Dem
  *
- * @param <P> the type of the parent to return on completion
+ * @param <T> the type of the parent to return on completion
  */
-public class SwitchBuilder
-// the parent of this class can contain SwitchStatements
-<P extends CodeBlockBuilder<? super Statement>>
-// This class is a code block accepting CaseStatements
-extends CodeBlockBuilder<CaseStatement> {
+public class SwitchBuilder<T> {
 
-  private final P parent;
+  public interface SwitchStatementsHandler<T> {
+    T handleStatement(SwitchStatement switchStatement);
+  }
+
   private final Expression switchOnExpression;
+  private final SwitchStatementsHandler<T> switchStatementHandler;
+  private final List<CaseStatement> statements = new ArrayList<CaseStatement>();
   private CaseStatement defaultCaseStatement;
 
-  public SwitchBuilder(P parent, Expression switchOnExpression) {
-    this.parent = parent;
+  SwitchBuilder(Expression switchOnExpression, SwitchStatementsHandler<T> switchStatementHandler) {
     this.switchOnExpression = switchOnExpression;
+    this.switchStatementHandler = switchStatementHandler;
   }
 
-  public CaseBuilder<P> caseBlock(int value) {
-    return new CaseBuilder<P>(new LiteralExpression(value), this);
-  }
-
-  public CaseBuilder<P> defaultCase() {
-    return new CaseBuilder<P>(this);
-  }
-
-  public P endSwitch() {
-    parent.addStatement(new SwitchStatement(switchOnExpression, getStatements(), defaultCaseStatement));
-    return parent;
-  }
-
-  @Override
-  void addStatement(CaseStatement statement) {
-    if (statement.getExpression() == null) {
-      if (defaultCaseStatement != null) {
-        throw new RuntimeException("multiple default cases "+defaultCaseStatement+" and "+statement);
+  public CaseBuilder<T> caseBlock(int value) {
+    return new CaseBuilder<T>(new LiteralExpression(value), new CaseStatementHandler<T>() {
+      public SwitchBuilder<T> handleStatement(CaseStatement statement) {
+        statements.add(statement);
+        return SwitchBuilder.this;
       }
-      this.defaultCaseStatement = statement;
-    } else {
-      super.addStatement(statement);
-    }
+    });
   }
 
+  public CaseBuilder<T> defaultCase() {
+    if (defaultCaseStatement != null) {
+      throw new RuntimeException("already a default case "+defaultCaseStatement);
+    }
+    return new CaseBuilder<T>(null, new CaseStatementHandler<T>() {
+      public SwitchBuilder<T> handleStatement(CaseStatement statement) {
+        defaultCaseStatement = statement;
+        return SwitchBuilder.this;
+      }
+    });
+  }
+
+  public T endSwitch() {
+    return switchStatementHandler.handleStatement(new SwitchStatement(switchOnExpression, statements, defaultCaseStatement));
+  }
 
 }

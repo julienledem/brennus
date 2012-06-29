@@ -15,8 +15,11 @@ abstract public class Type {
 
   abstract public Method getMethod(String methodName);
 
+  abstract public boolean isAssignableFrom(Type type);
+
   @Override
   public String toString() {
-    return "["+getClass().getName()+" "+getName()+"]";
+    return "["+getClass().getSimpleName()+" "+getName()+"]";
   }
+
 }

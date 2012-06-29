@@ -1,5 +1,7 @@
 package brennus.model;
 
+import static brennus.model.ExceptionHandlingVisitor.wrap;
+
 public class LiteralExpression extends Expression {
 
   private final int value;
@@ -10,7 +12,7 @@ public class LiteralExpression extends Expression {
 
   @Override
   public void accept(ExpressionVisitor expressionVisitor) {
-    expressionVisitor.visit(this);
+    wrap(expressionVisitor).visit(this);
   }
 
   public int getValue() {

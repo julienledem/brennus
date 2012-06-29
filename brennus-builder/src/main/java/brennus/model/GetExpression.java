@@ -1,5 +1,7 @@
 package brennus.model;
 
+import static brennus.model.ExceptionHandlingVisitor.wrap;
+
 public class GetExpression extends Expression {
 
   private final String fieldName;
@@ -10,7 +12,7 @@ public class GetExpression extends Expression {
 
   @Override
   public void accept(ExpressionVisitor expressionVisitor) {
-    expressionVisitor.visit(this);
+    wrap(expressionVisitor).visit(this);
   }
 
   public String getFieldName() {
@@ -19,6 +21,6 @@ public class GetExpression extends Expression {
 
   @Override
   public String toString() {
-    return getClass().getName()+" "+fieldName;
+    return "["+getClass().getSimpleName()+" "+fieldName+"]";
   }
 }

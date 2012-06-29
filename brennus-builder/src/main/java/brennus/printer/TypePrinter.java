@@ -3,6 +3,7 @@ package brennus.printer;
 import java.util.Collection;
 import java.util.List;
 
+import brennus.model.AddExpression;
 import brennus.model.CallMethodExpression;
 import brennus.model.CaseStatement;
 import brennus.model.ExistingType;
@@ -17,6 +18,7 @@ import brennus.model.MemberFlags;
 import brennus.model.Method;
 import brennus.model.Parameter;
 import brennus.model.ReturnStatement;
+import brennus.model.SetStatement;
 import brennus.model.Statement;
 import brennus.model.StatementVisitor;
 import brennus.model.SwitchStatement;
@@ -32,7 +34,7 @@ public class TypePrinter {
   }
 
 }
-class TypePrinterVisitor implements TypeVisitor, StatementVisitor, ExpressionVisitor {
+class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
 
   private int indent;
 
@@ -50,10 +52,6 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor, ExpressionVis
   private void println(Object ln) {
     printIndent();
     System.out.println(ln);
-  }
-
-  private void print(Object o) {
-    System.out.print(o);
   }
 
   private void decIndent() {
@@ -138,37 +136,28 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor, ExpressionVis
 
   @Override
   public void visit(ReturnStatement returnStatement) {
-    printIndent();
-    print("return ");
-    returnStatement.getExpression().accept(this);
-    print(";");
-    println();
+    println("return " + toString(returnStatement.getExpression())+";");
   }
 
   @Override
   public void visit(ThrowStatement throwStatement) {
-    printIndent();
-    print("throw ");
-    throwStatement.getExpression().accept(this);
-    print(";");
-    println();
+    println("throw "+ toString(throwStatement.getExpression())+";");
   }
 
   @Override
   public void visit(ExpressionStatement expressionStatement) {
-    printIndent();
-    expressionStatement.getExpression().accept(this);
-    print(";");
-    println();
+    println(toString(expressionStatement.getExpression())+";");
+  }
+
+  private String toString(Expression expression) {
+    ExpressionStringifierVisitor expressionVisitor = new ExpressionStringifierVisitor();
+    expression.accept(expressionVisitor);
+    return expressionVisitor.toString();
   }
 
   @Override
   public void visit(SwitchStatement switchStatement) {
-    printIndent();
-    print("switch (");
-    switchStatement.getExpression().accept(this);
-    print(") {");
-    println();
+    println("switch (" + toString(switchStatement.getExpression()) + ") {");
     incIndent();
     Collection<CaseStatement> caseStatements = switchStatement.getCaseStatements();
     for (CaseStatement caseStatement : caseStatements) {
@@ -183,16 +172,13 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor, ExpressionVis
 
   @Override
   public void visit(CaseStatement caseStatement) {
-    printIndent();
-    Expression expression = caseStatement.getExpression();
-    if (expression == null) {
-      print("default");
+    String caseType;
+    if (caseStatement.getExpression() == null) {
+      caseType = "default";
     } else {
-      print("case ");
-      expression.accept(this);
+      caseType = "case " + toString(caseStatement.getExpression());
     }
-    print(":");
-    println();
+    println(caseType + ":");
     incIndent();
     List<Statement> statements = caseStatement.getStatements();
     for (Statement statement : statements) {
@@ -202,21 +188,41 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor, ExpressionVis
     println("break;");
   }
 
-  // Expressions
+  @Override
+  public void visit(SetStatement setStatement) {
+    println(setStatement.getTo() + " = " + toString(setStatement.getExpression()) + ";");
+  }
+
+
+}
+class ExpressionStringifierVisitor implements ExpressionVisitor {
+
+  private StringBuilder sb = new StringBuilder();
 
   @Override
   public void visit(LiteralExpression literalExpression) {
-    print(literalExpression.getValue());
-
+    sb.append(literalExpression.getValue());
   }
 
   @Override
   public void visit(GetExpression getFieldExpression) {
-    print(getFieldExpression.getFieldName());
+    sb.append(getFieldExpression.getFieldName());
   }
 
   @Override
   public void visit(CallMethodExpression callMethodExpression) {
-    print("this."+callMethodExpression.getMethodName()+"()");
+    sb.append("this."+callMethodExpression.getMethodName()+"()");
+  }
+
+  @Override
+  public void visit(AddExpression addExpression) {
+    addExpression.getLeftExpression().accept(this);
+    sb.append(" + ");
+    addExpression.getRightExpression().accept(this);
+  }
+
+  @Override
+  public String toString() {
+    return sb.toString();
   }
 }

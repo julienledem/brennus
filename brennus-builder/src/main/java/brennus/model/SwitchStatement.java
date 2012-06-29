@@ -1,5 +1,7 @@
 package brennus.model;
 
+import static brennus.model.ExceptionHandlingVisitor.wrap;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -17,7 +19,7 @@ public class SwitchStatement extends Statement {
 
   @Override
   public void accept(StatementVisitor statementVisitor) {
-    statementVisitor.visit(this);
+    wrap(statementVisitor).visit(this);
   }
 
   public List<CaseStatement> getCaseStatements() {
