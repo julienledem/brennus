@@ -30,7 +30,7 @@ public class CaseBuilder<T> extends StatementBuilder<CaseBuilder<T>> {
   }
 
   public SwitchBuilder<T> endCase() {
-    return statementHandler.handleStatement(new CaseStatement(literalExpression, statements));
+    return statementHandler.handleStatement(new CaseStatement(literalExpression, statements, false));
   }
 
   protected StatementHandler<CaseBuilder<T>> statementHandler() {
@@ -40,6 +40,10 @@ public class CaseBuilder<T> extends StatementBuilder<CaseBuilder<T>> {
         return CaseBuilder.this;
       }
     };
+  }
+
+  public SwitchBuilder<T> breakCase() {
+    return statementHandler.handleStatement(new CaseStatement(literalExpression, statements, true));
   }
 
 }

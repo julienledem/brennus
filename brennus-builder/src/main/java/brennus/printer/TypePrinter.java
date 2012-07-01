@@ -201,7 +201,13 @@ class ExpressionStringifierVisitor implements ExpressionVisitor {
 
   @Override
   public void visit(LiteralExpression literalExpression) {
+    if (literalExpression.getType().equals(ExistingType.STRING)) {
+      sb.append("\"");
+    }
     sb.append(literalExpression.getValue());
+    if (literalExpression.getType().equals(ExistingType.STRING)) {
+      sb.append("\"");
+    }
   }
 
   @Override
@@ -211,7 +217,18 @@ class ExpressionStringifierVisitor implements ExpressionVisitor {
 
   @Override
   public void visit(CallMethodExpression callMethodExpression) {
-    sb.append("this."+callMethodExpression.getMethodName()+"()");
+    sb.append("this."+callMethodExpression.getMethodName()+"(");
+    boolean first = true;
+    List<Expression> parameters = callMethodExpression.getParameters();
+    for (Expression expression : parameters) {
+      if (first) {
+        first = false;
+      } else {
+        sb.append(", ");
+      }
+      expression.accept(this);
+    }
+    sb.append(")");
   }
 
   @Override

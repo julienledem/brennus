@@ -103,12 +103,23 @@ public class ExistingType extends Type {
     java.lang.reflect.Method[] declaredMethods = existing.getDeclaredMethods();
     for (java.lang.reflect.Method method : declaredMethods) {
       if (method.getName() == methodName) {
+        ArrayList<Parameter> parameters = new ArrayList<Parameter>();
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        for (int i = 0; i < parameterTypes.length; i++) {
+          Class<?> paramClass = parameterTypes[i];
+          parameters.add(
+              new Parameter(
+                  ExistingType.existing(paramClass),
+                  "arg"+i,
+                  i));
+
+        }
         return new Method(
             this.getClassIdentifier(),
             MemberFlags.fromReflection(method),
             existing(method.getReturnType()),
             methodName,
-            new ArrayList<Parameter>(),
+            parameters,
             new ArrayList<Statement>());
       }
     }

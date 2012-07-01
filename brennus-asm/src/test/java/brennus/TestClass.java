@@ -21,12 +21,16 @@ public class TestClass extends BaseTestClass {
   public Object get(int i) {
     switch (i) {
     case 0:
+      println("get(0)");
       return getFoo();
     case 1:
+      println("get(1)");
       return getBar();
     case 72:
+      println("get(72)");
       return null;
     default:
+      println("get(?)");
       throw error();
     }
   }
@@ -40,11 +44,17 @@ public class TestClass extends BaseTestClass {
   public void set(int i, Object o) {
     switch (i) {
     case 0:
+      println("set(0)");
       this.foo = (String)o;
+      break;
     case 1:
+      println("set(1)");
       this.bar = (Integer)o;
+      break;
     case 72:
+      println("set(72)");
     default:
+      println("set(?)");
       throw error();
     }
   }

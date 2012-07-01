@@ -51,8 +51,8 @@ public class ClassBuilder {
     return this;
   }
 
-  public MethodDeclarationBuilder startMethod(Type returnType, String name, Keyword... keywords) {
-    return new MethodDeclarationBuilder(name.replace(".", "/"), new MemberFlags(keywords), returnType, name, new MethodHandler() {
+  public MethodDeclarationBuilder startMethod(Type returnType, String methodName, Keyword... keywords) {
+    return new MethodDeclarationBuilder(this.name.replace(".", "/"), new MemberFlags(keywords), returnType, methodName, new MethodHandler() {
       public ClassBuilder handleMethod(Method method) {
         addMethod(method);
         return ClassBuilder.this;

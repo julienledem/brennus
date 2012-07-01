@@ -22,6 +22,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.util.ASMifierClassVisitor;
+import org.objectweb.asm.util.CheckClassAdapter;
 
 class ASMTypeGeneratorVisitor implements Opcodes {
 
@@ -32,6 +33,7 @@ class ASMTypeGeneratorVisitor implements Opcodes {
     classNode.version = Opcodes.V1_6;
     classNode.access = ACC_PUBLIC | ACC_SUPER;
 //    classNode.signature ???
+    classNode.sourceFile = "generated";
     classNode.name = futureType.getClassIdentifier();
     classNode.superName = futureType.getExtending().getClassIdentifier();
     List<Field> fields = futureType.getFields();
@@ -72,8 +74,8 @@ class ASMTypeGeneratorVisitor implements Opcodes {
 //    classNode.accept(new TraceClassVisitor(new PrintWriter(System.out)));
     classNode.accept(new ASMifierClassVisitor(new PrintWriter(System.out)));
     ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
-//    ClassVisitor cv = new CheckClassAdapter(cw);
-    ClassVisitor cv = cw;
+    ClassVisitor cv = new CheckClassAdapter(cw, true);
+//    ClassVisitor cv = cw;
     classNode.accept(cv);
     return cw.toByteArray();
   }

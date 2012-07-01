@@ -27,12 +27,16 @@ public class ExpressionBuilder<T> {
     return new ValueExpressionBuilder<T>(expressionHandler, new GetExpression(name));
   }
 
-  public ValueExpressionBuilder<T> call(String methodName) {
-    return new ValueExpressionBuilder<T>(expressionHandler, new CallMethodExpression(methodName));
+  public MethodCallBuilder<T> call(final String methodName) {
+    return new MethodCallBuilder<T>(methodName, expressionHandler);
   }
 
   public ValueExpressionBuilder<T> literal(int i) {
     return new ValueExpressionBuilder<T>(expressionHandler, new LiteralExpression(i));
+  }
+
+  public ValueExpressionBuilder<T> literal(String string) {
+    return new ValueExpressionBuilder<T>(expressionHandler, new LiteralExpression(string));
   }
 
 }

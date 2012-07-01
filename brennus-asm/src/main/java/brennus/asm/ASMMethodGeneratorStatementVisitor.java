@@ -29,6 +29,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -40,6 +41,7 @@ class ASMMethodGeneratorStatementVisitor implements Opcodes, StatementVisitor {
   private final MethodByteCodeContext methodByteCodeContext;
 
   private LabelNode currentLabel;
+  private LabelNode endLabel;
 
   public ASMMethodGeneratorStatementVisitor(MethodContext methodContext) {
     this.methodContext = methodContext;
@@ -62,8 +64,7 @@ class ASMMethodGeneratorStatementVisitor implements Opcodes, StatementVisitor {
 
   @Override
   public void visit(ExpressionStatement methodCallStatement) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("TODO");
+    visit(methodCallStatement.getExpression());
   }
 
   @Override
@@ -74,9 +75,11 @@ class ASMMethodGeneratorStatementVisitor implements Opcodes, StatementVisitor {
     LabelNode[] labels = new LabelNode[caseStatements.size()];
     for (int i = 0; i < labels.length; i++) {
       labels[i] = new LabelNode();
-      values[i] = ((LiteralExpression)caseStatements.get(i).getExpression()).getValue();
+      // TODO handle other values
+      values[i] = ((Integer)((LiteralExpression)caseStatements.get(i).getExpression()).getValue()).intValue();
     }
     LabelNode defaultLabel = new LabelNode();
+    endLabel = new LabelNode();
     methodByteCodeContext.addInstruction(new LookupSwitchInsnNode(defaultLabel, values, labels));
     int i=0;
     for (CaseStatement caseStatement : caseStatements) {
@@ -91,6 +94,8 @@ class ASMMethodGeneratorStatementVisitor implements Opcodes, StatementVisitor {
     } else {
       methodByteCodeContext.addInstruction(defaultLabel);
     }
+    methodByteCodeContext.addInstruction(endLabel);
+    endLabel = null;
   }
 
   @Override
@@ -101,6 +106,9 @@ class ASMMethodGeneratorStatementVisitor implements Opcodes, StatementVisitor {
     List<Statement> statements = caseStatement.getStatements();
     for (Statement statement : statements) {
       statement.accept(this);
+    }
+    if (caseStatement.isBreakCase()) {
+      methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, endLabel));
     }
   }
 

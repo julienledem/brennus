@@ -3,6 +3,7 @@ package brennus.asm;
 import brennus.MethodContext;
 import brennus.model.BoxingTypeConversion;
 import brennus.model.CastTypeConversion;
+import brennus.model.ExistingType;
 import brennus.model.Method;
 import brennus.model.PrimitiveType;
 import brennus.model.Type;
@@ -12,6 +13,9 @@ import brennus.model.UnboxingTypeConversion;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
@@ -22,6 +26,7 @@ class MethodByteCodeContext implements Opcodes {
   private final MethodContext methodContext;
   private final MethodNode methodNode;
   private int maxv = 0;
+  private int stack = 0;
 
   MethodByteCodeContext(MethodContext methodContext) {
     Method method = methodContext.getMethod();
@@ -30,7 +35,7 @@ class MethodByteCodeContext implements Opcodes {
   }
 
   public void addInstruction(AbstractInsnNode insnNode) {
-    getMethodNode().instructions.add(insnNode);
+    methodNode.instructions.add(insnNode);
   }
 
   public void load(int load, int i) {
@@ -39,9 +44,13 @@ class MethodByteCodeContext implements Opcodes {
   }
 
   public MethodNode getMethodNode() {
+    if (methodContext.getReturnType().equals(ExistingType.VOID)) {
+      addInstruction(new InsnNode(RETURN));
+    }
     methodNode.visitMaxs(
         Math.max(1,
-        methodContext.getMethod().getParameters().size()), maxv);
+        methodContext.getMethod().getParameters().size())
+        + stack, maxv);
     return methodNode;
   }
 
@@ -81,5 +90,17 @@ class MethodByteCodeContext implements Opcodes {
         cast(castTypeConversion.getType());
       }
     });
+  }
+
+  public void push(int bipush, int intValue) {
+    // TODO: better than this
+    stack++;
+    addInstruction(new IntInsnNode(BIPUSH, intValue));
+  }
+
+  public void ldc(String value) {
+    // TODO: better than this
+    stack++;
+    addInstruction(new LdcInsnNode(value));
   }
 }

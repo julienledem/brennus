@@ -17,9 +17,12 @@ abstract public class StatementBuilder<T> {
     T handleStatement(Statement statement);
   }
 
+  /**
+   * @return the statement handler to be called with the finished statement
+   */
   protected abstract StatementHandler<T> statementHandler();
 
-  public ExpressionBuilder<T> returnExp() {
+  final public ExpressionBuilder<T> returnExp() {
     return new ExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {
         return statementHandler().handleStatement(new ReturnStatement(e));
@@ -27,7 +30,7 @@ abstract public class StatementBuilder<T> {
     });
   }
 
-  public ExpressionBuilder<SwitchBuilder<T>> switchOn() {
+  final public ExpressionBuilder<SwitchBuilder<T>> switchOn() {
     return new ExpressionBuilder<SwitchBuilder<T>>(new ExpressionHandler<SwitchBuilder<T>>() {
       public SwitchBuilder<T> handleExpression(final Expression e) {
         return new SwitchBuilder<T>(e, new SwitchStatementsHandler<T>() {
@@ -39,7 +42,7 @@ abstract public class StatementBuilder<T> {
     });
   }
 
-  public ExpressionBuilder<T> throwExp() {
+  final public ExpressionBuilder<T> throwExp() {
     return new ExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {
         return statementHandler().handleStatement(new ThrowStatement(e));
@@ -47,7 +50,7 @@ abstract public class StatementBuilder<T> {
     });
   }
 
-  public ExpressionBuilder<T> set(final String to) {
+  final public ExpressionBuilder<T> set(final String to) {
     return new ExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {
         return statementHandler().handleStatement(new SetStatement(to, e));
@@ -55,11 +58,16 @@ abstract public class StatementBuilder<T> {
     });
   }
 
-  public ValueExpressionBuilder<T> call(String methodName) {
-    return new ExpressionBuilder<T>(new ExpressionHandler<T>() {
-      public T handleExpression(Expression e) {
-        return statementHandler().handleStatement(new ExpressionStatement(e));
+  /**
+   * creates a call statement
+   * @param methodName
+   * @return a methodCallBuilder for optionally passing parameters
+   */
+  final public MethodCallBuilder<T> call(String methodName) {
+    return new MethodCallBuilder<T>(methodName, new ExpressionHandler<T>() {
+      public T handleExpression(Expression expression) {
+        return statementHandler().handleStatement(new ExpressionStatement(expression));
       }
-    }).call(methodName);
+    });
   }
 }

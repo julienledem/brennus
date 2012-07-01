@@ -6,8 +6,8 @@ abstract public class BaseTestClass {
     return new RuntimeException("param not valid");
   }
 
-  public void println(String string) {
-    System.out.println(string);
+  public void println(Object o) {
+    System.out.println(o);
   }
 
   abstract public int inc(int i);

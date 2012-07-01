@@ -1,9 +1,12 @@
 package brennus.asm;
 
+import java.util.List;
+
 import brennus.MethodContext;
 import brennus.model.AddExpression;
 import brennus.model.CallMethodExpression;
 import brennus.model.ExistingType;
+import brennus.model.Expression;
 import brennus.model.ExpressionVisitor;
 import brennus.model.Field;
 import brennus.model.FieldAccessType;
@@ -20,6 +23,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 
 class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
@@ -61,10 +65,15 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
 //    System.out.println(callMethodExpression);
     methodByteCodeContext.load(ALOAD, 0);
     String methodName = callMethodExpression.getMethodName();
+    List<Expression> parameters = callMethodExpression.getParameters();
+    for (Expression expression : parameters) {
+      expression.accept(this);
+    }
+    // TODO: use parameter count/types for lookup and check they match
     Method method = getMethod(methodName);
     if (method != null) {
 //      System.out.println(method);
-      methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKEVIRTUAL, methodContext.getType().getClassIdentifier(), methodName, method.getSignature()));
+      methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKEVIRTUAL, method.getTypeName(), methodName, method.getSignature()));
       lastExpressionType = method.getReturnType();
     } else {
       throw new RuntimeException("can't find method "+methodName+" in hierarchy of "+methodContext.getType());
@@ -77,9 +86,13 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
 
   @Override
   public void visit(LiteralExpression literalExpression) {
+    lastExpressionType = literalExpression.getType();
     // TODO: support other types
-    lastExpressionType = ExistingType.INT;
-    methodByteCodeContext.addInstruction(new IntInsnNode(BIPUSH, literalExpression.getValue()));
+    if (literalExpression.getType().getExisting().equals(Integer.TYPE)) {
+      methodByteCodeContext.push(BIPUSH, ((Integer)literalExpression.getValue()).intValue());
+    } else if (literalExpression.getType().getExisting().equals(String.class)) {
+      methodByteCodeContext.ldc((String)literalExpression.getValue());
+    }
   }
 
   @Override
