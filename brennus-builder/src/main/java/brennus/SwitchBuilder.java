@@ -24,6 +24,7 @@ public class SwitchBuilder<T> {
   }
 
   private final Expression switchOnExpression;
+  private final int line;
   private final SwitchStatementsHandler<T> switchStatementHandler;
   private final List<CaseStatement> statements = new ArrayList<CaseStatement>();
   private CaseStatement defaultCaseStatement;
@@ -31,6 +32,7 @@ public class SwitchBuilder<T> {
   SwitchBuilder(Expression switchOnExpression, SwitchStatementsHandler<T> switchStatementHandler) {
     this.switchOnExpression = switchOnExpression;
     this.switchStatementHandler = switchStatementHandler;
+    this.line = MethodContext.getSourceLineNumber();
   }
 
   public CaseBuilder<T> caseBlock(int value) {
@@ -55,7 +57,7 @@ public class SwitchBuilder<T> {
   }
 
   public T endSwitch() {
-    return switchStatementHandler.handleStatement(new SwitchStatement(switchOnExpression, statements, defaultCaseStatement));
+    return switchStatementHandler.handleStatement(new SwitchStatement(line, switchOnExpression, statements, defaultCaseStatement));
   }
 
 }

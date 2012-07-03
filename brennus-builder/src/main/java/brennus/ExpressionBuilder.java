@@ -1,6 +1,5 @@
 package brennus;
 
-import brennus.model.CallMethodExpression;
 import brennus.model.Expression;
 import brennus.model.GetExpression;
 import brennus.model.LiteralExpression;

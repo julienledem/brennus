@@ -3,9 +3,11 @@ package brennus.model;
 abstract public class Statement {
 
   private final Expression expression;
+  private final int line;
 
-  public Statement(Expression expression) {
+  public Statement(Expression expression, int line) {
     this.expression = expression;
+    this.line = line;
   }
 
   public Expression getExpression() {
@@ -17,5 +19,9 @@ abstract public class Statement {
   @Override
   public String toString() {
     return "["+getClass().getSimpleName() + " " + expression + "]";
+  }
+
+  public int getLine() {
+    return line;
   }
 }

@@ -4,8 +4,8 @@ import static brennus.model.ExceptionHandlingVisitor.wrap;
 
 public class ThrowStatement extends Statement {
 
-  public ThrowStatement(Expression expression) {
-    super(expression);
+  public ThrowStatement(int line, Expression expression) {
+    super(expression, line);
   }
 
   @Override

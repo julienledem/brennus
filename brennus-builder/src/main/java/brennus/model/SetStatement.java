@@ -7,8 +7,8 @@ public class SetStatement extends Statement {
 
   private final String to;
 
-  public SetStatement(String to, Expression expression) {
-    super(expression);
+  public SetStatement(int line, String to, Expression expression) {
+    super(expression, line);
     this.to = to;
   }
 

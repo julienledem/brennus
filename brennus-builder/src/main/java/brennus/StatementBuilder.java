@@ -25,7 +25,7 @@ abstract public class StatementBuilder<T> {
   final public ExpressionBuilder<T> returnExp() {
     return new ExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {
-        return statementHandler().handleStatement(new ReturnStatement(e));
+        return statementHandler().handleStatement(new ReturnStatement(MethodContext.getSourceLineNumber(), e));
       }
     });
   }
@@ -45,7 +45,7 @@ abstract public class StatementBuilder<T> {
   final public ExpressionBuilder<T> throwExp() {
     return new ExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {
-        return statementHandler().handleStatement(new ThrowStatement(e));
+        return statementHandler().handleStatement(new ThrowStatement(MethodContext.getSourceLineNumber(), e));
       }
     });
   }
@@ -53,7 +53,7 @@ abstract public class StatementBuilder<T> {
   final public ExpressionBuilder<T> set(final String to) {
     return new ExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {
-        return statementHandler().handleStatement(new SetStatement(to, e));
+        return statementHandler().handleStatement(new SetStatement(MethodContext.getSourceLineNumber(), to, e));
       }
     });
   }
@@ -66,7 +66,7 @@ abstract public class StatementBuilder<T> {
   final public MethodCallBuilder<T> call(String methodName) {
     return new MethodCallBuilder<T>(methodName, new ExpressionHandler<T>() {
       public T handleExpression(Expression expression) {
-        return statementHandler().handleStatement(new ExpressionStatement(expression));
+        return statementHandler().handleStatement(new ExpressionStatement(MethodContext.getSourceLineNumber(), expression));
       }
     });
   }

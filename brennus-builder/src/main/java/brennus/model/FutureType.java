@@ -13,14 +13,16 @@ public final class FutureType extends Type {
   private final List<Field> staticFields;
   private final List<Method> methods;
   private final List<Method> staticMethods;
+  private final String sourceFile;
 
-  public FutureType(String name, Type extending, List<Field> fields, List<Field> staticFields, List<Method> methods, List<Method> staticMethods) {
+  public FutureType(String name, Type extending, List<Field> fields, List<Field> staticFields, List<Method> methods, List<Method> staticMethods, String sourceFile) {
     this.name = name;
     this.extending = extending;
     this.fields = Collections.unmodifiableList(fields);
     this.staticFields = Collections.unmodifiableList(staticFields);
     this.methods = Collections.unmodifiableList(methods);
     this.staticMethods = Collections.unmodifiableList(staticMethods);
+    this.sourceFile = sourceFile;
   }
 
   @Override
@@ -96,6 +98,10 @@ public final class FutureType extends Type {
     type.accept(typeVisitor);
     System.out.println(this+".isAssignableFrom."+type+"="+typeVisitor.isAssignableFrom);
     return typeVisitor.isAssignableFrom;
+  }
+
+  public String getSourceFile() {
+    return sourceFile;
   }
 
 }

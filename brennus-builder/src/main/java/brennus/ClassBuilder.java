@@ -26,9 +26,16 @@ public class ClassBuilder {
   private final List<Field> staticFields = new ArrayList<Field>();
   private final List<Method> methods = new ArrayList<Method>();
   private final List<Method> staticMethods = new ArrayList<Method>();
+  private final String sourceFile;
 
   private ClassBuilder(String name) {
     this.name = name;
+    StackTraceElement creatingStackFrame = MethodContext.getCreatingStackFrame();
+    if (creatingStackFrame == null) {
+      sourceFile = "generated";
+    } else {
+      sourceFile = creatingStackFrame.getFileName();
+    }
   }
 
   // builder methods
@@ -61,7 +68,7 @@ public class ClassBuilder {
   }
 
   public FutureType endClass() {
-    FutureType futureType = new FutureType(getName(), extending == null ? ExistingType.OBJECT : extending, fields, staticFields, methods, staticMethods);
+    FutureType futureType = new FutureType(getName(), extending == null ? ExistingType.OBJECT : extending, fields, staticFields, methods, staticMethods, sourceFile);
     new ClassValidator().validate(futureType);
     return futureType;
   }
@@ -75,4 +82,5 @@ public class ClassBuilder {
   public String getName() {
     return name;
   }
+
 }

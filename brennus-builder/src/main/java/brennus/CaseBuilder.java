@@ -23,14 +23,16 @@ public class CaseBuilder<T> extends StatementBuilder<CaseBuilder<T>> {
   private final LiteralExpression literalExpression;
   private final CaseStatementHandler<T> statementHandler;
   private final List<Statement> statements = new ArrayList<Statement>();
+  private final int line;
 
   CaseBuilder(LiteralExpression literalExpression, CaseStatementHandler<T> statementHandler) {
     this.literalExpression = literalExpression;
     this.statementHandler = statementHandler;
+    line = MethodContext.getSourceLineNumber();
   }
 
   public SwitchBuilder<T> endCase() {
-    return statementHandler.handleStatement(new CaseStatement(literalExpression, statements, false));
+    return statementHandler.handleStatement(new CaseStatement(line, literalExpression, statements, false));
   }
 
   protected StatementHandler<CaseBuilder<T>> statementHandler() {
@@ -43,7 +45,7 @@ public class CaseBuilder<T> extends StatementBuilder<CaseBuilder<T>> {
   }
 
   public SwitchBuilder<T> breakCase() {
-    return statementHandler.handleStatement(new CaseStatement(literalExpression, statements, true));
+    return statementHandler.handleStatement(new CaseStatement(line, literalExpression, statements, true));
   }
 
 }

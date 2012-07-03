@@ -3,16 +3,13 @@ package brennus.asm;
 import java.util.List;
 
 import brennus.MethodContext;
-import brennus.model.BoxingTypeConversion;
 import brennus.model.CaseStatement;
 import brennus.model.Expression;
 import brennus.model.ExpressionStatement;
 import brennus.model.Field;
 import brennus.model.FieldAccessType;
 import brennus.model.LiteralExpression;
-import brennus.model.Method;
 import brennus.model.ParameterAccessType;
-import brennus.model.PrimitiveType;
 import brennus.model.ReturnStatement;
 import brennus.model.SetStatement;
 import brennus.model.Statement;
@@ -20,9 +17,6 @@ import brennus.model.StatementVisitor;
 import brennus.model.SwitchStatement;
 import brennus.model.ThrowStatement;
 import brennus.model.Type;
-import brennus.model.TypeConversion;
-import brennus.model.TypeConversionVisitor;
-import brennus.model.UnboxingTypeConversion;
 import brennus.model.VarAccessTypeVisitor;
 
 import org.objectweb.asm.Opcodes;
@@ -59,7 +53,7 @@ class ASMMethodGeneratorStatementVisitor implements Opcodes, StatementVisitor {
     Type expressionType = visit(returnStatement.getExpression());
     Type returnType = methodContext.getReturnType();
     methodByteCodeContext.handleConversion(expressionType, returnType);
-    methodByteCodeContext.addInstruction(new InsnNode(ASMOps.getReturn(returnType)));
+    methodByteCodeContext.addReturn(returnType);
   }
 
   @Override
@@ -101,11 +95,11 @@ class ASMMethodGeneratorStatementVisitor implements Opcodes, StatementVisitor {
   @Override
   public void visit(CaseStatement caseStatement) {
 //    System.out.println(caseStatement);
-    methodByteCodeContext.addInstruction(currentLabel);
+    methodByteCodeContext.addLabel(caseStatement.getLine(), currentLabel);
     methodByteCodeContext.addInstruction(new FrameNode(F_SAME, 0, null, 0, null));
     List<Statement> statements = caseStatement.getStatements();
     for (Statement statement : statements) {
-      statement.accept(this);
+      this.visit(statement);
     }
     if (caseStatement.isBreakCase()) {
       methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, endLabel));
@@ -121,7 +115,7 @@ class ASMMethodGeneratorStatementVisitor implements Opcodes, StatementVisitor {
 
   @Override
   public void visit(SetStatement setStatement) {
-    methodByteCodeContext.load(ALOAD, 0);
+    methodByteCodeContext.loadThis();
     final Type expressionType = visit(setStatement.getExpression());
     methodContext.getVarAccessType(setStatement.getTo()).accept(
     new VarAccessTypeVisitor() {
@@ -141,12 +135,16 @@ class ASMMethodGeneratorStatementVisitor implements Opcodes, StatementVisitor {
 
 
   public void addDefaultConstructorStatements() {
-    methodByteCodeContext.load(ALOAD, 0);
+    methodByteCodeContext.loadThis();
     methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKESPECIAL, methodContext.getType().getExtending().getClassIdentifier(), "<init>", "()V"));
-    methodByteCodeContext.addInstruction(new InsnNode(RETURN));
   }
 
   public MethodNode getMethodNode() {
     return methodByteCodeContext.getMethodNode();
+  }
+
+  public void visit(Statement statement) {
+    methodByteCodeContext.addLineNumber(statement.getLine());
+    statement.accept(this);
   }
 }

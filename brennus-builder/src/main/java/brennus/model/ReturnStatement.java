@@ -5,8 +5,8 @@ import static brennus.model.ExceptionHandlingVisitor.wrap;
 
 public class ReturnStatement extends Statement {
 
-  public ReturnStatement(Expression expression) {
-    super(expression);
+  public ReturnStatement(int line, Expression expression) {
+    super(expression, line);
   }
 
   @Override

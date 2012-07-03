@@ -22,8 +22,6 @@ import brennus.model.VarAccessTypeVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.IntInsnNode;
-import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 
 class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
@@ -45,7 +43,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
     varAccessType.accept(new VarAccessTypeVisitor() {
       public void visit(FieldAccessType fieldAccessType) {
         Field field = fieldAccessType.getField();
-        methodByteCodeContext.load(ALOAD, 0);
+        methodByteCodeContext.loadThis();
         methodByteCodeContext.addInstruction(new FieldInsnNode(GETFIELD, methodContext.getType().getClassIdentifier(), getExpression.getFieldName(), field.getSignature()));
         lastExpressionType = field.getType();
       }
@@ -54,7 +52,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
         //        System.out.println(getExpression.getFieldName()+" "+param.getIndex());
         Parameter param = parameterAccessType.getParam();
         // TODO: check boxing
-        methodByteCodeContext.load(ASMOps.getLoad(param.getType()), param.getIndex() + 1);
+        methodByteCodeContext.load(param.getType(), param.getIndex() + 1);
         lastExpressionType = param.getType();
       }
     });
@@ -63,16 +61,25 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
   @Override
   public void visit(CallMethodExpression callMethodExpression) {
 //    System.out.println(callMethodExpression);
-    methodByteCodeContext.load(ALOAD, 0);
+    methodByteCodeContext.loadThis();
     String methodName = callMethodExpression.getMethodName();
-    List<Expression> parameters = callMethodExpression.getParameters();
-    for (Expression expression : parameters) {
-      expression.accept(this);
-    }
-    // TODO: use parameter count/types for lookup and check they match
+    // TODO: use parameter count/types for lookup
     Method method = getMethod(methodName);
     if (method != null) {
-//      System.out.println(method);
+      List<Expression> parameterValues = callMethodExpression.getParameters();
+      List<Parameter> parameterTypes = method.getParameters();
+      if (parameterTypes.size() != parameterValues.size()) {
+        throw new RuntimeException("parameters passed do not match, parameters declared in "+method);
+      }
+      for (int i = 0; i < parameterValues.size(); i++) {
+        Expression expression = parameterValues.get(i);
+        Type expected = parameterTypes.get(i).getType();
+        expression.accept(this);
+        // TODO: handle more than 1 parameter !!!
+        // don't assume first on the stack
+        methodByteCodeContext.handleConversion(lastExpressionType, expected);
+      }
+      //      System.out.println(method);
       methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKEVIRTUAL, method.getTypeName(), methodName, method.getSignature()));
       lastExpressionType = method.getReturnType();
     } else {

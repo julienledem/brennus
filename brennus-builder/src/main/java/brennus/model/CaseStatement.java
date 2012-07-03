@@ -9,8 +9,8 @@ public class CaseStatement extends Statement {
   private final List<Statement> statements;
   private final boolean breakCase;
 
-  public CaseStatement(Expression value, List<Statement> statements, boolean breakCase) {
-    super(value);
+  public CaseStatement(int line, Expression value, List<Statement> statements, boolean breakCase) {
+    super(value, line);
     this.statements = statements;
     this.breakCase = breakCase;
   }

@@ -10,8 +10,8 @@ public class SwitchStatement extends Statement {
   private final List<CaseStatement> caseStatements;
   private final CaseStatement defaultCaseStatement;
 
-  public SwitchStatement(Expression expression, List<CaseStatement> caseStatements, CaseStatement defaultCaseStatement) {
-    super(expression);
+  public SwitchStatement(int line, Expression expression, List<CaseStatement> caseStatements, CaseStatement defaultCaseStatement) {
+    super(expression, line);
     this.caseStatements = Collections.unmodifiableList(caseStatements);
     this.defaultCaseStatement = defaultCaseStatement;
 

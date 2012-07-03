@@ -18,6 +18,26 @@ import brennus.model.VarAccessType;
 
 public class MethodContext {
 
+  public static int getSourceLineNumber() {
+    StackTraceElement creatingStackFrame = getCreatingStackFrame();
+    return creatingStackFrame!=null && creatingStackFrame.getLineNumber()>0 ? creatingStackFrame.getLineNumber() : 0;
+  }
+
+  public static StackTraceElement getCreatingStackFrame() {
+    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+    String builderPackageName = MethodContext.class.getPackage().getName();
+    for (StackTraceElement stackTraceElement : stackTrace) {
+      String className = stackTraceElement.getClassName();
+      String packageName = className.substring(0, className.lastIndexOf("."));
+      if (!packageName.startsWith("java.")
+          && !packageName.equals(builderPackageName)
+          ) {
+        return stackTraceElement;
+      }
+    }
+    return null;
+  }
+
   private final FutureType type;
   private final Method method;
 
