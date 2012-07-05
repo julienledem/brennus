@@ -18,4 +18,6 @@ abstract public class BaseTestClass {
 
   abstract public void set(int i, Object o);
 
+  abstract public int sign(int i);
+
 }

@@ -58,4 +58,16 @@ public class TestClass extends BaseTestClass {
       throw error();
     }
   }
+
+  public int sign(int i) {
+    if ((i == 42) == true) {
+      return 42;
+    } else {
+    }
+    if (i > 42) {
+      return 43;
+    } else {
+      return -41;
+    }
+  }
 }

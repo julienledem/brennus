@@ -3,7 +3,7 @@ package brennus.printer;
 import java.util.Collection;
 import java.util.List;
 
-import brennus.model.AddExpression;
+import brennus.model.BinaryExpression;
 import brennus.model.CallMethodExpression;
 import brennus.model.CaseStatement;
 import brennus.model.ExistingType;
@@ -13,6 +13,7 @@ import brennus.model.ExpressionVisitor;
 import brennus.model.Field;
 import brennus.model.FutureType;
 import brennus.model.GetExpression;
+import brennus.model.IfStatement;
 import brennus.model.LiteralExpression;
 import brennus.model.MemberFlags;
 import brennus.model.Method;
@@ -193,6 +194,22 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
     println(setStatement.getTo() + " = " + toString(setStatement.getExpression()) + ";");
   }
 
+  @Override
+  public void visit(IfStatement ifStatement) {
+    println("if ("+toString(ifStatement.getExpression())+") {");
+    incIndent();
+    for (Statement statement : ifStatement.getThenStatements()) {
+      statement.accept(this);
+    }
+    decIndent();
+    println("} else {");
+    incIndent();
+    for (Statement statement : ifStatement.getElseStatements()) {
+      statement.accept(this);
+    }
+    decIndent();
+    println("}");
+  }
 
 }
 class ExpressionStringifierVisitor implements ExpressionVisitor {
@@ -232,10 +249,10 @@ class ExpressionStringifierVisitor implements ExpressionVisitor {
   }
 
   @Override
-  public void visit(AddExpression addExpression) {
-    addExpression.getLeftExpression().accept(this);
-    sb.append(" + ");
-    addExpression.getRightExpression().accept(this);
+  public void visit(BinaryExpression binaryExpression) {
+    binaryExpression.getLeftExpression().accept(this);
+    sb.append(" "+binaryExpression.getOperator().getRepresentation()+" ");
+    binaryExpression.getRightExpression().accept(this);
   }
 
   @Override

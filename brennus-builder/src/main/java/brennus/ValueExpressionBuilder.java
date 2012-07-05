@@ -1,7 +1,10 @@
 package brennus;
 
+import static brennus.model.BinaryOperator.*;
+
 import brennus.ExpressionBuilder.ExpressionHandler;
-import brennus.model.AddExpression;
+import brennus.model.BinaryExpression;
+import brennus.model.BinaryOperator;
 import brennus.model.Expression;
 
 public class ValueExpressionBuilder<T> {
@@ -20,15 +23,27 @@ public class ValueExpressionBuilder<T> {
   }
 
   public ExpressionBuilder<T> add() {
-    return new ExpressionBuilder<T>(new ExpressionHandler<T>() {
-      public T handleExpression(Expression e) {
-        return expressionHandler.handleExpression(new AddExpression(expression, e));
-      }
-    });
+    return operator(PLUS);
+  }
+
+  public ExpressionBuilder<T> isEqualTo() {
+    return operator(EQUALS);
+  }
+
+  public ExpressionBuilder<T> isGreaterThan() {
+    return operator(GREATER_THAN);
   }
 
   public T end() {
     return expressionHandler.handleExpression(expression);
+  }
+
+  private ExpressionBuilder<T> operator(final BinaryOperator operator) {
+    return new ExpressionBuilder<T>(new ExpressionHandler<T>() {
+      public T handleExpression(Expression e) {
+        return expressionHandler.handleExpression(new BinaryExpression(expression, operator, e));
+      }
+    });
   }
 
 }

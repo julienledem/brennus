@@ -2,13 +2,15 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
-public class AddExpression extends Expression {
+public class BinaryExpression extends Expression {
 
   private final Expression leftExpression;
+  private final BinaryOperator operator;
   private final Expression rightExpression;
 
-  public AddExpression(Expression leftExpression, Expression rightExpression) {
+  public BinaryExpression(Expression leftExpression, BinaryOperator operator, Expression rightExpression) {
     this.leftExpression = leftExpression;
+    this.operator = operator;
     this.rightExpression = rightExpression;
   }
 
@@ -21,12 +23,16 @@ public class AddExpression extends Expression {
     return leftExpression;
   }
 
+  public BinaryOperator getOperator() {
+    return operator;
+  }
+
   public Expression getRightExpression() {
     return rightExpression;
   }
 
   @Override
   public String toString() {
-    return "["+leftExpression + " + " + rightExpression+"]";
+    return "["+leftExpression + " " + getOperator().getRepresentation() + " " + rightExpression+"]";
   }
 }

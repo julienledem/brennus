@@ -7,9 +7,9 @@ import brennus.MethodBuilder.MethodHandler;
 import brennus.model.ExistingType;
 import brennus.model.Field;
 import brennus.model.FutureType;
-import brennus.model.Keyword;
 import brennus.model.MemberFlags;
 import brennus.model.Method;
+import brennus.model.Protection;
 import brennus.model.Type;
 
 /**
@@ -52,19 +52,22 @@ public class ClassBuilder {
     return this;
   }
 
-  public ClassBuilder field(Type type, String name, Keyword... keywords) {
-    Field f = new Field(new MemberFlags(keywords), type, name);
-    (f.isStatic() ? staticFields : fields).add(f);
+  public ClassBuilder field(Protection protection, Type type, String name) {
+    field(protection, type, name, false);
     return this;
   }
 
-  public MethodDeclarationBuilder startMethod(Type returnType, String methodName, Keyword... keywords) {
-    return new MethodDeclarationBuilder(this.name.replace(".", "/"), new MemberFlags(keywords), returnType, methodName, new MethodHandler() {
-      public ClassBuilder handleMethod(Method method) {
-        addMethod(method);
-        return ClassBuilder.this;
-      }
-    });
+  public ClassBuilder staticField(Protection protection, Type type, String name) {
+    field(protection, type, name, true);
+    return this;
+  }
+
+  public MethodDeclarationBuilder startStaticMethod(Protection protection, Type returnType, String methodName) {
+    return startMethod(protection, returnType, methodName, true);
+  }
+
+  public MethodDeclarationBuilder startMethod(Protection protection, Type returnType, String methodName) {
+    return startMethod(protection, returnType, methodName, false);
   }
 
   public FutureType endClass() {
@@ -75,8 +78,17 @@ public class ClassBuilder {
 
   // internals
 
-  private void addMethod(Method method) {
-    (method.isStatic() ? staticMethods : methods).add(method);
+  private MethodDeclarationBuilder startMethod(Protection protection, Type returnType, String methodName, final boolean isStatic) {
+    return new MethodDeclarationBuilder(this.name.replace(".", "/"), new MemberFlags(isStatic, protection), returnType, methodName, new MethodHandler() {
+      public ClassBuilder handleMethod(Method method) {
+        (isStatic ? staticMethods : methods).add(method);
+        return ClassBuilder.this;
+      }
+    });
+  }
+
+  private void field(Protection protection, Type type, String name, boolean isStatic) {
+    (isStatic ? staticFields : fields).add(new Field(new MemberFlags(isStatic, protection), type, name));
   }
 
   public String getName() {

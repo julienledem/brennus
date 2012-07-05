@@ -3,11 +3,16 @@ package brennus.asm;
 import java.util.List;
 
 import brennus.MethodContext;
+import brennus.model.BinaryExpression;
+import brennus.model.CallMethodExpression;
 import brennus.model.CaseStatement;
 import brennus.model.Expression;
 import brennus.model.ExpressionStatement;
+import brennus.model.ExpressionVisitor;
 import brennus.model.Field;
 import brennus.model.FieldAccessType;
+import brennus.model.GetExpression;
+import brennus.model.IfStatement;
 import brennus.model.LiteralExpression;
 import brennus.model.ParameterAccessType;
 import brennus.model.ReturnStatement;
@@ -29,7 +34,7 @@ import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
-class ASMMethodGeneratorStatementVisitor implements Opcodes, StatementVisitor {
+class ASMMethodGenerator implements Opcodes, StatementVisitor {
 
   private final MethodContext methodContext;
   private final MethodByteCodeContext methodByteCodeContext;
@@ -37,7 +42,7 @@ class ASMMethodGeneratorStatementVisitor implements Opcodes, StatementVisitor {
   private LabelNode currentLabel;
   private LabelNode endLabel;
 
-  public ASMMethodGeneratorStatementVisitor(MethodContext methodContext) {
+  public ASMMethodGenerator(MethodContext methodContext) {
     this.methodContext = methodContext;
     this.methodByteCodeContext = new MethodByteCodeContext(methodContext);
   }
@@ -146,5 +151,57 @@ class ASMMethodGeneratorStatementVisitor implements Opcodes, StatementVisitor {
   public void visit(Statement statement) {
     methodByteCodeContext.addLineNumber(statement.getLine());
     statement.accept(this);
+  }
+
+  @Override
+  public void visit(final IfStatement ifStatement) {
+    ifStatement.getExpression().accept(new ExpressionVisitor() {
+      public void visit(BinaryExpression binaryExpression) {
+        ASMMethodGenerator.this.visit(binaryExpression.getLeftExpression());
+        ASMMethodGenerator.this.visit(binaryExpression.getRightExpression());
+        List<Statement> firstStatements;
+        List<Statement> secondStatements;
+
+        int jumpInst;
+        switch (binaryExpression.getOperator()) {
+        case EQUALS:
+          // TODO handle types
+          jumpInst = IF_ICMPNE;
+          firstStatements = ifStatement.getThenStatements();
+          secondStatements = ifStatement.getElseStatements();
+          break;
+        case GREATER_THAN:
+          jumpInst = IF_ICMPGT;
+          firstStatements = ifStatement.getElseStatements();
+          secondStatements = ifStatement.getThenStatements();
+          break;
+        default:
+          throw new UnsupportedOperationException("op: "+binaryExpression.getOperator());
+        }
+
+        LabelNode labelNode = new LabelNode();
+        methodByteCodeContext.addInstruction(new JumpInsnNode(jumpInst, labelNode));
+        for (Statement statement : firstStatements) {
+          ASMMethodGenerator.this.visit(statement);
+        }
+        methodByteCodeContext.addLabel(ifStatement.getLine(), labelNode);
+        for (Statement statement : secondStatements) {
+          ASMMethodGenerator.this.visit(statement);
+        }
+      }
+
+      public void visit(LiteralExpression literalExpression) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+      }
+
+      public void visit(CallMethodExpression callMethodExpression) {
+        throw new UnsupportedOperationException();
+      }
+
+      public void visit(GetExpression getFieldExpression) {
+        throw new UnsupportedOperationException();
+      }
+    });
   }
 }

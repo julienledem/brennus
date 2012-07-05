@@ -3,7 +3,7 @@ package brennus.asm;
 import java.util.List;
 
 import brennus.MethodContext;
-import brennus.model.AddExpression;
+import brennus.model.BinaryExpression;
 import brennus.model.CallMethodExpression;
 import brennus.model.ExistingType;
 import brennus.model.Expression;
@@ -103,12 +103,19 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
   }
 
   @Override
-  public void visit(AddExpression addExpression) {
+  public void visit(BinaryExpression binaryExpression) {
     // TODO: support other types
-    addExpression.getLeftExpression().accept(this);
-    addExpression.getRightExpression().accept(this);
+    binaryExpression.getLeftExpression().accept(this);
+    binaryExpression.getRightExpression().accept(this);
     lastExpressionType = ExistingType.INT;
-    methodByteCodeContext.addInstruction(new InsnNode(IADD));
+    switch (binaryExpression.getOperator()) {
+    case PLUS:
+      methodByteCodeContext.addInstruction(new InsnNode(IADD));
+      break;
+    default:
+      // TODO: other operators
+      throw new UnsupportedOperationException("op: "+binaryExpression.getOperator());
+    }
   }
 
   public Type getExpressionType() {

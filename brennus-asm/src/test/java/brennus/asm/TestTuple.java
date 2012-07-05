@@ -9,11 +9,9 @@ import static brennus.model.ExistingType.existing;
 import static brennus.model.Protection.PRIVATE;
 import static brennus.model.Protection.PUBLIC;
 import junit.framework.Assert;
-import brennus.BaseTestClass;
 import brennus.TestGeneration.DynamicClassLoader;
 import brennus.asm.ref.ReferenceClass;
 import brennus.model.FutureType;
-import brennus.printer.TypePrinter;
 
 import org.junit.Test;
 
@@ -26,12 +24,12 @@ public class TestTuple {
 
     FutureType testClass =
         startClass("brennus.asm.TestTuple$TestClass").extendsType(existing(BaseClass.class))
-          .field(STRING, "a", PRIVATE)
-          .field(INT, "b", PRIVATE)
+          .field(PRIVATE, STRING, "a")
+          .field(PRIVATE, INT, "b")
 
-          .startMethod(OBJECT, "get", PUBLIC).param(INT, "i")
-            .call("println").withParam().literal("get").end()
-            .call("println").withParam().get("i").end()
+          .startMethod(PUBLIC, OBJECT, "get").param(INT, "i")
+            .call("println").param().literal("get").end()
+            .call("println").param().get("i").end()
             .switchOn().get("i").end()
               .caseBlock(0)
                 .returnExp().get("a").end()
@@ -45,9 +43,9 @@ public class TestTuple {
             .endSwitch()
           .endMethod()
 
-          .startMethod(VOID, "set", PUBLIC).param(INT, "i").param(OBJECT, "o")
-            .call("println").withParam().literal("set").end()
-            .call("println").withParam().get("i").end()
+          .startMethod(PUBLIC, VOID, "set").param(INT, "i").param(OBJECT, "o")
+            .call("println").param().literal("set").end()
+            .call("println").param().get("i").end()
             .switchOn().get("i").end()
               .caseBlock(0)
                 .set("a").get("o").end()
@@ -67,11 +65,11 @@ public class TestTuple {
 
     DynamicClassLoader cl = new DynamicClassLoader();
     cl.define(testClass);
-    testSetGet((Class<? extends BaseClass>)cl.loadClass("brennus.asm.TestTuple$TestClass"));
+    testSetGet((Class<?>)cl.loadClass("brennus.asm.TestTuple$TestClass"));
   }
 
-  private void testSetGet(Class<? extends BaseClass> c) throws Exception {
-    BaseClass t = c.newInstance();
+  private void testSetGet(Class<?> c) throws Exception {
+    BaseClass t = (BaseClass)c.newInstance();
     t.set(0, "test");
     Assert.assertEquals("test", t.get(0));
     t.set(1, 12);

@@ -14,4 +14,6 @@ public interface StatementVisitor {
 
   void visit(SetStatement setStatement);
 
+  void visit(IfStatement ifStatement);
+
 }

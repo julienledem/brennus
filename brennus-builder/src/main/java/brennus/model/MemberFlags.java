@@ -1,5 +1,7 @@
 package brennus.model;
 
+import static brennus.model.StaticStatus.STATIC;
+
 public class MemberFlags {
 
   private final Keyword[] keywords;
@@ -11,6 +13,12 @@ public class MemberFlags {
     this.keywords = keywords;
     this.protection = Protection.getProtection(keywords);
     this.isStatic = StaticStatus.isStatic(keywords);
+  }
+
+  public MemberFlags(boolean isStatic, Protection protection) {
+    this.keywords = isStatic ? new Keyword[] { STATIC, protection } : new Keyword[] { protection };
+    this.protection = protection;
+    this.isStatic = isStatic;
   }
 
   public Protection getProtection() {

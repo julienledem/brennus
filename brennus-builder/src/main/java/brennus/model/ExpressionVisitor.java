@@ -9,6 +9,6 @@ public interface ExpressionVisitor {
 
   void visit(LiteralExpression literalExpression);
 
-  void visit(AddExpression addExpression);
+  void visit(BinaryExpression binaryExpression);
 
 }

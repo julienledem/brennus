@@ -1,9 +1,11 @@
 package brennus;
 
 import brennus.ExpressionBuilder.ExpressionHandler;
+import brennus.ThenBuilder.IfStatementHandler;
 import brennus.SwitchBuilder.SwitchStatementsHandler;
 import brennus.model.Expression;
 import brennus.model.ExpressionStatement;
+import brennus.model.IfStatement;
 import brennus.model.ReturnStatement;
 import brennus.model.SetStatement;
 import brennus.model.Statement;
@@ -54,6 +56,18 @@ abstract public class StatementBuilder<T> {
     return new ExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {
         return statementHandler().handleStatement(new SetStatement(MethodContext.getSourceLineNumber(), to, e));
+      }
+    });
+  }
+
+  final public ExpressionBuilder<ThenBuilder<T>> ifExp() {
+    return new ExpressionBuilder<ThenBuilder<T>>(new ExpressionHandler<ThenBuilder<T>>() {
+      public ThenBuilder<T> handleExpression(final Expression e) {
+        return new ThenBuilder<T>(e, new IfStatementHandler<T>() {
+          public T handleStatement(IfStatement ifStatement) {
+            return statementHandler().handleStatement(ifStatement);
+          }
+        });
       }
     });
   }

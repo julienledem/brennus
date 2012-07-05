@@ -39,7 +39,7 @@ public class ASMTypeGenerator {
     }
 
 //    add default constructor
-    ASMMethodGeneratorStatementVisitor defaultConstructor = new ASMMethodGeneratorStatementVisitor(
+    ASMMethodGenerator defaultConstructor = new ASMMethodGenerator(
         new MethodContext(
             futureType,
             new Method(
@@ -54,7 +54,7 @@ public class ASMTypeGenerator {
     List<Method> methods = futureType.getMethods();
     for (Method method : methods) {
       MethodContext methodContext = new MethodContext(futureType, method);
-      ASMMethodGeneratorStatementVisitor statementVisitor = new ASMMethodGeneratorStatementVisitor(methodContext);
+      ASMMethodGenerator statementVisitor = new ASMMethodGenerator(methodContext);
       List<Statement> statements = method.getStatements();
       for (Statement statement : statements) {
         statementVisitor.visit(statement);

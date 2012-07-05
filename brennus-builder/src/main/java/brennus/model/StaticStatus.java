@@ -2,11 +2,11 @@ package brennus.model;
 
 public enum StaticStatus implements Keyword {
 
-  Static;
+  STATIC;
 
   public static boolean isStatic(Keyword... keywords) {
     for (Keyword k : keywords) {
-      if (k == Static) {
+      if (k == STATIC) {
         return true;
       }
     }

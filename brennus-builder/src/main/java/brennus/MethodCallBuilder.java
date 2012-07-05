@@ -23,7 +23,7 @@ public class MethodCallBuilder<T> extends StatementBuilder<T> {
    * pass a parameter to the method
    * @return the expressionbuilder to build the parameter value
    */
-  public ExpressionBuilder<MethodCallBuilder<T>> withParam() {
+  public ExpressionBuilder<MethodCallBuilder<T>> param() {
     return new ExpressionBuilder<MethodCallBuilder<T>>(
         new ExpressionHandler<MethodCallBuilder<T>>() {
           public MethodCallBuilder<T> handleExpression(Expression e) {
