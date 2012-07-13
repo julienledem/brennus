@@ -6,10 +6,12 @@ import java.util.List;
 
 public class CallMethodExpression extends Expression {
 
+  private final Expression callee;
   private final String methodName;
   private final List<Expression> parameters;
 
-  public CallMethodExpression(String methodName, List<Expression> parameters) {
+  public CallMethodExpression(Expression callee, String methodName, List<Expression> parameters) {
+    this.callee = callee;
     this.methodName = methodName;
     this.parameters = parameters;
   }
@@ -29,7 +31,11 @@ public class CallMethodExpression extends Expression {
 
   @Override
   public String toString() {
-    return "["+getClass().getSimpleName()+" "+methodName+"]";
+    return "["+getClass().getSimpleName()+" "+getCallee()+"."+methodName+"("+parameters+")]";
+  }
+
+  public Expression getCallee() {
+    return callee;
   }
 
 }

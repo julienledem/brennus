@@ -78,10 +78,10 @@ abstract public class StatementBuilder<T> {
    * @return a methodCallBuilder for optionally passing parameters
    */
   final public MethodCallBuilder<T> call(String methodName) {
-    return new MethodCallBuilder<T>(methodName, new ExpressionHandler<T>() {
+    return new ExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression expression) {
         return statementHandler().handleStatement(new ExpressionStatement(MethodContext.getSourceLineNumber(), expression));
       }
-    });
+    }).call(methodName);
   }
 }

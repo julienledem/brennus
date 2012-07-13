@@ -27,7 +27,7 @@ public class ExpressionBuilder<T> {
   }
 
   public MethodCallBuilder<T> call(final String methodName) {
-    return new MethodCallBuilder<T>(methodName, expressionHandler);
+    return new MethodCallBuilder<T>(null, methodName, expressionHandler);
   }
 
   public ValueExpressionBuilder<T> literal(int i) {
@@ -36,6 +36,10 @@ public class ExpressionBuilder<T> {
 
   public ValueExpressionBuilder<T> literal(String string) {
     return new ValueExpressionBuilder<T>(expressionHandler, new LiteralExpression(string));
+  }
+
+  public ValueExpressionBuilder<T> literal(boolean b) {
+    return new ValueExpressionBuilder<T>(expressionHandler, new LiteralExpression(b));
   }
 
 }

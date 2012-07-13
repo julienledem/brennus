@@ -11,4 +11,10 @@ public interface ExpressionVisitor {
 
   void visit(BinaryExpression binaryExpression);
 
+  void visit(UnaryExpression unaryExpression);
+
+  void visit(InstanceOfExpression instanceOfExpression);
+
+  void visit(CastExpression castExpression);
+
 }

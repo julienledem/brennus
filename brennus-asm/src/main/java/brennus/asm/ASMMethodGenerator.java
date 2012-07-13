@@ -1,11 +1,15 @@
 package brennus.asm;
 
+import static brennus.model.BinaryOperator.EQUALS;
+
 import java.util.List;
 
 import brennus.MethodContext;
 import brennus.model.BinaryExpression;
+import brennus.model.BinaryOperator;
 import brennus.model.CallMethodExpression;
 import brennus.model.CaseStatement;
+import brennus.model.CastExpression;
 import brennus.model.Expression;
 import brennus.model.ExpressionStatement;
 import brennus.model.ExpressionVisitor;
@@ -13,6 +17,7 @@ import brennus.model.Field;
 import brennus.model.FieldAccessType;
 import brennus.model.GetExpression;
 import brennus.model.IfStatement;
+import brennus.model.InstanceOfExpression;
 import brennus.model.LiteralExpression;
 import brennus.model.ParameterAccessType;
 import brennus.model.ReturnStatement;
@@ -22,6 +27,7 @@ import brennus.model.StatementVisitor;
 import brennus.model.SwitchStatement;
 import brennus.model.ThrowStatement;
 import brennus.model.Type;
+import brennus.model.UnaryExpression;
 import brennus.model.VarAccessTypeVisitor;
 
 import org.objectweb.asm.Opcodes;
@@ -33,6 +39,7 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 
 class ASMMethodGenerator implements Opcodes, StatementVisitor {
 
@@ -93,7 +100,7 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
     } else {
       methodByteCodeContext.addInstruction(defaultLabel);
     }
-    methodByteCodeContext.addInstruction(endLabel);
+    methodByteCodeContext.addInstruction(endLabel, "switch end");
     endLabel = null;
   }
 
@@ -101,13 +108,13 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
   public void visit(CaseStatement caseStatement) {
 //    System.out.println(caseStatement);
     methodByteCodeContext.addLabel(caseStatement.getLine(), currentLabel);
-    methodByteCodeContext.addInstruction(new FrameNode(F_SAME, 0, null, 0, null));
+    methodByteCodeContext.addInstruction(new FrameNode(F_SAME, 0, null, 0, null), "case", caseStatement.getExpression());
     List<Statement> statements = caseStatement.getStatements();
     for (Statement statement : statements) {
       this.visit(statement);
     }
     if (caseStatement.isBreakCase()) {
-      methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, endLabel));
+      methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, endLabel), "break case");
     }
   }
 
@@ -119,8 +126,8 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
 
 
   @Override
-  public void visit(SetStatement setStatement) {
-    methodByteCodeContext.loadThis();
+  public void visit(final SetStatement setStatement) {
+    methodByteCodeContext.loadThis("set", setStatement.getTo());
     final Type expressionType = visit(setStatement.getExpression());
     methodContext.getVarAccessType(setStatement.getTo()).accept(
     new VarAccessTypeVisitor() {
@@ -133,7 +140,7 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
         Field field = fieldAccessType.getField();
         methodByteCodeContext.handleConversion(expressionType, field.getType());
 //      mv.visitTypeInsn(CHECKCAST, "java/lang/String");
-        methodByteCodeContext.addInstruction(new FieldInsnNode(PUTFIELD, methodContext.getClassIdentifier(), field.getName(), field.getSignature()));
+        methodByteCodeContext.addInstruction(new FieldInsnNode(PUTFIELD, methodContext.getClassIdentifier(), field.getName(), field.getSignature()), "set", setStatement.getTo());
       }
     });
   }
@@ -141,7 +148,7 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
 
   public void addDefaultConstructorStatements() {
     methodByteCodeContext.loadThis();
-    methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKESPECIAL, methodContext.getType().getExtending().getClassIdentifier(), "<init>", "()V"));
+    methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKESPECIAL, methodContext.getType().getExtending().getClassIdentifier(), "<init>", "()V"), "super()");
   }
 
   public MethodNode getMethodNode() {
@@ -159,39 +166,21 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
       public void visit(BinaryExpression binaryExpression) {
         ASMMethodGenerator.this.visit(binaryExpression.getLeftExpression());
         ASMMethodGenerator.this.visit(binaryExpression.getRightExpression());
-        List<Statement> firstStatements;
-        List<Statement> secondStatements;
-
-        int jumpInst;
+        // TODO: combine expression ! and =  etc
         switch (binaryExpression.getOperator()) {
         case EQUALS:
           // TODO handle types
-          jumpInst = IF_ICMPNE;
-          firstStatements = ifStatement.getThenStatements();
-          secondStatements = ifStatement.getElseStatements();
+          generateThenElse(IF_ICMPNE, ifStatement.getElseStatements(), ifStatement.getThenStatements());
           break;
         case GREATER_THAN:
-          jumpInst = IF_ICMPGT;
-          firstStatements = ifStatement.getElseStatements();
-          secondStatements = ifStatement.getThenStatements();
+          generateThenElse(IF_ICMPGT, ifStatement.getThenStatements(), ifStatement.getElseStatements());
           break;
         default:
           throw new UnsupportedOperationException("op: "+binaryExpression.getOperator());
         }
-
-        LabelNode labelNode = new LabelNode();
-        methodByteCodeContext.addInstruction(new JumpInsnNode(jumpInst, labelNode));
-        for (Statement statement : firstStatements) {
-          ASMMethodGenerator.this.visit(statement);
-        }
-        methodByteCodeContext.addLabel(ifStatement.getLine(), labelNode);
-        for (Statement statement : secondStatements) {
-          ASMMethodGenerator.this.visit(statement);
-        }
       }
 
       public void visit(LiteralExpression literalExpression) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
       }
 
@@ -200,8 +189,46 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
       }
 
       public void visit(GetExpression getFieldExpression) {
+        methodByteCodeContext.addIConst0();
+        ASMMethodGenerator.this.visit(getFieldExpression);
+        // if (false) else then
+        generateThenElse(IFEQ, ifStatement.getElseStatements(), ifStatement.getThenStatements());
+      }
+
+      @Override
+      public void visit(UnaryExpression unaryExpression) {
         throw new UnsupportedOperationException();
       }
+
+      @Override
+      public void visit(InstanceOfExpression instanceOfExpression) {
+        ASMMethodGenerator.this.visit(instanceOfExpression.getExpression());
+        methodByteCodeContext.addInstruction(new TypeInsnNode(INSTANCEOF, instanceOfExpression.getType().getClassIdentifier()), "if");
+        generateThenElse(IFEQ, ifStatement.getElseStatements(), ifStatement.getThenStatements());
+      }
+
+      @Override
+      public void visit(CastExpression castExpression) {
+        throw new UnsupportedOperationException();
+      }
+
     });
+  }
+
+  private void generateThenElse(int jumpInst, List<Statement> thenStatements, List<Statement> elseStatements) {
+    LabelNode thenNode = new LabelNode();
+    LabelNode endNode = new LabelNode();
+    methodByteCodeContext.addInstruction(new JumpInsnNode(jumpInst, thenNode), "IF exp GOTO label else keep going");
+    // else
+    for (Statement statement : elseStatements) {
+      visit(statement);
+    }
+    methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, endNode), "endElse now Then");
+    // then
+    methodByteCodeContext.addLabel(thenNode);
+    for (Statement statement : thenStatements) {
+      visit(statement);
+    }
+    methodByteCodeContext.addLabel(endNode, "endThen");
   }
 }

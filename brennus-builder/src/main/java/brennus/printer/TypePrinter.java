@@ -6,6 +6,7 @@ import java.util.List;
 import brennus.model.BinaryExpression;
 import brennus.model.CallMethodExpression;
 import brennus.model.CaseStatement;
+import brennus.model.CastExpression;
 import brennus.model.ExistingType;
 import brennus.model.Expression;
 import brennus.model.ExpressionStatement;
@@ -14,6 +15,7 @@ import brennus.model.Field;
 import brennus.model.FutureType;
 import brennus.model.GetExpression;
 import brennus.model.IfStatement;
+import brennus.model.InstanceOfExpression;
 import brennus.model.LiteralExpression;
 import brennus.model.MemberFlags;
 import brennus.model.Method;
@@ -26,6 +28,7 @@ import brennus.model.SwitchStatement;
 import brennus.model.ThrowStatement;
 import brennus.model.Type;
 import brennus.model.TypeVisitor;
+import brennus.model.UnaryExpression;
 
 
 public class TypePrinter {
@@ -259,4 +262,24 @@ class ExpressionStringifierVisitor implements ExpressionVisitor {
   public String toString() {
     return sb.toString();
   }
+
+  @Override
+  public void visit(UnaryExpression unaryExpression) {
+    sb.append(unaryExpression.getOperator().getRepresentation()).append(" ");
+    unaryExpression.getExpression().accept(this);
+  }
+
+  @Override
+  public void visit(InstanceOfExpression instanceOfExpression) {
+    instanceOfExpression.getExpression().accept(this);
+    sb.append(" instanceOf ").append(instanceOfExpression.getType().getName());
+  }
+
+  @Override
+  public void visit(CastExpression castExpression) {
+    sb.append("((").append(castExpression.getType().getName()).append(")");
+    castExpression.getExpression().accept(this);
+    sb.append(")");
+  }
+
 }

@@ -68,7 +68,7 @@ public class ASMTypeGenerator {
 //    classNode.interfaces.add(...);
 
 //    classNode.accept(new TraceClassVisitor(new PrintWriter(System.out)));
-    classNode.accept(new ASMifierClassVisitor(new PrintWriter(System.out)));
+//    classNode.accept(new ASMifierClassVisitor(new PrintWriter(System.out)));
     ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
     ClassVisitor cv = new CheckClassAdapter(cw, true);
 //    ClassVisitor cv = cw;

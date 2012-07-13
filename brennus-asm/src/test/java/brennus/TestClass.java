@@ -62,12 +62,37 @@ public class TestClass extends BaseTestClass {
   public int sign(int i) {
     if ((i == 42) == true) {
       return 42;
-    } else {
     }
     if (i > 42) {
       return 43;
     } else {
       return -41;
     }
+  }
+
+  public int sign2(int i) {
+    int result;
+    if ((i == 42) == true) {
+      result = 42;
+    }
+    if (i > 42) {
+      result = 43;
+    } else {
+      result = -41;
+    }
+    return result;
+  }
+
+  public boolean not(boolean b) {
+    println(b);
+    println(!b);
+    return !b;
+  }
+
+  public boolean equals(Object o) {
+    if (o instanceof BaseTestClass) {
+      return equalOrBothNull(((BaseTestClass)o).get(0),foo) && equalOrBothNull(((BaseTestClass)o).get(1),bar);
+    }
+    return false;
   }
 }

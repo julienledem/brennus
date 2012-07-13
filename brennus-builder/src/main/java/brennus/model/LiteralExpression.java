@@ -17,6 +17,11 @@ public class LiteralExpression extends Expression {
     this.type = ExistingType.STRING;
   }
 
+  public LiteralExpression(boolean value) {
+    this.value = value;
+    this.type = ExistingType.BOOLEAN;
+  }
+
   @Override
   public void accept(ExpressionVisitor expressionVisitor) {
     wrap(expressionVisitor).visit(this);

@@ -1,14 +1,12 @@
 package brennus.model;
 
-public enum BinaryOperator implements Operator {
-  PLUS("+"),
-  EQUALS("=="),
-  GREATER_THAN(">"),
-  AND("&&");
+public enum UnaryOperator implements Operator {
+
+  NOT("!");
 
   private final String representation;
 
-  private BinaryOperator(String representation) {
+  private UnaryOperator(String representation) {
     this.representation = representation;
   }
 
