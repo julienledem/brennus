@@ -25,4 +25,9 @@ public class UnaryExpression extends Expression {
     return expression;
   }
 
+  @Override
+  public String toString() {
+    return "[" + getOperator().getRepresentation() + " " + expression + "]";
+  }
+
 }

@@ -237,7 +237,12 @@ class ExpressionStringifierVisitor implements ExpressionVisitor {
 
   @Override
   public void visit(CallMethodExpression callMethodExpression) {
-    sb.append("this."+callMethodExpression.getMethodName()+"(");
+    if (callMethodExpression.getCallee() == null){
+      sb.append("this");
+    } else {
+      callMethodExpression.getCallee().accept(this);
+    }
+    sb.append("."+callMethodExpression.getMethodName()+"(");
     boolean first = true;
     List<Expression> parameters = callMethodExpression.getParameters();
     for (Expression expression : parameters) {

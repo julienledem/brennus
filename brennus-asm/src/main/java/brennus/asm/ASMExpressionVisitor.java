@@ -56,7 +56,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
     varAccessType.accept(new VarAccessTypeVisitor() {
       public void visit(FieldAccessType fieldAccessType) {
         Field field = fieldAccessType.getField();
-        methodByteCodeContext.loadThis();
+        methodByteCodeContext.loadThis("get field", getExpression.getFieldName(), "on this");
         methodByteCodeContext.addInstruction(
             new FieldInsnNode(GETFIELD, methodContext.getType().getClassIdentifier(), getExpression.getFieldName(), field.getSignature()),
             "get field", getExpression.getFieldName());
@@ -198,7 +198,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
   @Override
   public void visit(CastExpression castExpression) {
     castExpression.getExpression().accept(this);
-    methodByteCodeContext.addInstruction(new TypeInsnNode(CHECKCAST, castExpression.getType().getClassIdentifier()));
+    methodByteCodeContext.addInstruction(new TypeInsnNode(CHECKCAST, castExpression.getType().getClassIdentifier()), "cast to", castExpression.getType());
     lastExpressionType = castExpression.getType();
   }
 

@@ -25,4 +25,9 @@ public class InstanceOfExpression extends Expression {
     return type;
   }
 
+  @Override
+  public String toString() {
+    return "[" + expression + " instanceof " + type + "]";
+  }
+
 }

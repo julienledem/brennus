@@ -31,7 +31,7 @@ public class CallMethodExpression extends Expression {
 
   @Override
   public String toString() {
-    return "["+getClass().getSimpleName()+" "+getCallee()+"."+methodName+"("+parameters+")]";
+    return "["+getClass().getSimpleName()+" "+(callee==null ? "this": callee)+"."+methodName+"("+parameters+")]";
   }
 
   public Expression getCallee() {
