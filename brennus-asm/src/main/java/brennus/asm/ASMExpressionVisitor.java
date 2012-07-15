@@ -52,6 +52,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
 
   @Override
   public void visit(final GetExpression getExpression) {
+    methodByteCodeContext.incIndent("get", getExpression.getFieldName());
     VarAccessType varAccessType = methodContext.getVarAccessType(getExpression.getFieldName());
     varAccessType.accept(new VarAccessTypeVisitor() {
       public void visit(FieldAccessType fieldAccessType) {
@@ -72,12 +73,14 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
         lastExpressionType = param.getType();
       }
     });
+    methodByteCodeContext.decIndent();
   }
 
   @Override
   public void visit(CallMethodExpression callMethodExpression) {
 //    System.out.println(callMethodExpression);
     String methodName = callMethodExpression.getMethodName();
+    methodByteCodeContext.incIndent("call method", methodName);
     Method method;
     if (callMethodExpression.getCallee()==null) {
       methodByteCodeContext.loadThis("calling on this", methodName);
@@ -93,23 +96,27 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
         throw new RuntimeException("can't find method "+methodName+" in hierarchy of "+lastExpressionType);
       }
     }
-
+    methodByteCodeContext.incIndent("pass", callMethodExpression.getParameters().size(), "params to", methodName);
     List<Expression> parameterValues = callMethodExpression.getParameters();
     List<Parameter> parameterTypes = method.getParameters();
     if (parameterTypes.size() != parameterValues.size()) {
       throw new RuntimeException("parameters passed do not match, parameters declared in "+method);
     }
     for (int i = 0; i < parameterValues.size(); i++) {
+      methodByteCodeContext.incIndent("param", i);
       Expression expression = parameterValues.get(i);
       Type expected = parameterTypes.get(i).getType();
       expression.accept(this);
       // TODO: handle more than 1 parameter !!!
       // don't assume first on the stack
       methodByteCodeContext.handleConversion(lastExpressionType, expected, "param", i, "for", callMethodExpression.getMethodName());
+      methodByteCodeContext.decIndent();
     }
+    methodByteCodeContext.decIndent();
     //      System.out.println(method);
     methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKEVIRTUAL, method.getTypeName(), methodName, method.getSignature()), "call", methodName);
     lastExpressionType = method.getReturnType();
+    methodByteCodeContext.decIndent();
   }
 
   @Override
@@ -134,34 +141,44 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
 
   @Override
   public void visit(BinaryExpression binaryExpression) {
+    methodByteCodeContext.incIndent(binaryExpression.getOperator().getRepresentation());
     // TODO: support other types
     switch (binaryExpression.getOperator()) {
     case PLUS:
+      methodByteCodeContext.incIndent("left +");
       binaryExpression.getLeftExpression().accept(this);
+      methodByteCodeContext.decIndent();
+      methodByteCodeContext.incIndent("+ right");
       binaryExpression.getRightExpression().accept(this);
+      methodByteCodeContext.decIndent();
       lastExpressionType = ExistingType.INT;
       methodByteCodeContext.addInstruction(new InsnNode(IADD), "+");
       break;
     case AND:
       int line;
+      methodByteCodeContext.incIndent("left &&");
       binaryExpression.getLeftExpression().accept(this);
+      methodByteCodeContext.decIndent();
       new LiteralExpression(false).accept(this);
       LabelNode falseLabel = new LabelNode();
       LabelNode endLabel = new LabelNode();
       methodByteCodeContext.addInstruction(new JumpInsnNode(IF_ICMPEQ, falseLabel), "AND: IF left is false => false");
+      methodByteCodeContext.incIndent("%% right");
       binaryExpression.getRightExpression().accept(this);
+      methodByteCodeContext.decIndent();
       new LiteralExpression(false).accept(this);
       methodByteCodeContext.addInstruction(new JumpInsnNode(IF_ICMPEQ, falseLabel), "AND: IF right is false => false");
       new LiteralExpression(true).accept(this);
       methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, endLabel), "AND: all true => skip false");
-      methodByteCodeContext.addLabel(falseLabel);
+      methodByteCodeContext.addLabel(falseLabel, "AND: false");
       new LiteralExpression(false).accept(this);
-      methodByteCodeContext.addLabel(endLabel);
+      methodByteCodeContext.addLabel(endLabel, "AND: end");
       break;
     default:
       // TODO: other operators
       throw new UnsupportedOperationException("op: "+binaryExpression.getOperator());
     }
+    methodByteCodeContext.decIndent();
   }
 
   public Type getExpressionType() {
@@ -170,7 +187,10 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
 
   @Override
   public void visit(UnaryExpression unaryExpression) {
+    methodByteCodeContext.incIndent(unaryExpression.getOperator().getRepresentation());
+    methodByteCodeContext.incIndent("!exp");
     unaryExpression.getExpression().accept(this);
+    methodByteCodeContext.decIndent();
     switch (unaryExpression.getOperator()) {
     case NOT:
       // TODO: combine with parent
@@ -187,19 +207,24 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
       // TODO: other operators
       throw new UnsupportedOperationException("op: "+unaryExpression.getOperator());
     }
+    methodByteCodeContext.decIndent();
   }
 
   @Override
   public void visit(InstanceOfExpression instanceOfExpression) {
+    methodByteCodeContext.incIndent("instanceOF");
     instanceOfExpression.getExpression().accept(this);
     methodByteCodeContext.addInstruction(new TypeInsnNode(INSTANCEOF, instanceOfExpression.getType().getClassIdentifier()));
+    methodByteCodeContext.decIndent();
   }
 
   @Override
   public void visit(CastExpression castExpression) {
+    methodByteCodeContext.incIndent("cast (", castExpression.getType(), ")");
     castExpression.getExpression().accept(this);
     methodByteCodeContext.addInstruction(new TypeInsnNode(CHECKCAST, castExpression.getType().getClassIdentifier()), "cast to", castExpression.getType());
     lastExpressionType = castExpression.getType();
+    methodByteCodeContext.decIndent();
   }
 
 }

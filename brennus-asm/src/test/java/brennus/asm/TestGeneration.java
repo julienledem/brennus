@@ -1,4 +1,4 @@
-package brennus;
+package brennus.asm;
 
 import static brennus.ClassBuilder.startClass;
 import static brennus.model.ExistingType.*;
@@ -10,6 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import brennus.BaseTestClass;
+import brennus.TestClass;
 import brennus.asm.ASMTypeGenerator;
 import brennus.model.FutureType;
 import brennus.printer.TypePrinter;
@@ -131,21 +133,17 @@ public class TestGeneration {
 
     Logger.getLogger("brennus").setLevel(Level.FINEST);
     Logger.getLogger("brennus").addHandler(new Handler() {
-      @Override
       public void publish(LogRecord record) {
         System.out.println(record.getMessage());
       }
-
-      @Override
       public void flush() {
         System.out.flush();
       }
-
-      @Override
       public void close() throws SecurityException {
         System.out.flush();
       }
     });
+
     DynamicClassLoader cl = new DynamicClassLoader();
     cl.define(testClass);
 

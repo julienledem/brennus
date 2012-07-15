@@ -55,6 +55,9 @@ class MethodByteCodeContext implements Opcodes {
   private final MethodNode methodNode;
   private int maxv = 0;
   private int stack = 0;
+  private int indent = 0;
+  private ASMifierMethodVisitor methodVisitor = new ASMifierMethodVisitor();
+  private int currentOp;
 
   MethodByteCodeContext(MethodContext methodContext) {
     Method method = methodContext.getMethod();
@@ -67,25 +70,58 @@ class MethodByteCodeContext implements Opcodes {
     methodNode.instructions.add(insnNode);
     if (logger.isLoggable(Level.FINE)) {
       String s = "";
-      TraceMethodVisitor methodVisitor = new TraceMethodVisitor();
+
       insnNode.accept(methodVisitor);
       List<String> text = methodVisitor.getText();
-      for (String t : text) {
-        int i;
-        while ((i = t.indexOf('\n'))>=0) {
-          s += t.substring(0, i);
+      for (; currentOp < text.size(); currentOp++) {
+        String t = text.get(currentOp);
+        while (t.length()>0) {
+          String current;
+          int i = t.indexOf('\n');
+          if (i >= 0) {
+            current = t.substring(0, i);
+            t = t.substring(i+1);
+          } else {
+            current = t;
+            t = "";
+          }
+          s += indent() + current;
           if (comments!=null && comments.length>0) {
             s += " //";
             for (Object c : comments) {
               s += " " + c;
             }
           }
-          t = t.substring(i+1);
+          if (t.length()>0) {
+            s += "\n";
+          }
         }
-        s += t;
       }
       logger.fine(s);
     }
+  }
+
+  public void incIndent(Object... comments) {
+    indent ++;
+    if (logger.isLoggable(Level.FINE) && comments.length > 0) {
+      String log = indent() + "//";
+      for (Object object : comments) {
+        log += " " + object;
+      }
+      logger.fine(log);
+    }
+  }
+
+  public void decIndent() {
+    indent--;
+  }
+
+  private String indent() {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i< indent; ++i) {
+      sb.append(" ");
+    }
+    return sb.toString();
   }
 
   public void loadThis(Object... comments) {
@@ -206,15 +242,18 @@ class MethodByteCodeContext implements Opcodes {
     }
   }
 
-  public void addLineNumber(int line) {
-    Label l = new Label();
-    LabelNode labelNode = new LabelNode(l);
-    addLabel(line, labelNode);
+  public void addLineNumber(int line, Object... comments) {
+    if (line != 0) {
+      LabelNode labelNode = new LabelNode(new Label());
+      addLabel(line, labelNode, addComment(comments, "line", line));
+    }
   }
 
-  public void addLabel(int line, LabelNode label) {
-    methodNode.instructions.add(label);
-    methodNode.instructions.add(new LineNumberNode(line, label));
+  public void addLabel(int line, LabelNode label, Object... comments) {
+    addInstruction(label, comments);
+    if (line != 0) {
+      addInstruction(new LineNumberNode(line, label), comments);
+    }
   }
 
   public void addLabel(LabelNode label, Object... comments) {

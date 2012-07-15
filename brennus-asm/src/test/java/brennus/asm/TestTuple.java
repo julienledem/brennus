@@ -9,7 +9,7 @@ import static brennus.model.ExistingType.existing;
 import static brennus.model.Protection.PRIVATE;
 import static brennus.model.Protection.PUBLIC;
 import junit.framework.Assert;
-import brennus.TestGeneration.DynamicClassLoader;
+import brennus.asm.TestGeneration.DynamicClassLoader;
 import brennus.asm.ref.ReferenceClass;
 import brennus.model.FutureType;
 

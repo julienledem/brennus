@@ -1,12 +1,9 @@
 package brennus.asm;
 
-import static brennus.model.BinaryOperator.EQUALS;
-
 import java.util.List;
 
 import brennus.MethodContext;
 import brennus.model.BinaryExpression;
-import brennus.model.BinaryOperator;
 import brennus.model.CallMethodExpression;
 import brennus.model.CaseStatement;
 import brennus.model.CastExpression;
@@ -55,14 +52,18 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
   }
 
   private Type visit(Expression expression) {
+    methodByteCodeContext.incIndent();
     ASMExpressionVisitor expressionVisitor = new ASMExpressionVisitor(methodContext, methodByteCodeContext);
     expression.accept(expressionVisitor);
+    methodByteCodeContext.decIndent();
     return expressionVisitor.getExpressionType();
   }
 
   @Override
   public void visit(ReturnStatement returnStatement) {
+    methodByteCodeContext.incIndent("return exp");
     Type expressionType = visit(returnStatement.getExpression());
+    methodByteCodeContext.decIndent();
     Type returnType = methodContext.getReturnType();
     methodByteCodeContext.handleConversion(expressionType, returnType);
     methodByteCodeContext.addReturn(returnType);
@@ -75,7 +76,9 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
 
   @Override
   public void visit(SwitchStatement switchStatement) {
+    methodByteCodeContext.incIndent("switch exp");
     Type expressionType = visit(switchStatement.getExpression());
+    methodByteCodeContext.decIndent();
     List<CaseStatement> caseStatements = switchStatement.getCaseStatements();
     int[] values = new int[caseStatements.size()];
     LabelNode[] labels = new LabelNode[caseStatements.size()];
@@ -86,8 +89,9 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
     }
     LabelNode defaultLabel = new LabelNode();
     endLabel = new LabelNode();
-    methodByteCodeContext.addInstruction(new LookupSwitchInsnNode(defaultLabel, values, labels));
+    methodByteCodeContext.addInstruction(new LookupSwitchInsnNode(defaultLabel, values, labels), "switch(", switchStatement.getExpression(), ")");
     int i=0;
+    methodByteCodeContext.incIndent("switch");
     for (CaseStatement caseStatement : caseStatements) {
       currentLabel = labels[i++];
       caseStatement.accept(this);
@@ -100,15 +104,17 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
     } else {
       methodByteCodeContext.addInstruction(defaultLabel);
     }
+    methodByteCodeContext.decIndent();
     methodByteCodeContext.addInstruction(endLabel, "switch end");
     endLabel = null;
   }
 
   @Override
   public void visit(CaseStatement caseStatement) {
-//    System.out.println(caseStatement);
-    methodByteCodeContext.addLabel(caseStatement.getLine(), currentLabel);
-    methodByteCodeContext.addInstruction(new FrameNode(F_SAME, 0, null, 0, null), "case", caseStatement.getExpression());
+    Object value = caseStatement.getExpression() == null ? "default" : caseStatement.getliteralExpression().getValue();
+    methodByteCodeContext.addLabel(caseStatement.getLine(), currentLabel, "case", value);
+    methodByteCodeContext.addInstruction(new FrameNode(F_SAME, 0, null, 0, null), "case", value);
+    methodByteCodeContext.incIndent("case", value);
     List<Statement> statements = caseStatement.getStatements();
     for (Statement statement : statements) {
       this.visit(statement);
@@ -116,11 +122,14 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
     if (caseStatement.isBreakCase()) {
       methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, endLabel), "break case");
     }
+    methodByteCodeContext.decIndent();
   }
 
   @Override
   public void visit(ThrowStatement throwStatement) {
+    methodByteCodeContext.incIndent("throw exp");
     Type expressionType = visit(throwStatement.getExpression());
+    methodByteCodeContext.decIndent();
     methodByteCodeContext.addInstruction(new InsnNode(ATHROW));
   }
 
@@ -128,7 +137,9 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
   @Override
   public void visit(final SetStatement setStatement) {
     methodByteCodeContext.loadThis("set", setStatement.getTo());
+    methodByteCodeContext.incIndent("set exp", setStatement.getTo());
     final Type expressionType = visit(setStatement.getExpression());
+    methodByteCodeContext.decIndent();
     methodContext.getVarAccessType(setStatement.getTo()).accept(
     new VarAccessTypeVisitor() {
       public void visit(ParameterAccessType parameterAccessType) {
@@ -147,8 +158,10 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
 
 
   public void addDefaultConstructorStatements() {
+    methodByteCodeContext.incIndent("default constructor");
     methodByteCodeContext.loadThis();
     methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKESPECIAL, methodContext.getType().getExtending().getClassIdentifier(), "<init>", "()V"), "super()");
+    methodByteCodeContext.decIndent();
   }
 
   public MethodNode getMethodNode() {
@@ -157,15 +170,23 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
 
   public void visit(Statement statement) {
     methodByteCodeContext.addLineNumber(statement.getLine());
+    methodByteCodeContext.incIndent(statement.getClass().getSimpleName());
     statement.accept(this);
+    methodByteCodeContext.decIndent();
   }
 
   @Override
   public void visit(final IfStatement ifStatement) {
+    methodByteCodeContext.incIndent("if");
     ifStatement.getExpression().accept(new ExpressionVisitor() {
       public void visit(BinaryExpression binaryExpression) {
+        methodByteCodeContext.incIndent("if left");
         ASMMethodGenerator.this.visit(binaryExpression.getLeftExpression());
+        methodByteCodeContext.decIndent();
+        methodByteCodeContext.incIndent("if right");
         ASMMethodGenerator.this.visit(binaryExpression.getRightExpression());
+        methodByteCodeContext.decIndent();
+        methodByteCodeContext.incIndent(binaryExpression.getOperator().getRepresentation());
         // TODO: combine expression ! and =  etc
         switch (binaryExpression.getOperator()) {
         case EQUALS:
@@ -178,6 +199,7 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
         default:
           throw new UnsupportedOperationException("op: "+binaryExpression.getOperator());
         }
+        methodByteCodeContext.decIndent();
       }
 
       public void visit(LiteralExpression literalExpression) {
@@ -189,10 +211,12 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
       }
 
       public void visit(GetExpression getFieldExpression) {
+        methodByteCodeContext.incIndent("if get", getFieldExpression.getFieldName());
         methodByteCodeContext.addIConst0();
         ASMMethodGenerator.this.visit(getFieldExpression);
         // if (false) else then
         generateThenElse(IFEQ, ifStatement.getElseStatements(), ifStatement.getThenStatements());
+        methodByteCodeContext.decIndent();
       }
 
       @Override
@@ -202,9 +226,11 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
 
       @Override
       public void visit(InstanceOfExpression instanceOfExpression) {
+        methodByteCodeContext.incIndent("if instanceof", instanceOfExpression.getType());
         ASMMethodGenerator.this.visit(instanceOfExpression.getExpression());
         methodByteCodeContext.addInstruction(new TypeInsnNode(INSTANCEOF, instanceOfExpression.getType().getClassIdentifier()), "if");
         generateThenElse(IFEQ, ifStatement.getElseStatements(), ifStatement.getThenStatements());
+        methodByteCodeContext.decIndent();
       }
 
       @Override
@@ -213,22 +239,27 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
       }
 
     });
+    methodByteCodeContext.decIndent();
   }
 
   private void generateThenElse(int jumpInst, List<Statement> thenStatements, List<Statement> elseStatements) {
     LabelNode thenNode = new LabelNode();
     LabelNode endNode = new LabelNode();
     methodByteCodeContext.addInstruction(new JumpInsnNode(jumpInst, thenNode), "IF exp GOTO label else keep going");
+    methodByteCodeContext.incIndent();
     // else
     for (Statement statement : elseStatements) {
       visit(statement);
     }
+    methodByteCodeContext.decIndent();
     methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, endNode), "endElse now Then");
     // then
-    methodByteCodeContext.addLabel(thenNode);
+    methodByteCodeContext.addLabel(thenNode, "then");
+    methodByteCodeContext.incIndent();
     for (Statement statement : thenStatements) {
       visit(statement);
     }
+    methodByteCodeContext.decIndent();
     methodByteCodeContext.addLabel(endNode, "endThen");
   }
 }

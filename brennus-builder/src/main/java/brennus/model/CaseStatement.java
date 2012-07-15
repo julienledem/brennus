@@ -9,7 +9,7 @@ public class CaseStatement extends Statement {
   private final List<Statement> statements;
   private final boolean breakCase;
 
-  public CaseStatement(int line, Expression value, List<Statement> statements, boolean breakCase) {
+  public CaseStatement(int line, LiteralExpression value, List<Statement> statements, boolean breakCase) {
     super(value, line);
     this.statements = statements;
     this.breakCase = breakCase;
@@ -28,4 +28,7 @@ public class CaseStatement extends Statement {
     return breakCase;
   }
 
+  public LiteralExpression getliteralExpression() {
+    return (LiteralExpression)getExpression();
+  }
 }
