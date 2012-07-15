@@ -74,10 +74,15 @@ public class TestTuple {
     Assert.assertEquals("test", t.get(0));
     t.set(1, 12);
     Assert.assertEquals(12, t.get(1));
-    try {
-      t.set(123, null);
-    } catch (RuntimeException e) {
-      e.printStackTrace();
+    if (!(t instanceof ReferenceClass)) {
+      try {
+        t.set(123, null);
+      } catch (RuntimeException e) {
+        Assert.assertEquals("TestTuple.java", e.getStackTrace()[1].getFileName());
+        Assert.assertEquals(57, e.getStackTrace()[1].getLineNumber());
+        // checking that we display the line number from the builder class
+        e.printStackTrace();
+      }
     }
   }
 }
