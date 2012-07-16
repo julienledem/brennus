@@ -16,7 +16,7 @@ public class ExistingType extends Type {
   public static final PrimitiveType BYTE = primitive(Byte.TYPE, "B", Byte.class);
   public static final PrimitiveType BOOLEAN = primitive(Boolean.TYPE, "Z", Boolean.class);
   public static final PrimitiveType SHORT = primitive(Short.TYPE, "S", Short.class);
-  public static final PrimitiveType CHARACTER = primitive(Character.TYPE, "C", Character.class);
+  public static final PrimitiveType CHAR = primitive(Character.TYPE, "C", Character.class);
   public static final PrimitiveType FLOAT = primitive(Float.TYPE, "F", Float.class);
   public static final PrimitiveType DOUBLE = primitive(Double.TYPE, "D", Double.class);
 

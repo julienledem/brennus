@@ -150,7 +150,6 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
       public void visit(FieldAccessType fieldAccessType) {
         Field field = fieldAccessType.getField();
         methodByteCodeContext.handleConversion(expressionType, field.getType());
-//      mv.visitTypeInsn(CHECKCAST, "java/lang/String");
         methodByteCodeContext.addInstruction(new FieldInsnNode(PUTFIELD, methodContext.getClassIdentifier(), field.getName(), field.getSignature()), "set", setStatement.getTo());
       }
     });

@@ -1,29 +1,22 @@
 package brennus.asm;
 
-import static brennus.model.BinaryOperator.EQUALS;
-
-import java.util.Arrays;
 import java.util.List;
 
 import brennus.MethodContext;
 import brennus.model.BinaryExpression;
-import brennus.model.BinaryOperator;
 import brennus.model.CallMethodExpression;
 import brennus.model.CastExpression;
 import brennus.model.ExistingType;
 import brennus.model.Expression;
-import brennus.model.ExpressionStatement;
 import brennus.model.ExpressionVisitor;
 import brennus.model.Field;
 import brennus.model.FieldAccessType;
 import brennus.model.GetExpression;
-import brennus.model.IfStatement;
 import brennus.model.InstanceOfExpression;
 import brennus.model.LiteralExpression;
 import brennus.model.Method;
 import brennus.model.Parameter;
 import brennus.model.ParameterAccessType;
-import brennus.model.Statement;
 import brennus.model.Type;
 import brennus.model.UnaryExpression;
 import brennus.model.VarAccessType;
@@ -78,7 +71,6 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
 
   @Override
   public void visit(CallMethodExpression callMethodExpression) {
-//    System.out.println(callMethodExpression);
     String methodName = callMethodExpression.getMethodName();
     methodByteCodeContext.incIndent("call method", methodName);
     Method method;
@@ -107,13 +99,10 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
       Expression expression = parameterValues.get(i);
       Type expected = parameterTypes.get(i).getType();
       expression.accept(this);
-      // TODO: handle more than 1 parameter !!!
-      // don't assume first on the stack
       methodByteCodeContext.handleConversion(lastExpressionType, expected, "param", i, "for", callMethodExpression.getMethodName());
       methodByteCodeContext.decIndent();
     }
     methodByteCodeContext.decIndent();
-    //      System.out.println(method);
     methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKEVIRTUAL, method.getTypeName(), methodName, method.getSignature()), "call", methodName);
     lastExpressionType = method.getReturnType();
     methodByteCodeContext.decIndent();
@@ -155,7 +144,6 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
       methodByteCodeContext.addInstruction(new InsnNode(IADD), "+");
       break;
     case AND:
-      int line;
       methodByteCodeContext.incIndent("left &&");
       binaryExpression.getLeftExpression().accept(this);
       methodByteCodeContext.decIndent();
@@ -163,7 +151,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
       LabelNode falseLabel = new LabelNode();
       LabelNode endLabel = new LabelNode();
       methodByteCodeContext.addInstruction(new JumpInsnNode(IF_ICMPEQ, falseLabel), "AND: IF left is false => false");
-      methodByteCodeContext.incIndent("%% right");
+      methodByteCodeContext.incIndent("&& right");
       binaryExpression.getRightExpression().accept(this);
       methodByteCodeContext.decIndent();
       new LiteralExpression(false).accept(this);

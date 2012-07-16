@@ -14,4 +14,8 @@ abstract public class BaseClass {
 
   abstract public void set(int i, Object o);
 
+  public boolean equalOrBothNull(Object o1, Object o2) {
+    return (o1 == null && o2 == null) || (o1 != null && o1.equals(o2));
+  }
+
 }
