@@ -29,7 +29,11 @@ abstract public class ExpressionBuilder<T,VEB> {
     return newValueExpressionBuilder(expressionHandler, new GetExpression(name));
   }
 
-  public MethodCallBuilder<T, VEB> call(final String methodName) {
+  public ParamExpressionBuilder<T, VEB> call(final String methodName) {
+    return innerCall(methodName).param();
+  }
+
+  private MethodCallBuilder<T, VEB> innerCall(final String methodName) {
     return new MethodCallBuilder<T,VEB>(null, methodName, expressionHandler) {
       @Override
       protected VEB newValueExpressionBuilder(
@@ -39,6 +43,10 @@ abstract public class ExpressionBuilder<T,VEB> {
       }
 
     };
+  }
+
+  public VEB callNoParam(final String methodName) {
+    return innerCall(methodName).endCall();
   }
 
   public VEB literal(int i) {

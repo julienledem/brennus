@@ -22,8 +22,16 @@ public class ParamValueExpressionBuilder<T, VEB> extends ValueExpressionBuilder<
     return new ParamValueExpressionBuilder<T, VEB>(expressionHandler, expression);
   }
 
-  public MethodCallBuilder<T, VEB> endParam() {
+  private MethodCallBuilder<T, VEB> endParam() {
     return this.end();
+  }
+
+  public ParamExpressionBuilder<T, VEB> nextParam() {
+    return this.endParam().param();
+  }
+
+  public VEB endCall() {
+    return this.endParam().endCall();
   }
 
 }

@@ -81,7 +81,7 @@ abstract public class ValueExpressionBuilder<T, EB, VEB> {
     return newValueExpressionBuilder(expressionHandler, new UnaryExpression(operator, expression));
   }
 
-  public MethodCallBuilder<T, VEB> call(String methodName) {
+  public ParamExpressionBuilder<T, VEB> call(String methodName) {
     return new MethodCallBuilder<T, VEB>(expression, methodName, expressionHandler) {
       @Override
       protected VEB newValueExpressionBuilder(
@@ -89,7 +89,7 @@ abstract public class ValueExpressionBuilder<T, EB, VEB> {
           CallMethodExpression callMethodExpression) {
         return ValueExpressionBuilder.this.newValueExpressionBuilder(expressionHandler, callMethodExpression);
       }
-    };
+    }.param();
   }
 
 }

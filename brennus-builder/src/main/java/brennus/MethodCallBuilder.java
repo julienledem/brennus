@@ -25,7 +25,7 @@ abstract public class MethodCallBuilder<T, VEB> {
    * pass a parameter to the method
    * @return the expressionbuilder to build the parameter value
    */
-  public ParamExpressionBuilder<T, VEB> param() {
+  ParamExpressionBuilder<T, VEB> param() {
     return new ParamExpressionBuilder<T, VEB>(
         new ExpressionHandler<MethodCallBuilder<T, VEB>>() {
           public MethodCallBuilder<T, VEB> handleExpression(Expression e) {
@@ -40,7 +40,7 @@ abstract public class MethodCallBuilder<T, VEB> {
    * (mostly used when no parameters at all)
    * @return the parent
    */
-  public VEB endCall() {
+  VEB endCall() {
     return newValueExpressionBuilder(expressionHandler, new CallMethodExpression(callee, methodName, parameters));
   }
 

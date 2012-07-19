@@ -43,8 +43,8 @@ public class TestTuple {
 
 
           .startMethod(PUBLIC, OBJECT, "get").param(INT, "index")
-            .exec().call("println").param().literal("get").endParam().endCall().endExec()
-            .exec().call("println").param().get("index").endParam().endCall().endExec()
+            .exec().call("println").literal("get").endCall().endExec()
+            .exec().call("println").get("index").endCall().endExec()
             .switchOn().get("index").endSwitchOn()
               .caseBlock(0)
                 .returnExp().get("a").endReturn()
@@ -74,14 +74,14 @@ public class TestTuple {
                 .returnExp().get("i").endReturn()
               .endCase()
               .defaultCase()
-                .throwExp().call("error").endCall().endThrow()
+                .throwExp().callNoParam("error").endThrow()
               .endCase()
             .endSwitch()
           .endMethod()
 
           .startMethod(PUBLIC, VOID, "set").param(INT, "index").param(OBJECT, "o")
-            .exec().call("println").param().literal("set").endParam().endCall().endExec()
-            .exec().call("println").param().get("index").endParam().endCall().endExec()
+            .exec().call("println").literal("set").endCall().endExec()
+            .exec().call("println").get("index").endCall().endExec()
             .switchOn().get("index").endSwitchOn()
               .caseBlock(0)
                 .set("a").get("o").endSet()
@@ -111,7 +111,7 @@ public class TestTuple {
                 .set("i").get("o").endSet()
               .breakCase()
               .defaultCase()
-                .throwExp().call("error").endCall().endThrow() // this line number is checked later
+                .throwExp().callNoParam("error").endThrow() // this line number is checked later
               .breakCase()
             .endSwitch()
           .endMethod()
@@ -123,70 +123,61 @@ public class TestTuple {
             // equalOrBothNull(
               .call("equalOrBothNull")
                  // ((BaseClass)o)
-                .param().get("o").castTo(existing(BaseClass.class))
+                .get("o").castTo(existing(BaseClass.class))
                 // .get(0)
-                   .call("get").param().literal(0).endParam().endCall()
-                .endParam()
-                 //  , a
-                .param().get("a").endParam()
+                   .call("get").literal(0).endCall()
+                   //  , a
+                .nextParam().get("a")
                // )
               .endCall()
               // &&
               .and()
               .call("equalOrBothNull")
-                .param().get("o").castTo(existing(BaseClass.class))
-                   .call("get").param().literal(1).endParam().endCall()
-                .endParam()
-                .param().get("b").endParam()
+                .get("o").castTo(existing(BaseClass.class))
+                   .call("get").literal(1).endCall()
+                .nextParam().get("b")
               .endCall()
               .and()
               .call("equalOrBothNull")
-                .param().get("o").castTo(existing(BaseClass.class))
-                   .call("get").param().literal(2).endParam().endCall()
-                .endParam()
-                .param().get("c").endParam()
+                .get("o").castTo(existing(BaseClass.class))
+                   .call("get").literal(2).endCall()
+                .nextParam().get("c")
               .endCall()
               .and()
               .call("equalOrBothNull")
-                .param().get("o").castTo(existing(BaseClass.class))
-                   .call("get").param().literal(3).endParam().endCall()
-                .endParam()
-                .param().get("d").endParam()
+                .get("o").castTo(existing(BaseClass.class))
+                   .call("get").literal(3).endCall()
+                .nextParam().get("d")
               .endCall()
               .and()
               .call("equalOrBothNull")
-                .param().get("o").castTo(existing(BaseClass.class))
-                   .call("get").param().literal(4).endParam().endCall()
-                .endParam()
-                .param().get("e").endParam()
+                .get("o").castTo(existing(BaseClass.class))
+                   .call("get").literal(4).endCall()
+                .nextParam().get("e")
               .endCall()
               .and()
               .call("equalOrBothNull")
-                .param().get("o").castTo(existing(BaseClass.class))
-                   .call("get").param().literal(5).endParam().endCall()
-                .endParam()
-                .param().get("f").endParam()
+                .get("o").castTo(existing(BaseClass.class))
+                   .call("get").literal(5).endCall()
+                .nextParam().get("f")
               .endCall()
               .and()
               .call("equalOrBothNull")
-                .param().get("o").castTo(existing(BaseClass.class))
-                   .call("get").param().literal(6).endParam().endCall()
-                .endParam()
-                .param().get("g").endParam()
+                .get("o").castTo(existing(BaseClass.class))
+                   .call("get").literal(6).endCall()
+                .nextParam().get("g")
               .endCall()
               .and()
               .call("equalOrBothNull")
-                .param().get("o").castTo(existing(BaseClass.class))
-                   .call("get").param().literal(7).endParam().endCall()
-                .endParam()
-                .param().get("h").endParam()
+                .get("o").castTo(existing(BaseClass.class))
+                   .call("get").literal(7).endCall()
+                .nextParam().get("h")
               .endCall()
               .and()
               .call("equalOrBothNull")
-                .param().get("o").castTo(existing(BaseClass.class))
-                   .call("get").param().literal(8).endParam().endCall()
-                .endParam()
-                .param().get("i").endParam()
+                .get("o").castTo(existing(BaseClass.class))
+                   .call("get").literal(8).endCall()
+                .nextParam().get("i")
               .endCall()
               .endReturn()
             .elseBlock()
@@ -241,21 +232,20 @@ public class TestTuple {
   }
 
   private void testEquals(BaseClass o1, BaseClass o2) {
+    Object[] good = { "test", 12, 22l, 32f, 42d, (byte)52, 'a', true,  (short)82 };
+    Object[] bad  = { "foo",  13, 23l, 33f, 43d, (byte)53, 'b', false, (short)83 };
     for (BaseClass t : new BaseClass[]{o1,o2}) {
-      t.set(0, "test");
-      t.set(1, 12);
-      t.set(2, 22l);
-      t.set(3, 32f);
-      t.set(4, 42d);
-      t.set(5, (byte)52);
-      t.set(6, 'a');
-      t.set(7, true);
-      t.set(8, (short)82);
+      for (int i = 0; i <= 8; i++) {
+        t.set(0, good[0]);
+      }
     }
     Assert.assertEquals(o2, o1);
     Assert.assertEquals(o1, o2);
-    o1.set(7, false);
-    Assert.assertFalse(o2.equals(o1));
-    Assert.assertFalse(o1.equals(o2));
+    for (int i = 0; i <= 8; i++) {
+      o1.set(i, bad[i]);
+      Assert.assertFalse(o2.equals(o1));
+      Assert.assertFalse(o1.equals(o2));
+      o1.set(i, good[i]);
+    }
   }
 }
