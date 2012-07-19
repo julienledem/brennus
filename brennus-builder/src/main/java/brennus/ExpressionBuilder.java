@@ -1,5 +1,6 @@
 package brennus;
 
+import brennus.model.CallMethodExpression;
 import brennus.model.Expression;
 import brennus.model.GetExpression;
 import brennus.model.LiteralExpression;
@@ -10,7 +11,7 @@ import brennus.model.LiteralExpression;
  *
  * @param <T> the type of the parent to return on completion
  */
-public class ExpressionBuilder<T> {
+abstract public class ExpressionBuilder<T,VEB> {
 
   public interface ExpressionHandler<T> {
     T handleExpression(Expression e);
@@ -22,24 +23,34 @@ public class ExpressionBuilder<T> {
     this.expressionHandler = expressionHandler;
   }
 
-  public ValueExpressionBuilder<T> get(String name) {
-    return new ValueExpressionBuilder<T>(expressionHandler, new GetExpression(name));
+  protected abstract VEB newValueExpressionBuilder(ExpressionHandler<T> expressionHandler, Expression expression);
+
+  public VEB get(String name) {
+    return newValueExpressionBuilder(expressionHandler, new GetExpression(name));
   }
 
-  public MethodCallBuilder<T> call(final String methodName) {
-    return new MethodCallBuilder<T>(null, methodName, expressionHandler);
+  public MethodCallBuilder<T, VEB> call(final String methodName) {
+    return new MethodCallBuilder<T,VEB>(null, methodName, expressionHandler) {
+      @Override
+      protected VEB newValueExpressionBuilder(
+          ExpressionHandler<T> expressionHandler,
+          CallMethodExpression callMethodExpression) {
+        return ExpressionBuilder.this.newValueExpressionBuilder(expressionHandler, callMethodExpression);
+      }
+
+    };
   }
 
-  public ValueExpressionBuilder<T> literal(int i) {
-    return new ValueExpressionBuilder<T>(expressionHandler, new LiteralExpression(i));
+  public VEB literal(int i) {
+    return newValueExpressionBuilder(expressionHandler, new LiteralExpression(i));
   }
 
-  public ValueExpressionBuilder<T> literal(String string) {
-    return new ValueExpressionBuilder<T>(expressionHandler, new LiteralExpression(string));
+  public VEB literal(String string) {
+    return newValueExpressionBuilder(expressionHandler, new LiteralExpression(string));
   }
 
-  public ValueExpressionBuilder<T> literal(boolean b) {
-    return new ValueExpressionBuilder<T>(expressionHandler, new LiteralExpression(b));
+  public VEB literal(boolean b) {
+    return newValueExpressionBuilder(expressionHandler, new LiteralExpression(b));
   }
 
 }

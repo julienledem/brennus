@@ -7,7 +7,7 @@ import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.model.CallMethodExpression;
 import brennus.model.Expression;
 
-public class MethodCallBuilder<T>/* extends StatementBuilder<T> */ {
+abstract public class MethodCallBuilder<T, VEB> {
 
   private final Expression callee;
   private final String methodName;
@@ -25,34 +25,27 @@ public class MethodCallBuilder<T>/* extends StatementBuilder<T> */ {
    * pass a parameter to the method
    * @return the expressionbuilder to build the parameter value
    */
-  public ExpressionBuilder<MethodCallBuilder<T>> param() {
-    return new ExpressionBuilder<MethodCallBuilder<T>>(
-        new ExpressionHandler<MethodCallBuilder<T>>() {
-          public MethodCallBuilder<T> handleExpression(Expression e) {
+  public ParamExpressionBuilder<T, VEB> param() {
+    return new ParamExpressionBuilder<T, VEB>(
+        new ExpressionHandler<MethodCallBuilder<T, VEB>>() {
+          public MethodCallBuilder<T, VEB> handleExpression(Expression e) {
             parameters.add(e);
             return MethodCallBuilder.this;
           }
     });
   }
 
-//  /**
-//   * @return the handler for statements created in this method
-//   */
-//  @Override
-//  protected StatementHandler<T> statementHandler() {
-//    // in this case we are saying we are done with parameters.
-//    // so the handler will finalize this method and add the next statement to the parent
-//    // TODO: fix type declaration
-//    return ((StatementBuilder<T>)expressionHandler.handleExpression(new CallMethodExpression(callee, methodName, parameters))).statementHandler();
-//  }
-
   /**
    * no more parameters to pass to this method
    * (mostly used when no parameters at all)
    * @return the parent
    */
-  public ValueExpressionBuilder<T> endCall() {
-    return new ValueExpressionBuilder<T>(expressionHandler, new CallMethodExpression(callee, methodName, parameters));
+  public VEB endCall() {
+    return newValueExpressionBuilder(expressionHandler, new CallMethodExpression(callee, methodName, parameters));
   }
+
+  abstract protected VEB newValueExpressionBuilder(
+      ExpressionHandler<T> expressionHandler,
+      CallMethodExpression callMethodExpression);
 
 }

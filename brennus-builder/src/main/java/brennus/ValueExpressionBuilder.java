@@ -9,6 +9,7 @@ import static brennus.model.UnaryOperator.NOT;
 import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.model.BinaryExpression;
 import brennus.model.BinaryOperator;
+import brennus.model.CallMethodExpression;
 import brennus.model.CastExpression;
 import brennus.model.ExistingType;
 import brennus.model.Expression;
@@ -17,7 +18,7 @@ import brennus.model.Type;
 import brennus.model.UnaryExpression;
 import brennus.model.UnaryOperator;
 
-public class ValueExpressionBuilder<T> {
+abstract public class ValueExpressionBuilder<T, EB, VEB> {
 
   private final ExpressionHandler<T> expressionHandler;
   private final Expression expression;
@@ -32,51 +33,63 @@ public class ValueExpressionBuilder<T> {
         this.expression = expression;
   }
 
-  public ValueExpressionBuilder<T> not() {
+  public VEB not() {
     return unaryOperator(NOT);
   }
 
-  public ExpressionBuilder<T> and() {
+  public EB and() {
     return binaryOperator(AND);
   }
 
-  public ExpressionBuilder<T> add() {
+  public EB add() {
     return binaryOperator(PLUS);
   }
 
-  public ExpressionBuilder<T> isEqualTo() {
+  public EB isEqualTo() {
     return binaryOperator(EQUALS);
   }
 
-  public ExpressionBuilder<T> isGreaterThan() {
+  public EB isGreaterThan() {
     return binaryOperator(GREATER_THAN);
   }
 
-  public ValueExpressionBuilder<T> instanceOf(ExistingType existingType) {
-    return new ValueExpressionBuilder<T>(expressionHandler, new InstanceOfExpression(expression, existingType));
+  public VEB instanceOf(ExistingType existingType) {
+    return newValueExpressionBuilder(expressionHandler, new InstanceOfExpression(expression, existingType));
   }
 
-  public T end() {
+  public VEB castTo(Type type) {
+    return newValueExpressionBuilder(expressionHandler, new CastExpression(type, expression));
+  }
+
+  protected T end() {
     return expressionHandler.handleExpression(expression);
   }
 
-  private ExpressionBuilder<T> binaryOperator(final BinaryOperator operator) {
-    return new ExpressionBuilder<T>(new ExpressionHandler<T>() {
+  protected abstract EB newExpressionBuilder(ExpressionHandler<T> expressionHandler);
+
+  protected abstract VEB newValueExpressionBuilder(ExpressionHandler<T> expressionHandler, Expression expression);
+
+  private EB binaryOperator(final BinaryOperator operator) {
+    return newExpressionBuilder(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {
         return expressionHandler.handleExpression(new BinaryExpression(expression, operator, e));
       }
     });
   }
 
-  private ValueExpressionBuilder<T> unaryOperator(UnaryOperator operator) {
-    return new ValueExpressionBuilder<T>(expressionHandler, new UnaryExpression(operator, expression));
+  private VEB unaryOperator(UnaryOperator operator) {
+    return newValueExpressionBuilder(expressionHandler, new UnaryExpression(operator, expression));
   }
 
-  public MethodCallBuilder<T> call(String methodName) {
-    return new MethodCallBuilder<T>(expression, methodName, expressionHandler);
+  public MethodCallBuilder<T, VEB> call(String methodName) {
+    return new MethodCallBuilder<T, VEB>(expression, methodName, expressionHandler) {
+      @Override
+      protected VEB newValueExpressionBuilder(
+          ExpressionHandler<T> expressionHandler,
+          CallMethodExpression callMethodExpression) {
+        return ValueExpressionBuilder.this.newValueExpressionBuilder(expressionHandler, callMethodExpression);
+      }
+    };
   }
 
-  public ValueExpressionBuilder<T> castTo(Type type) {
-    return new ValueExpressionBuilder<T>(expressionHandler, new CastExpression(type, expression));
-  }
 }

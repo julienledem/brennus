@@ -4,7 +4,7 @@ public interface StatementVisitor {
 
   void visit(ReturnStatement returnStatement);
 
-  void visit(ExpressionStatement methodCallStatement);
+  void visit(ExpressionStatement expressionStatement);
 
   void visit(SwitchStatement switchStatement);
 
