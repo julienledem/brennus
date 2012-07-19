@@ -205,12 +205,14 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
       statement.accept(this);
     }
     decIndent();
-    println("} else {");
-    incIndent();
-    for (Statement statement : ifStatement.getElseStatements()) {
-      statement.accept(this);
+    if (ifStatement.getElseStatements().size() > 0) {
+      println("} else {");
+      incIndent();
+      for (Statement statement : ifStatement.getElseStatements()) {
+        statement.accept(this);
+      }
+      decIndent();
     }
-    decIndent();
     println("}");
   }
 
