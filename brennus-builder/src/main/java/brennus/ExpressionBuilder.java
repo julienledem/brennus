@@ -1,9 +1,12 @@
 package brennus;
 
+import static brennus.model.UnaryOperator.NOT;
 import brennus.model.CallMethodExpression;
 import brennus.model.Expression;
 import brennus.model.GetExpression;
 import brennus.model.LiteralExpression;
+import brennus.model.UnaryExpression;
+import brennus.model.UnaryOperator;
 
 /**
  * builds an expression
@@ -11,19 +14,27 @@ import brennus.model.LiteralExpression;
  *
  * @param <T> the type of the parent to return on completion
  */
-abstract public class ExpressionBuilder<T,VEB> {
+abstract public class ExpressionBuilder<T, EB, VEB> {
 
   public interface ExpressionHandler<T> {
     T handleExpression(Expression e);
   }
 
+  private final ExpressionBuilderFactory<T, EB, VEB> factory;
   private final ExpressionHandler<T> expressionHandler;
 
-  ExpressionBuilder(ExpressionHandler<T> expressionHandler) {
+  ExpressionBuilder(ExpressionBuilderFactory<T, EB, VEB> factory, ExpressionHandler<T> expressionHandler) {
+    this.factory = factory;
     this.expressionHandler = expressionHandler;
   }
 
-  protected abstract VEB newValueExpressionBuilder(ExpressionHandler<T> expressionHandler, Expression expression);
+  private VEB newValueExpressionBuilder(ExpressionHandler<T> expressionHandler, Expression expression) {
+    return factory.newValueExpressionBuilder(expressionHandler, expression);
+  }
+
+  private EB newExpressionBuilder(ExpressionHandler<T> expressionHandler) {
+    return factory.newExpressionBuilder(expressionHandler);
+  }
 
   public VEB get(String name) {
     return newValueExpressionBuilder(expressionHandler, new GetExpression(name));
@@ -61,4 +72,15 @@ abstract public class ExpressionBuilder<T,VEB> {
     return newValueExpressionBuilder(expressionHandler, new LiteralExpression(b));
   }
 
+  public EB not() {
+    return unaryOperator(NOT);
+  }
+
+  private EB unaryOperator(final UnaryOperator operator) {
+    return newExpressionBuilder(new ExpressionHandler<T>() {
+      public T handleExpression(Expression e) {
+        return expressionHandler.handleExpression(new UnaryExpression(operator, e));
+      }
+    });
+  }
 }

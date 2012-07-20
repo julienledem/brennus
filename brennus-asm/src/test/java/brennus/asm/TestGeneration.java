@@ -57,8 +57,8 @@ public class TestGeneration {
 
           .startMethod(PUBLIC, BOOLEAN, "not").param(BOOLEAN, "b")
             .exec().thisCall("println").get("b").endCall().endExec()
-            .exec().thisCall("println").get("b").not().endCall().endExec()
-            .returnExp().get("b").not().endReturn()
+            .exec().thisCall("println").not().get("b").endCall().endExec()
+            .returnExp().not().get("b").endReturn()
           .endMethod()
 
           .startMethod(PUBLIC, INT, "plus6").param(INT, "i")

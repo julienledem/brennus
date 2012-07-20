@@ -7,19 +7,7 @@ public class SwitchValueExpressionBuilder<T> extends ValueExpressionBuilder<Swit
 
   SwitchValueExpressionBuilder(ExpressionHandler<SwitchBuilder<T>> expressionHandler,
       Expression expression) {
-    super(expressionHandler, expression);
-  }
-
-  @Override
-  protected SwitchExpressionBuilder<T> newExpressionBuilder(
-      ExpressionHandler<SwitchBuilder<T>> expressionHandler) {
-    return new SwitchExpressionBuilder<T>(expressionHandler);
-  }
-
-  @Override
-  protected SwitchValueExpressionBuilder<T> newValueExpressionBuilder(
-      ExpressionHandler<SwitchBuilder<T>> expressionHandler, Expression expression) {
-    return new SwitchValueExpressionBuilder<T>(expressionHandler, expression);
+    super(new SwitchExpressionBuilderFactory<T>(), expressionHandler, expression);
   }
 
   public SwitchBuilder<T> endSwitchOn() {

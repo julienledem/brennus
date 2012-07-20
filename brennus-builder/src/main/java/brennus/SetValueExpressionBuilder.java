@@ -8,19 +8,7 @@ public class SetValueExpressionBuilder<T> extends
 
   SetValueExpressionBuilder(ExpressionHandler<T> expressionHandler,
       Expression expression) {
-    super(expressionHandler, expression);
-  }
-
-  @Override
-  protected SetExpressionBuilder<T> newExpressionBuilder(
-      ExpressionHandler<T> expressionHandler) {
-    return new SetExpressionBuilder<T>(expressionHandler);
-  }
-
-  @Override
-  protected SetValueExpressionBuilder<T> newValueExpressionBuilder(
-      ExpressionHandler<T> expressionHandler, Expression expression) {
-    return new SetValueExpressionBuilder<T>(expressionHandler, expression);
+    super(new SetExpressionBuilderFactory<T>(), expressionHandler, expression);
   }
 
   public T endSet() {

@@ -7,19 +7,7 @@ public class ReturnValueExpressionBuilder<T> extends ValueExpressionBuilder<T, R
 
   ReturnValueExpressionBuilder(ExpressionHandler<T> expressionHandler,
       Expression expression) {
-    super(expressionHandler, expression);
-  }
-
-  @Override
-  protected ReturnExpressionBuilder<T> newExpressionBuilder(
-      ExpressionHandler<T> expressionHandler) {
-    return new ReturnExpressionBuilder<T>(expressionHandler);
-  }
-
-  @Override
-  protected ReturnValueExpressionBuilder<T> newValueExpressionBuilder(
-      ExpressionHandler<T> expressionHandler, Expression expression) {
-    return new ReturnValueExpressionBuilder<T>(expressionHandler, expression);
+    super(new ReturnExpressionBuilderFactory<T>(), expressionHandler, expression);
   }
 
   public T endReturn() {

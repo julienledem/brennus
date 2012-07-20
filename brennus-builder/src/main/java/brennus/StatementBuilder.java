@@ -24,7 +24,7 @@ abstract public class StatementBuilder<T> {
    */
   protected abstract StatementHandler<T> statementHandler();
 
-  final public ExpressionBuilder<T, ReturnValueExpressionBuilder<T>> returnExp() {
+  final public ReturnExpressionBuilder<T> returnExp() {
     final int sourceLineNumber = MethodContext.getSourceLineNumber();
     return new ReturnExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {
@@ -33,7 +33,7 @@ abstract public class StatementBuilder<T> {
     });
   }
 
-  final public ExpressionBuilder<SwitchBuilder<T>, SwitchValueExpressionBuilder<T>> switchOn() {
+  final public SwitchExpressionBuilder<T> switchOn() {
     return new SwitchExpressionBuilder<T>(new ExpressionHandler<SwitchBuilder<T>>() {
       public SwitchBuilder<T> handleExpression(final Expression e) {
         return new SwitchBuilder<T>(e, new SwitchStatementsHandler<T>() {
@@ -45,7 +45,7 @@ abstract public class StatementBuilder<T> {
     });
   }
 
-  final public ExpressionBuilder<T, ThrowValueExpressionBuilder<T>> throwExp() {
+  final public ThrowExpressionBuilder<T> throwExp() {
     final int sourceLineNumber = MethodContext.getSourceLineNumber();
     return new ThrowExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {
@@ -54,7 +54,7 @@ abstract public class StatementBuilder<T> {
     });
   }
 
-  final public ExpressionBuilder<T, SetValueExpressionBuilder<T>> set(final String to) {
+  final public SetExpressionBuilder<T> set(final String to) {
     final int sourceLineNumber = MethodContext.getSourceLineNumber();
     return new SetExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {
@@ -63,7 +63,7 @@ abstract public class StatementBuilder<T> {
     });
   }
 
-  final public ExpressionBuilder<ThenBuilder<T>, ThenValueExpressionBuilder<T>> ifExp() {
+  final public ThenExpressionBuilder<T> ifExp() {
     return new ThenExpressionBuilder<T>(new ExpressionHandler<ThenBuilder<T>>() {
       public ThenBuilder<T> handleExpression(final Expression e) {
         return new ThenBuilder<T>(e, new IfStatementHandler<T>() {
@@ -80,7 +80,7 @@ abstract public class StatementBuilder<T> {
    * @param methodName
    * @return a methodCallBuilder for optionally passing parameters
    */
-  final public ExpressionBuilder<T, ExecValueExpressionBuilder<T>> exec() {
+  final public ExecExpressionBuilder<T> exec() {
     final int sourceLineNumber = MethodContext.getSourceLineNumber();
     return new ExecExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {

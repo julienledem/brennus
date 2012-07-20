@@ -4,8 +4,6 @@ import static brennus.model.BinaryOperator.AND;
 import static brennus.model.BinaryOperator.EQUALS;
 import static brennus.model.BinaryOperator.GREATER_THAN;
 import static brennus.model.BinaryOperator.PLUS;
-import static brennus.model.UnaryOperator.NOT;
-
 import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.model.BinaryExpression;
 import brennus.model.BinaryOperator;
@@ -15,11 +13,10 @@ import brennus.model.ExistingType;
 import brennus.model.Expression;
 import brennus.model.InstanceOfExpression;
 import brennus.model.Type;
-import brennus.model.UnaryExpression;
-import brennus.model.UnaryOperator;
 
 abstract public class ValueExpressionBuilder<T, EB, VEB> {
 
+  private final ExpressionBuilderFactory<T, EB, VEB> factory;
   private final ExpressionHandler<T> expressionHandler;
   private final Expression expression;
 
@@ -28,13 +25,10 @@ abstract public class ValueExpressionBuilder<T, EB, VEB> {
    * @param expressionHandler the handler that will receive the resulting expression
    * @param expression the paarent expression (left operand)
    */
-  ValueExpressionBuilder(ExpressionHandler<T> expressionHandler, Expression expression) {
+  ValueExpressionBuilder(ExpressionBuilderFactory<T, EB, VEB> factory, ExpressionHandler<T> expressionHandler, Expression expression) {
+        this.factory = factory;
         this.expressionHandler = expressionHandler;
         this.expression = expression;
-  }
-
-  public VEB not() {
-    return unaryOperator(NOT);
   }
 
   public EB and() {
@@ -65,9 +59,13 @@ abstract public class ValueExpressionBuilder<T, EB, VEB> {
     return expressionHandler.handleExpression(expression);
   }
 
-  protected abstract EB newExpressionBuilder(ExpressionHandler<T> expressionHandler);
+  private EB newExpressionBuilder(ExpressionHandler<T> expressionHandler) {
+    return factory.newExpressionBuilder(expressionHandler);
+  }
 
-  protected abstract VEB newValueExpressionBuilder(ExpressionHandler<T> expressionHandler, Expression expression);
+  private VEB newValueExpressionBuilder(ExpressionHandler<T> expressionHandler, Expression expression) {
+    return factory.newValueExpressionBuilder(expressionHandler, expression);
+  }
 
   private EB binaryOperator(final BinaryOperator operator) {
     return newExpressionBuilder(new ExpressionHandler<T>() {
@@ -75,10 +73,6 @@ abstract public class ValueExpressionBuilder<T, EB, VEB> {
         return expressionHandler.handleExpression(new BinaryExpression(expression, operator, e));
       }
     });
-  }
-
-  private VEB unaryOperator(UnaryOperator operator) {
-    return newValueExpressionBuilder(expressionHandler, new UnaryExpression(operator, expression));
   }
 
   public ParamExpressionBuilder<T, VEB> call(String methodName) {

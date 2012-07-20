@@ -8,18 +8,7 @@ public class ParamValueExpressionBuilder<T, VEB> extends ValueExpressionBuilder<
   ParamValueExpressionBuilder(
       ExpressionHandler<MethodCallBuilder<T, VEB>> expressionHandler,
       Expression expression) {
-    super(expressionHandler, expression);
-  }
-
-  @Override
-  protected ParamExpressionBuilder<T, VEB> newExpressionBuilder(ExpressionHandler<MethodCallBuilder<T, VEB>> expressionHandler) {
-    return new ParamExpressionBuilder<T, VEB>(expressionHandler);
-  }
-
-  @Override
-  protected ParamValueExpressionBuilder<T, VEB> newValueExpressionBuilder(
-      ExpressionHandler<MethodCallBuilder<T, VEB>> expressionHandler, Expression expression) {
-    return new ParamValueExpressionBuilder<T, VEB>(expressionHandler, expression);
+    super(new ParamExpressionBuilderFactory<T, VEB>(), expressionHandler, expression);
   }
 
   private MethodCallBuilder<T, VEB> endParam() {

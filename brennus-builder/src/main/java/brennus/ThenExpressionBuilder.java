@@ -1,16 +1,10 @@
 package brennus;
 
-import brennus.model.Expression;
 
-public final class ThenExpressionBuilder<T> extends ExpressionBuilder<ThenBuilder<T>, ThenValueExpressionBuilder<T>> {
+public final class ThenExpressionBuilder<T> extends ExpressionBuilder<ThenBuilder<T>, ThenExpressionBuilder<T>, ThenValueExpressionBuilder<T>> {
 
   ThenExpressionBuilder( ExpressionHandler<ThenBuilder<T>> expressionHandler) {
-    super(expressionHandler);
+    super(new ThenExpressionBuilderFactory<T>(), expressionHandler);
   }
 
-  @Override
-  protected ThenValueExpressionBuilder<T> newValueExpressionBuilder(
-      ExpressionHandler<ThenBuilder<T>> expressionHandler, Expression expression) {
-    return new ThenValueExpressionBuilder<T>(expressionHandler, expression);
-  }
 }

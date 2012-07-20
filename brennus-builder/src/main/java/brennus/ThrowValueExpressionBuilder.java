@@ -8,19 +8,7 @@ public class ThrowValueExpressionBuilder<T> extends
 
   ThrowValueExpressionBuilder(ExpressionHandler<T> expressionHandler,
       Expression expression) {
-    super(expressionHandler, expression);
-  }
-
-  @Override
-  protected ThrowExpressionBuilder<T> newExpressionBuilder(
-      ExpressionHandler<T> expressionHandler) {
-    return new ThrowExpressionBuilder<T>(expressionHandler);
-  }
-
-  @Override
-  protected ThrowValueExpressionBuilder<T> newValueExpressionBuilder(
-      ExpressionHandler<T> expressionHandler, Expression expression) {
-    return new ThrowValueExpressionBuilder<T>(expressionHandler, expression);
+    super(new ThrowExpressionBuilderFactory<T>(),expressionHandler, expression);
   }
 
   public T endThrow() {

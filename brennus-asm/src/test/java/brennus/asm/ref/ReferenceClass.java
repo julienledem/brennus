@@ -1,6 +1,5 @@
 package brennus.asm.ref;
 
-import brennus.BaseTestClass;
 import brennus.asm.BaseClass;
 
 public class ReferenceClass extends BaseClass {
