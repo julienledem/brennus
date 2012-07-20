@@ -36,14 +36,6 @@ abstract public class ExpressionBuilder<T, EB, VEB> {
     return factory.newExpressionBuilder(expressionHandler);
   }
 
-  public VEB get(String name) {
-    return newValueExpressionBuilder(expressionHandler, new GetExpression(name));
-  }
-
-  public ParamExpressionBuilder<T, VEB> thisCall(final String methodName) {
-    return innerCall(methodName).param();
-  }
-
   private MethodCallBuilder<T, VEB> innerCall(final String methodName) {
     return new MethodCallBuilder<T,VEB>(null, methodName, expressionHandler) {
       @Override
@@ -56,7 +48,23 @@ abstract public class ExpressionBuilder<T, EB, VEB> {
     };
   }
 
-  public VEB thisCallNoParam(final String methodName) {
+  private EB unaryOperator(final UnaryOperator operator) {
+    return newExpressionBuilder(new ExpressionHandler<T>() {
+      public T handleExpression(Expression e) {
+        return expressionHandler.handleExpression(new UnaryExpression(operator, e));
+      }
+    });
+  }
+
+  public VEB get(String name) {
+    return newValueExpressionBuilder(expressionHandler, new GetExpression(name));
+  }
+
+  public ParamExpressionBuilder<T, VEB> callOnThis(final String methodName) {
+    return innerCall(methodName).param();
+  }
+
+  public VEB callOnThisNoParam(final String methodName) {
     return innerCall(methodName).endCall();
   }
 
@@ -76,11 +84,4 @@ abstract public class ExpressionBuilder<T, EB, VEB> {
     return unaryOperator(NOT);
   }
 
-  private EB unaryOperator(final UnaryOperator operator) {
-    return newExpressionBuilder(new ExpressionHandler<T>() {
-      public T handleExpression(Expression e) {
-        return expressionHandler.handleExpression(new UnaryExpression(operator, e));
-      }
-    });
-  }
 }

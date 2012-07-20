@@ -30,7 +30,6 @@ import brennus.model.Type;
 import brennus.model.TypeVisitor;
 import brennus.model.UnaryExpression;
 
-
 public class TypePrinter {
 
   public void print(Type type) {
