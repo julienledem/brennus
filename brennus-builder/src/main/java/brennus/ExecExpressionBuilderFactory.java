@@ -3,7 +3,7 @@ package brennus;
 import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.model.Expression;
 
-public class ExecExpressionBuilderFactory<T> implements
+class ExecExpressionBuilderFactory<T> implements
     ExpressionBuilderFactory<T, ExecExpressionBuilder<T>, ExecValueExpressionBuilder<T>> {
 
   @Override

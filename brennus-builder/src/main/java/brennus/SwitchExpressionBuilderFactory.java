@@ -3,7 +3,7 @@ package brennus;
 import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.model.Expression;
 
-public class SwitchExpressionBuilderFactory<T>
+class SwitchExpressionBuilderFactory<T>
     implements
     ExpressionBuilderFactory<SwitchBuilder<T>, SwitchExpressionBuilder<T>, SwitchValueExpressionBuilder<T>> {
 

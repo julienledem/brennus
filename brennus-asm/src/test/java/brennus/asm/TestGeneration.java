@@ -32,7 +32,7 @@ public class TestGeneration {
   @Test
   public void testGeneration() throws Exception {
     FutureType testClass =
-        startClass("test.TestClass").extendsType(existing(BaseTestClass.class))
+        startClass("test.TestClass", existing(BaseTestClass.class))
 
           .field(PRIVATE, STRING, "foo")
           .field(PRIVATE, INT, "bar")
@@ -62,7 +62,12 @@ public class TestGeneration {
           .endMethod()
 
           .startMethod(PUBLIC, INT, "plus6").param(INT, "i")
-            .returnExp().get("i").add().literal(1).add().literal(2).add().literal(3).endReturn()
+            .returnExp()
+              .get("i")
+              .add().literal(1)
+              .add().literal(2)
+              .add().literal(3)
+              .endReturn()
           .endMethod()
 
           .startMethod(PUBLIC, STRING, "getFoo")
@@ -74,7 +79,7 @@ public class TestGeneration {
           .endMethod()
 
           .startMethod(PUBLIC, OBJECT, "get").param(INT, "i")
-            .switchOn().get("i").endSwitchOn()
+            .switchOn().get("i").switchBlock()
               .caseBlock(0)
                 .exec().callOnThis("println").literal("get(0)").endCall().endExec()
                 .returnExp().callOnThisNoParam("getFoo").endReturn()
@@ -91,7 +96,7 @@ public class TestGeneration {
           .endMethod()
 
           .startMethod(PUBLIC, VOID, "set").param(INT, "i").param(OBJECT, "o")
-            .switchOn().get("i").endSwitchOn()
+            .switchOn().get("i").switchBlock()
               .caseBlock(0)
                 .exec().callOnThis("println").literal("set(0)").endCall().endExec()
                 .set("foo").get("o").endSet()

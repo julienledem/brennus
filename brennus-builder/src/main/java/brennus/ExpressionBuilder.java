@@ -1,7 +1,6 @@
 package brennus;
 
 import static brennus.model.UnaryOperator.NOT;
-import brennus.model.CallMethodExpression;
 import brennus.model.Expression;
 import brennus.model.GetExpression;
 import brennus.model.LiteralExpression;
@@ -16,7 +15,7 @@ import brennus.model.UnaryOperator;
  */
 abstract public class ExpressionBuilder<T, EB, VEB> {
 
-  public interface ExpressionHandler<T> {
+  interface ExpressionHandler<T> {
     T handleExpression(Expression e);
   }
 
@@ -36,16 +35,8 @@ abstract public class ExpressionBuilder<T, EB, VEB> {
     return factory.newExpressionBuilder(expressionHandler);
   }
 
-  private MethodCallBuilder<T, VEB> innerCall(final String methodName) {
-    return new MethodCallBuilder<T,VEB>(null, methodName, expressionHandler) {
-      @Override
-      protected VEB newValueExpressionBuilder(
-          ExpressionHandler<T> expressionHandler,
-          CallMethodExpression callMethodExpression) {
-        return ExpressionBuilder.this.newValueExpressionBuilder(expressionHandler, callMethodExpression);
-      }
-
-    };
+  private MethodCallBuilder<T, EB, VEB> innerCall(final String methodName) {
+    return new MethodCallBuilder<T, EB, VEB>(factory, null, methodName, expressionHandler);
   }
 
   private EB unaryOperator(final UnaryOperator operator) {
@@ -60,7 +51,7 @@ abstract public class ExpressionBuilder<T, EB, VEB> {
     return newValueExpressionBuilder(expressionHandler, new GetExpression(name));
   }
 
-  public ParamExpressionBuilder<T, VEB> callOnThis(final String methodName) {
+  public ParamExpressionBuilder<T, EB, VEB> callOnThis(final String methodName) {
     return innerCall(methodName).param();
   }
 

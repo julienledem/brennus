@@ -8,6 +8,13 @@ import brennus.model.MemberFlags;
 import brennus.model.Parameter;
 import brennus.model.Type;
 
+/**
+ *
+ * Builder for method declarations
+ *
+ * @author Julien Le Dem
+ *
+ */
 public class MethodDeclarationBuilder extends StatementBuilder<MethodBuilder> {
 
   private final String classIdentifier;
@@ -26,6 +33,12 @@ public class MethodDeclarationBuilder extends StatementBuilder<MethodBuilder> {
         this.methodHandler = methodHandler;
   }
 
+  /**
+   * declares a parameter
+   * @param type the type of the parameter
+   * @param name the name of the parameter
+   * @return this
+   */
   public MethodDeclarationBuilder param(Type type, String name) {
     parameters.add(new Parameter(type, name, parameters.size()));
     return this;

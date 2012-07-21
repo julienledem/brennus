@@ -3,21 +3,21 @@ package brennus;
 import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.model.Expression;
 
-public class ParamExpressionBuilderFactory<T, VEB>
+class ParamExpressionBuilderFactory<T, EB, VEB>
     implements
-    ExpressionBuilderFactory<MethodCallBuilder<T, VEB>, ParamExpressionBuilder<T, VEB>, ParamValueExpressionBuilder<T, VEB>> {
+    ExpressionBuilderFactory<MethodCallBuilder<T, EB, VEB>, ParamExpressionBuilder<T, EB, VEB>, ParamValueExpressionBuilder<T, EB, VEB>> {
 
   @Override
-  public ParamValueExpressionBuilder<T, VEB> newValueExpressionBuilder(
-      brennus.ExpressionBuilder.ExpressionHandler<MethodCallBuilder<T, VEB>> expressionHandler,
+  public ParamValueExpressionBuilder<T, EB, VEB> newValueExpressionBuilder(
+      brennus.ExpressionBuilder.ExpressionHandler<MethodCallBuilder<T, EB, VEB>> expressionHandler,
       Expression expression) {
-    return new ParamValueExpressionBuilder<T, VEB>(expressionHandler, expression);
+    return new ParamValueExpressionBuilder<T, EB, VEB>(expressionHandler, expression);
   }
 
   @Override
-  public ParamExpressionBuilder<T, VEB> newExpressionBuilder(
-      ExpressionHandler<MethodCallBuilder<T, VEB>> expressionHandler) {
-    return new ParamExpressionBuilder<T, VEB>(expressionHandler);
+  public ParamExpressionBuilder<T, EB, VEB> newExpressionBuilder(
+      ExpressionHandler<MethodCallBuilder<T, EB, VEB>> expressionHandler) {
+    return new ParamExpressionBuilder<T, EB, VEB>(expressionHandler);
   }
 
 }

@@ -30,7 +30,7 @@ public class TestTuple {
     testSetGet(c);
 
     FutureType testClass =
-        startClass("brennus.asm.TestTuple$TestClass").extendsType(existing(BaseClass.class))
+        startClass("brennus.asm.TestTuple$TestClass", existing(BaseClass.class))
           .field(PRIVATE, STRING, "a")
           .field(PRIVATE, INT, "b")
           .field(PRIVATE, LONG, "c")
@@ -45,7 +45,7 @@ public class TestTuple {
           .startMethod(PUBLIC, OBJECT, "get").param(INT, "index")
             .exec().callOnThis("println").literal("get").endCall().endExec()
             .exec().callOnThis("println").get("index").endCall().endExec()
-            .switchOn().get("index").endSwitchOn()
+            .switchOn().get("index").switchBlock()
               .caseBlock(0)
                 .returnExp().get("a").endReturn()
               .endCase()
@@ -82,7 +82,7 @@ public class TestTuple {
           .startMethod(PUBLIC, VOID, "set").param(INT, "index").param(OBJECT, "o")
             .exec().callOnThis("println").literal("set").endCall().endExec()
             .exec().callOnThis("println").get("index").endCall().endExec()
-            .switchOn().get("index").endSwitchOn()
+            .switchOn().get("index").switchBlock()
               .caseBlock(0)
                 .set("a").get("o").endSet()
               .breakCase()

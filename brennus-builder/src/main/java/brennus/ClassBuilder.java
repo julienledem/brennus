@@ -28,8 +28,9 @@ public class ClassBuilder {
   private final List<Method> staticMethods = new ArrayList<Method>();
   private final String sourceFile;
 
-  private ClassBuilder(String name) {
+  private ClassBuilder(String name, Type extending) {
     this.name = name;
+    this.extending = extending;
     StackTraceElement creatingStackFrame = MethodContext.getCreatingStackFrame();
     if (creatingStackFrame == null) {
       sourceFile = "generated";
@@ -40,38 +41,75 @@ public class ClassBuilder {
 
   // builder methods
 
+  /**
+   * startClass(name, extending)[.[static]field(protection, type, name)]*[.start[Static]Method(protection, return, name){statements}.endMethod()]*.endClass()
+   * @param name the fully qualified name of the class
+   * @return a ClassBuilder
+   */
+  public static ClassBuilder startClass(String name, Type extending) {
+    return new ClassBuilder(name, extending);
+  }
+
+  /**
+   * startClass(name, extending)[.[static]field(protection, type, name)]*[.start[Static]Method(protection, return, name){statements}.endMethod()]*.endClass()
+   * @param name the fully qualified name of the class
+   * @return a ClassBuilder
+   */
   public static ClassBuilder startClass(String name) {
-    return new ClassBuilder(name);
+    return new ClassBuilder(name, ExistingType.OBJECT);
   }
 
-  public ClassBuilder extendsType(Type type) {
-    if (extending != null) {
-      throw new IllegalStateException("Can't extend "+type+" Allready extending "+extending);
-    }
-    this.extending = type;
-    return this;
-  }
-
+  /**
+   * @param protection public/package/protected/private
+   * @param type
+   * @param name
+   * @return this
+   */
   public ClassBuilder field(Protection protection, Type type, String name) {
     field(protection, type, name, false);
     return this;
   }
 
+  /**
+   * @param protection public/package/protected/private
+   * @param type
+   * @param name
+   * @return this
+   */
   public ClassBuilder staticField(Protection protection, Type type, String name) {
     field(protection, type, name, true);
     return this;
   }
 
+  /**
+   * .startStaticMethod(protection, return, name){statements}.endMethod()
+   *
+   * @param protection public/package/protected/private
+   * @param returnType
+   * @param methodName
+   * @return a MethodDeclarationBuilder
+   */
   public MethodDeclarationBuilder startStaticMethod(Protection protection, Type returnType, String methodName) {
     return startMethod(protection, returnType, methodName, true);
   }
 
+  /**
+   * .startMethod(protection, return, name){statements}.endMethod()
+   *
+   * @param protection public/package/protected/private
+   * @param returnType
+   * @param methodName
+   * @return a MethodDeclarationBuilder
+   */
   public MethodDeclarationBuilder startMethod(Protection protection, Type returnType, String methodName) {
     return startMethod(protection, returnType, methodName, false);
   }
 
+  /**
+   * @return the resulting class
+   */
   public FutureType endClass() {
-    FutureType futureType = new FutureType(getName(), extending == null ? ExistingType.OBJECT : extending, fields, staticFields, methods, staticMethods, sourceFile);
+    FutureType futureType = new FutureType(name, extending == null ? ExistingType.OBJECT : extending, fields, staticFields, methods, staticMethods, sourceFile);
     new ClassValidator().validate(futureType);
     return futureType;
   }
@@ -89,10 +127,6 @@ public class ClassBuilder {
 
   private void field(Protection protection, Type type, String name, boolean isStatic) {
     (isStatic ? staticFields : fields).add(new Field(new MemberFlags(isStatic, protection), type, name));
-  }
-
-  public String getName() {
-    return name;
   }
 
 }

@@ -1,11 +1,11 @@
 package brennus;
 
 
-public class ParamExpressionBuilder<T, VEB> extends ExpressionBuilder<MethodCallBuilder<T, VEB>, ParamExpressionBuilder<T, VEB>, ParamValueExpressionBuilder<T, VEB>> {
+public class ParamExpressionBuilder<T, EB, VEB> extends ExpressionBuilder<MethodCallBuilder<T, EB, VEB>, ParamExpressionBuilder<T, EB, VEB>, ParamValueExpressionBuilder<T, EB, VEB>> {
 
   ParamExpressionBuilder(
-      ExpressionHandler<MethodCallBuilder<T, VEB>> expressionHandler) {
-    super(new ParamExpressionBuilderFactory<T, VEB>(), expressionHandler);
+      ExpressionHandler<MethodCallBuilder<T, EB, VEB>> expressionHandler) {
+    super(new ParamExpressionBuilderFactory<T, EB, VEB>(), expressionHandler);
   }
 
 }

@@ -9,7 +9,7 @@ import brennus.model.Statement;
 
 public class ThenBuilder<T> extends StatementBuilder<ThenBuilder<T>> {
 
-  public static interface IfStatementHandler<T> {
+  static interface IfStatementHandler<T> {
     T handleStatement(IfStatement ifStatement);
   }
 
@@ -18,7 +18,7 @@ public class ThenBuilder<T> extends StatementBuilder<ThenBuilder<T>> {
   private final int sourceLineNumber;
   private final List<Statement> thenStatements = new ArrayList<Statement>();
 
-  public ThenBuilder(Expression e, IfStatementHandler<T> ifStatementHandler) {
+  ThenBuilder(Expression e, IfStatementHandler<T> ifStatementHandler) {
     this.e = e;
     this.ifStatementHandler = ifStatementHandler;
     this.sourceLineNumber = MethodContext.getSourceLineNumber();

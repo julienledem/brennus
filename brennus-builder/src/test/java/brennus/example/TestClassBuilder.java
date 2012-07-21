@@ -18,7 +18,7 @@ public class TestClassBuilder {
   @Test
   public void testBuilder() {
     Type testClass =
-        startClass("test.TestClass").extendsType(existing(TestClassBuilder.class))
+        startClass("test.TestClass", existing(TestClassBuilder.class))
           .field(PRIVATE, STRING, "foo")
           .field(PRIVATE, INT, "bar")
           .startMethod(PUBLIC, STRING, "getFoo")
@@ -28,7 +28,7 @@ public class TestClassBuilder {
             .returnExp().get("bar").endReturn()
           .endMethod()
           .startMethod(PUBLIC, OBJECT, "get").param(INT, "i")
-            .switchOn().get("i").endSwitchOn()
+            .switchOn().get("i").switchBlock()
               .caseBlock(0)
                 .returnExp().callOnThisNoParam("getFoo").endReturn()
               .endCase()

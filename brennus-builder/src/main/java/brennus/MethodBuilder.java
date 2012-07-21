@@ -18,7 +18,7 @@ import brennus.model.Type;
  */
 public class MethodBuilder extends StatementBuilder<MethodBuilder> {
 
-  public interface MethodHandler {
+  interface MethodHandler {
     ClassBuilder handleMethod(Method method);
   }
 

@@ -19,7 +19,7 @@ import brennus.model.SwitchStatement;
  */
 public class SwitchBuilder<T> {
 
-  public interface SwitchStatementsHandler<T> {
+  interface SwitchStatementsHandler<T> {
     T handleStatement(SwitchStatement switchStatement);
   }
 

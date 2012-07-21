@@ -16,7 +16,7 @@ public class ElseBuilder<T> extends StatementBuilder<ElseBuilder<T>> {
   private final List<Statement> thenStatements;
   private final List<Statement> elseStatements = new ArrayList<Statement>();
 
-  public ElseBuilder(Expression ifExpression, int sourceLineNumber, IfStatementHandler<T> ifStatementHandler, List<Statement> thenStatements) {
+  ElseBuilder(Expression ifExpression, int sourceLineNumber, IfStatementHandler<T> ifStatementHandler, List<Statement> thenStatements) {
     this.ifExpression = ifExpression;
     this.sourceLineNumber = sourceLineNumber;
     this.ifStatementHandler = ifStatementHandler;

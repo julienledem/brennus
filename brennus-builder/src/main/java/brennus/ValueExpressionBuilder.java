@@ -7,13 +7,21 @@ import static brennus.model.BinaryOperator.PLUS;
 import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.model.BinaryExpression;
 import brennus.model.BinaryOperator;
-import brennus.model.CallMethodExpression;
 import brennus.model.CastExpression;
 import brennus.model.ExistingType;
 import brennus.model.Expression;
 import brennus.model.InstanceOfExpression;
 import brennus.model.Type;
 
+/**
+ * builder for operations that can be applied to a value
+ *
+ * @author Julien Le Dem
+ *
+ * @param <T> the Type of the parent
+ * @param <EB> the type of the next ExpressionBuilder
+ * @param <VEB> the type of the next ValueExpressionBuilder
+ */
 abstract public class ValueExpressionBuilder<T, EB, VEB> {
 
   private final ExpressionBuilderFactory<T, EB, VEB> factory;
@@ -21,9 +29,9 @@ abstract public class ValueExpressionBuilder<T, EB, VEB> {
   private final Expression expression;
 
   /**
-   *
+   * @param factory to get expressionBuilders of the right type
    * @param expressionHandler the handler that will receive the resulting expression
-   * @param expression the paarent expression (left operand)
+   * @param expression the parent expression (left operand)
    */
   ValueExpressionBuilder(ExpressionBuilderFactory<T, EB, VEB> factory, ExpressionHandler<T> expressionHandler, Expression expression) {
         this.factory = factory;
@@ -55,7 +63,7 @@ abstract public class ValueExpressionBuilder<T, EB, VEB> {
     return newValueExpressionBuilder(expressionHandler, new CastExpression(type, expression));
   }
 
-  protected T end() {
+  T end() {
     return expressionHandler.handleExpression(expression);
   }
 
@@ -75,15 +83,8 @@ abstract public class ValueExpressionBuilder<T, EB, VEB> {
     });
   }
 
-  public ParamExpressionBuilder<T, VEB> call(String methodName) {
-    return new MethodCallBuilder<T, VEB>(expression, methodName, expressionHandler) {
-      @Override
-      protected VEB newValueExpressionBuilder(
-          ExpressionHandler<T> expressionHandler,
-          CallMethodExpression callMethodExpression) {
-        return ValueExpressionBuilder.this.newValueExpressionBuilder(expressionHandler, callMethodExpression);
-      }
-    }.param();
+  public ParamExpressionBuilder<T, EB, VEB> call(String methodName) {
+    return new MethodCallBuilder<T, EB, VEB>(factory, expression, methodName, expressionHandler).param();
   }
 
 }

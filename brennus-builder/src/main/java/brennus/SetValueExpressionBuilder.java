@@ -3,6 +3,12 @@ package brennus;
 import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.model.Expression;
 
+/**
+ *
+ * @author Julien Le Dem
+ *
+ * @param <T> type of the parent
+ */
 public class SetValueExpressionBuilder<T> extends
     ValueExpressionBuilder<T, SetExpressionBuilder<T>, SetValueExpressionBuilder<T>> {
 
@@ -11,6 +17,10 @@ public class SetValueExpressionBuilder<T> extends
     super(new SetExpressionBuilderFactory<T>(), expressionHandler, expression);
   }
 
+  /**
+   * ends the set statement
+   * @return parent
+   */
   public T endSet() {
     return super.end();
   }

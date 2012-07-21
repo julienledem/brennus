@@ -12,10 +12,16 @@ import brennus.model.Statement;
 import brennus.model.SwitchStatement;
 import brennus.model.ThrowStatement;
 
-
+/**
+ * statement builder
+ *
+ * @author Julien Le Dem
+ *
+ * @param <T> the type of the parent to be returned on completion
+ */
 abstract public class StatementBuilder<T> {
 
-  public interface StatementHandler<T> {
+  interface StatementHandler<T> {
     T handleStatement(Statement statement);
   }
 
@@ -24,6 +30,10 @@ abstract public class StatementBuilder<T> {
    */
   protected abstract StatementHandler<T> statementHandler();
 
+  /**
+   * returnExp().{expression}.endReturn()
+   * @return an expression builder
+   */
   final public ReturnExpressionBuilder<T> returnExp() {
     final int sourceLineNumber = MethodContext.getSourceLineNumber();
     return new ReturnExpressionBuilder<T>(new ExpressionHandler<T>() {
@@ -33,6 +43,17 @@ abstract public class StatementBuilder<T> {
     });
   }
 
+  /**
+   * switchOn().{expression}.switchBlock()
+   *   .caseBlock(int)
+   *   {statements}
+   *   .[end|break]Case()
+   *   .defaultCase()
+   *   {statements}
+   *   .[end|break]Case()
+   * .endSwitch()
+   * @return an expression builder
+   */
   final public SwitchExpressionBuilder<T> switchOn() {
     return new SwitchExpressionBuilder<T>(new ExpressionHandler<SwitchBuilder<T>>() {
       public SwitchBuilder<T> handleExpression(final Expression e) {
@@ -45,6 +66,10 @@ abstract public class StatementBuilder<T> {
     });
   }
 
+  /**
+   * throwExp().{expression}.endThrow()
+   * @return an expression builder
+   */
   final public ThrowExpressionBuilder<T> throwExp() {
     final int sourceLineNumber = MethodContext.getSourceLineNumber();
     return new ThrowExpressionBuilder<T>(new ExpressionHandler<T>() {
@@ -54,6 +79,10 @@ abstract public class StatementBuilder<T> {
     });
   }
 
+  /**
+   * set(varName).{expression}.endSet()
+   * @return an expression builder
+   */
   final public SetExpressionBuilder<T> set(final String to) {
     final int sourceLineNumber = MethodContext.getSourceLineNumber();
     return new SetExpressionBuilder<T>(new ExpressionHandler<T>() {
@@ -63,6 +92,14 @@ abstract public class StatementBuilder<T> {
     });
   }
 
+  /**
+   * ifExp().{expression}.thenBlock()
+   * {statements}
+   * .elseBlock()
+   * {statements}
+   * .endIf()
+   * @return an expression builder
+   */
   final public ThenExpressionBuilder<T> ifExp() {
     return new ThenExpressionBuilder<T>(new ExpressionHandler<ThenBuilder<T>>() {
       public ThenBuilder<T> handleExpression(final Expression e) {
@@ -76,9 +113,8 @@ abstract public class StatementBuilder<T> {
   }
 
   /**
-   * creates a call statement
-   * @param methodName
-   * @return a methodCallBuilder for optionally passing parameters
+   * exec().{expression}.endExec()
+   * @return an expression builder
    */
   final public ExecExpressionBuilder<T> exec() {
     final int sourceLineNumber = MethodContext.getSourceLineNumber();
