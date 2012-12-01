@@ -5,7 +5,9 @@ import brennus.ThenBuilder.IfStatementHandler;
 import brennus.SwitchBuilder.SwitchStatementsHandler;
 import brennus.model.Expression;
 import brennus.model.ExpressionStatement;
+import brennus.model.GotoStatement;
 import brennus.model.IfStatement;
+import brennus.model.LabelStatement;
 import brennus.model.ReturnStatement;
 import brennus.model.SetStatement;
 import brennus.model.Statement;
@@ -123,5 +125,15 @@ abstract public class StatementBuilder<T> {
         return statementHandler().handleStatement(new ExpressionStatement(sourceLineNumber, e));
       }
     });
+  }
+
+
+  final public T label(String labelName) {
+    return statementHandler().handleStatement(new LabelStatement(MethodContext.getSourceLineNumber(), labelName));
+  }
+
+
+  public T gotoLabel(String labelName) {
+    return statementHandler().handleStatement(new GotoStatement(MethodContext.getSourceLineNumber(), labelName));
   }
 }

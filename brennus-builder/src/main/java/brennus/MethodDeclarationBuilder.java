@@ -47,4 +47,5 @@ public class MethodDeclarationBuilder extends StatementBuilder<MethodBuilder> {
   protected StatementHandler<MethodBuilder> statementHandler() {
     return new MethodBuilder(classIdentifier, memberFlags, returnType, methodName, parameters, methodHandler).statementHandler();
   }
+
 }

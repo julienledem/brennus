@@ -1,5 +1,11 @@
 package brennus.model;
 
+/**
+ * Visitor pattern for Statements
+ *
+ * @author Julien Le Dem
+ *
+ */
 public interface StatementVisitor {
 
   void visit(ReturnStatement returnStatement);
@@ -15,5 +21,9 @@ public interface StatementVisitor {
   void visit(SetStatement setStatement);
 
   void visit(IfStatement ifStatement);
+
+  void visit(LabelStatement labelStatement);
+
+  void visit(GotoStatement gotoStatement);
 
 }

@@ -13,8 +13,10 @@ import brennus.model.ExpressionVisitor;
 import brennus.model.Field;
 import brennus.model.FieldAccessType;
 import brennus.model.GetExpression;
+import brennus.model.GotoStatement;
 import brennus.model.IfStatement;
 import brennus.model.InstanceOfExpression;
+import brennus.model.LabelStatement;
 import brennus.model.LiteralExpression;
 import brennus.model.ParameterAccessType;
 import brennus.model.ReturnStatement;
@@ -260,5 +262,17 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
     }
     methodByteCodeContext.decIndent();
     methodByteCodeContext.addLabel(endNode, "endThen");
+  }
+
+  @Override
+  public void visit(LabelStatement labelStatement) {
+    LabelNode labelNode = methodByteCodeContext.getLabel(labelStatement.getName());
+    methodByteCodeContext.addLabel(labelStatement.getLine(), labelNode, labelStatement.getName()+":");
+  }
+
+  @Override
+  public void visit(GotoStatement gotoStatement) {
+    LabelNode labelNode = methodByteCodeContext.getLabel(gotoStatement.getName());
+    methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, labelNode), "goto "+gotoStatement.getName());
   }
 }

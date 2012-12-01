@@ -1,7 +1,9 @@
 package brennus.asm;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,6 +23,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LabelNode;
@@ -58,6 +61,7 @@ class MethodByteCodeContext implements Opcodes {
   private int indent = 0;
   private ASMifierMethodVisitor methodVisitor = new ASMifierMethodVisitor();
   private int currentOp;
+  private Map<String, LabelNode> namedLabels = new HashMap<String, LabelNode>();
 
   MethodByteCodeContext(MethodContext methodContext) {
     Method method = methodContext.getMethod();
@@ -270,5 +274,14 @@ class MethodByteCodeContext implements Opcodes {
     // TODO: better than this
     stack++;
     addInstruction(new InsnNode(ICONST_1), comment);
+  }
+
+  public LabelNode getLabel(String name) {
+    LabelNode labelNode = namedLabels .get(name);
+    if (labelNode == null) {
+      labelNode = new LabelNode();
+      namedLabels.put(name, labelNode);
+    }
+    return labelNode;
   }
 }

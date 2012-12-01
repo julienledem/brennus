@@ -14,8 +14,10 @@ import brennus.model.ExpressionVisitor;
 import brennus.model.Field;
 import brennus.model.FutureType;
 import brennus.model.GetExpression;
+import brennus.model.GotoStatement;
 import brennus.model.IfStatement;
 import brennus.model.InstanceOfExpression;
+import brennus.model.LabelStatement;
 import brennus.model.LiteralExpression;
 import brennus.model.MemberFlags;
 import brennus.model.Method;
@@ -213,6 +215,16 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
       decIndent();
     }
     println("}");
+  }
+
+  @Override
+  public void visit(LabelStatement labelStatement) {
+    println(labelStatement.getName() + ":");
+  }
+
+  @Override
+  public void visit(GotoStatement gotoStatement) {
+    println("goto " + gotoStatement.getName() + ";");
   }
 
 }

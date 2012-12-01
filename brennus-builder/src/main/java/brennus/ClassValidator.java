@@ -6,7 +6,9 @@ import brennus.model.CaseStatement;
 import brennus.model.ExpressionStatement;
 import brennus.model.FieldAccessType;
 import brennus.model.FutureType;
+import brennus.model.GotoStatement;
 import brennus.model.IfStatement;
+import brennus.model.LabelStatement;
 import brennus.model.Method;
 import brennus.model.ParameterAccessType;
 import brennus.model.ReturnStatement;
@@ -80,6 +82,18 @@ public class ClassValidator {
       }
 
       public void visit(IfStatement ifStatement) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void visit(LabelStatement labelStatement) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void visit(GotoStatement gotoStatement) {
         // TODO Auto-generated method stub
 
       }
