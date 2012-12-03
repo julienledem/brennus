@@ -153,6 +153,8 @@ class MethodByteCodeContext implements Opcodes {
 
   private void load(int load, int i, Object... comments) {
     maxv = Math.max(maxv, i+1);
+    // TODO: better than this
+    stack++;
     addInstruction(new VarInsnNode(load, i), comments);
   }
 

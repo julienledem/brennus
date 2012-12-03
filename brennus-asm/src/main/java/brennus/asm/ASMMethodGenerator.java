@@ -4,6 +4,8 @@ import java.util.List;
 
 import brennus.MethodContext;
 import brennus.model.BinaryExpression;
+import brennus.model.CallConstructorExpression;
+import brennus.model.CallConstructorStatement;
 import brennus.model.CallMethodExpression;
 import brennus.model.CaseStatement;
 import brennus.model.CastExpression;
@@ -147,7 +149,6 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
       public void visit(ParameterAccessType parameterAccessType) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
-
       }
       public void visit(FieldAccessType fieldAccessType) {
         Field field = fieldAccessType.getField();
@@ -155,14 +156,6 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
         methodByteCodeContext.addInstruction(new FieldInsnNode(PUTFIELD, methodContext.getClassIdentifier(), field.getName(), field.getSignature()), "set", setStatement.getTo());
       }
     });
-  }
-
-
-  public void addDefaultConstructorStatements() {
-    methodByteCodeContext.incIndent("default constructor");
-    methodByteCodeContext.loadThis();
-    methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKESPECIAL, methodContext.getType().getExtending().getClassIdentifier(), "<init>", "()V"), "super()");
-    methodByteCodeContext.decIndent();
   }
 
   public MethodNode getMethodNode() {
@@ -239,6 +232,11 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
         throw new UnsupportedOperationException();
       }
 
+      @Override
+      public void visit(CallConstructorExpression callConstructorExpression) {
+        throw new UnsupportedOperationException();
+      }
+
     });
     methodByteCodeContext.decIndent();
   }
@@ -274,5 +272,10 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
   public void visit(GotoStatement gotoStatement) {
     LabelNode labelNode = methodByteCodeContext.getLabel(gotoStatement.getName());
     methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, labelNode), "goto "+gotoStatement.getName());
+  }
+
+  @Override
+  public void visit(CallConstructorStatement callConstructorStatement) {
+    visit(callConstructorStatement.getExpression());
   }
 }

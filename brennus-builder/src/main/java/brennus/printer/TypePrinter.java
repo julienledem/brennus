@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 
 import brennus.model.BinaryExpression;
+import brennus.model.CallConstructorExpression;
+import brennus.model.CallConstructorStatement;
 import brennus.model.CallMethodExpression;
 import brennus.model.CaseStatement;
 import brennus.model.CastExpression;
@@ -67,11 +69,20 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
     indent += 2;
   }
 
-  private void printMethods(List<Method> methods) {
+  private void printMethods(String typeName, List<Method> methods) {
     for (Method m : methods) {
-      println(
-          getKeywords(m.getFlags()) + " " + m.getReturnType().getName() + " " + m.getName() + "("+paramString(m.getParameters())+") {"
-          );
+      String methodName = m.getName();
+      String returnType = m.getReturnType().getName();
+      if (methodName.equals("<init>")) {
+        // constructor
+        println(
+            getKeywords(m.getFlags()) + " " + typeName + "("+paramString(m.getParameters())+") {"
+            );
+      } else {
+        println(
+            getKeywords(m.getFlags()) + " " + returnType + " " + methodName + "("+paramString(m.getParameters())+") {"
+            );
+      }
       incIndent();
       for (Statement s : m.getStatements()) {
         s.accept(this);
@@ -117,7 +128,15 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
 
   @Override
   public void visit(FutureType futureType) {
-    println("class "+futureType.getName()+
+    int lastDot = futureType.getName().lastIndexOf('.');
+    String name;
+    if (lastDot == -1) {
+      name = futureType.getName();
+    } else {
+      name = futureType.getName().substring(lastDot + 1);
+      println("package "+futureType.getName().substring(0, lastDot)+";");
+    }
+    println("class " + name +
         (futureType.getExtending() == null ? "" : " extends " + futureType.getExtending().getName())+
         " {");
     incIndent();
@@ -125,13 +144,16 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
     printFields(futureType.getStaticFields());
     println();
     println("// static methods");
-    printMethods(futureType.getStaticMethods());
+    printMethods(name, futureType.getStaticMethods());
     println();
     println("// fields");
     printFields(futureType.getFields());
     println();
+    println("// constructors");
+    printMethods(name, futureType.getConstructors());
+    println();
     println("// methods");
-    printMethods(futureType.getMethods());
+    printMethods(name, futureType.getMethods());
     println();
     decIndent();
     println("}");
@@ -227,6 +249,11 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
     println("goto " + gotoStatement.getName() + ";");
   }
 
+  @Override
+  public void visit(CallConstructorStatement callConstructorStatement) {
+    println(toString(callConstructorStatement.getExpression())+";");
+  }
+
 }
 class ExpressionStringifierVisitor implements ExpressionVisitor {
 
@@ -297,6 +324,22 @@ class ExpressionStringifierVisitor implements ExpressionVisitor {
   public void visit(CastExpression castExpression) {
     sb.append("((").append(castExpression.getType().getName()).append(")");
     castExpression.getExpression().accept(this);
+    sb.append(")");
+  }
+
+  @Override
+  public void visit(CallConstructorExpression callConstructorExpression) {
+    sb.append("super(");
+    boolean first = true;
+    List<Expression> parameters = callConstructorExpression.getParameters();
+    for (Expression expression : parameters) {
+      if (first) {
+        first = false;
+      } else {
+        sb.append(", ");
+      }
+      expression.accept(this);
+    }
     sb.append(")");
   }
 

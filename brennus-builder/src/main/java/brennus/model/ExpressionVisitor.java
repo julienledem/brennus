@@ -17,4 +17,6 @@ public interface ExpressionVisitor {
 
   void visit(CastExpression castExpression);
 
+  void visit(CallConstructorExpression callConstructorExpression);
+
 }

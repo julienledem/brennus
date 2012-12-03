@@ -1,6 +1,13 @@
 package brennus.model;
 
+import static brennus.model.Protection.DEFAULT;
+import static brennus.model.Protection.PRIVATE;
+import static brennus.model.Protection.PROTECTED;
+import static brennus.model.Protection.PUBLIC;
 import static brennus.model.StaticStatus.STATIC;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 
 public class MemberFlags {
 
@@ -38,8 +45,28 @@ public class MemberFlags {
   }
 
   public static MemberFlags fromReflection(java.lang.reflect.Method method) {
-    // TODO: handle existingMethod
-    return new MemberFlags(new Keyword[0]);
+    int modifiers = method.getModifiers();
+    Protection protection = getProtection(modifiers);
+    return new MemberFlags(Modifier.isStatic(modifiers), protection);
+  }
+
+  public static MemberFlags fromReflection(Constructor<?> constructor) {
+    Protection protection = getProtection(constructor.getModifiers());
+    return new MemberFlags(false, protection);
+  }
+
+  private static Protection getProtection(int modifiers) {
+    Protection protection;
+    if (Modifier.isPublic(modifiers)) {
+      protection = PUBLIC;
+    } else if (Modifier.isPrivate(modifiers)) {
+      protection = PRIVATE;
+    } else if (Modifier.isProtected(modifiers)) {
+      protection = PROTECTED;
+    } else {
+      protection = DEFAULT;
+    }
+    return protection;
   }
 
 }

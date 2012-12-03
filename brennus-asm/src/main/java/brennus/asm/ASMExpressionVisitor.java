@@ -4,6 +4,7 @@ import java.util.List;
 
 import brennus.MethodContext;
 import brennus.model.BinaryExpression;
+import brennus.model.CallConstructorExpression;
 import brennus.model.CallMethodExpression;
 import brennus.model.CastExpression;
 import brennus.model.ExistingType;
@@ -74,22 +75,42 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
     String methodName = callMethodExpression.getMethodName();
     methodByteCodeContext.incIndent("call method", methodName);
     Method method;
+    int parameterCount = callMethodExpression.getParameters().size();
     if (callMethodExpression.getCallee()==null) {
       methodByteCodeContext.loadThis("calling on this", methodName);
       // TODO: use parameter count/types for lookup
-      method = methodContext.getType().getMethod(methodName);
+      method = methodContext.getType().getMethod(methodName, parameterCount);
       if (method == null) {
         throw new RuntimeException("can't find method "+methodName+" in hierarchy of "+methodContext.getType());
       }
     } else {
       callMethodExpression.getCallee().accept(this);
-      method = lastExpressionType.getMethod(methodName);
+      method = lastExpressionType.getMethod(methodName, parameterCount);
       if (method == null) {
         throw new RuntimeException("can't find method "+methodName+" in hierarchy of "+lastExpressionType);
       }
     }
-    methodByteCodeContext.incIndent("pass", callMethodExpression.getParameters().size(), "params to", methodName);
-    List<Expression> parameterValues = callMethodExpression.getParameters();
+    List<Expression> parameters = callMethodExpression.getParameters();
+    loadParameters(methodName, method, parameters);
+    methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKEVIRTUAL, method.getTypeName(), methodName, method.getSignature()), "call", methodName);
+    lastExpressionType = method.getReturnType();
+    methodByteCodeContext.decIndent();
+  }
+
+  @Override
+  public void visit(CallConstructorExpression callConstructorExpression) {
+    methodByteCodeContext.incIndent("call super constructor");
+    methodByteCodeContext.loadThis();
+    Method constructor = methodContext.getType().getSuperConstructor(callConstructorExpression.getParameters().size());
+    loadParameters("<init>", constructor, callConstructorExpression.getParameters());
+    methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKESPECIAL, methodContext.getType().getExtending().getClassIdentifier(), "<init>", constructor.getSignature()), "super(...)");
+    methodByteCodeContext.decIndent();
+  }
+
+  private void loadParameters(String methodName, Method method,
+      List<Expression> parameters) {
+    methodByteCodeContext.incIndent("pass", parameters.size(), "params to", methodName);
+    List<Expression> parameterValues = parameters;
     List<Parameter> parameterTypes = method.getParameters();
     if (parameterTypes.size() != parameterValues.size()) {
       throw new RuntimeException("parameters passed do not match, parameters declared in "+method);
@@ -99,12 +120,9 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
       Expression expression = parameterValues.get(i);
       Type expected = parameterTypes.get(i).getType();
       expression.accept(this);
-      methodByteCodeContext.handleConversion(lastExpressionType, expected, "param", i, "for", callMethodExpression.getMethodName());
+      methodByteCodeContext.handleConversion(lastExpressionType, expected, "param", i, "for", methodName);
       methodByteCodeContext.decIndent();
     }
-    methodByteCodeContext.decIndent();
-    methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKEVIRTUAL, method.getTypeName(), methodName, method.getSignature()), "call", methodName);
-    lastExpressionType = method.getReturnType();
     methodByteCodeContext.decIndent();
   }
 

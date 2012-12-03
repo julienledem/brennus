@@ -26,6 +26,7 @@ public class ClassBuilder {
   private final List<Field> staticFields = new ArrayList<Field>();
   private final List<Method> methods = new ArrayList<Method>();
   private final List<Method> staticMethods = new ArrayList<Method>();
+  private final List<Method> constructors = new ArrayList<Method>();
   private final String sourceFile;
 
   private ClassBuilder(String name, Type extending) {
@@ -109,9 +110,19 @@ public class ClassBuilder {
    * @return the resulting class
    */
   public FutureType endClass() {
-    FutureType futureType = new FutureType(name, extending == null ? ExistingType.OBJECT : extending, fields, staticFields, methods, staticMethods, sourceFile);
+    FutureType futureType = new FutureType(name, extending == null ? ExistingType.OBJECT : extending, fields, staticFields, methods, staticMethods, constructors, sourceFile);
     new ClassValidator().validate(futureType);
     return futureType;
+  }
+
+
+  public ConstructorDeclarationBuilder startConstructor(Protection protection) {
+    return new ConstructorDeclarationBuilder(this.name.replace(".", "/"), protection, new MethodHandler() {
+      public ClassBuilder handleMethod(Method method) {
+        constructors.add(method);
+        return ClassBuilder.this;
+      }
+    });
   }
 
   // internals

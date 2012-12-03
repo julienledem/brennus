@@ -98,27 +98,50 @@ public class ExistingType extends Type {
   }
 
   @Override
-  public Method getMethod(String methodName) {
+  public Method getMethod(String methodName, int parameterCount) {
     // TODO: add static
     java.lang.reflect.Method[] declaredMethods = existing.getDeclaredMethods();
     for (java.lang.reflect.Method method : declaredMethods) {
-      if (method.getName() == methodName) {
-        ArrayList<Parameter> parameters = new ArrayList<Parameter>();
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        for (int i = 0; i < parameterTypes.length; i++) {
-          Class<?> paramClass = parameterTypes[i];
-          parameters.add(
-              new Parameter(
-                  ExistingType.existing(paramClass),
-                  "arg"+i,
-                  i));
-
-        }
+      Class<?>[] parameterTypes = method.getParameterTypes();
+      if (method.getName().equals(methodName) && parameterTypes.length == parameterCount) {
+        ArrayList<Parameter> parameters = convertParameters(parameterTypes);
         return new Method(
             this.getClassIdentifier(),
             MemberFlags.fromReflection(method),
             existing(method.getReturnType()),
             methodName,
+            parameters,
+            new ArrayList<Statement>());
+      }
+    }
+    return null;
+  }
+
+  private ArrayList<Parameter> convertParameters(Class<?>[] parameterTypes) {
+    ArrayList<Parameter> parameters = new ArrayList<Parameter>();
+    for (int i = 0; i < parameterTypes.length; i++) {
+      Class<?> paramClass = parameterTypes[i];
+      parameters.add(
+          new Parameter(
+              ExistingType.existing(paramClass),
+              "arg"+i,
+              i));
+
+    }
+    return parameters;
+  }
+
+  @Override
+  public Method getConstructor(int parameterCount) {
+    for (java.lang.reflect.Constructor<?> constructor : existing.getConstructors()) {
+      Class<?>[] parameterTypes = constructor.getParameterTypes();
+      if (parameterTypes.length == parameterCount) {
+        ArrayList<Parameter> parameters = convertParameters(parameterTypes);
+        return new Method(
+            this.getClassIdentifier(),
+            MemberFlags.fromReflection(constructor),
+            VOID,
+            "<init>",
             parameters,
             new ArrayList<Statement>());
       }

@@ -13,9 +13,11 @@ abstract public class Type {
 
   abstract public boolean isPrimitive();
 
-  abstract public Method getMethod(String methodName);
+  abstract public Method getMethod(String methodName, int parameterCount);
 
   abstract public boolean isAssignableFrom(Type type);
+
+  abstract public Method getConstructor(int parameterCount);
 
   @Override
   public String toString() {

@@ -26,4 +26,6 @@ public interface StatementVisitor {
 
   void visit(GotoStatement gotoStatement);
 
+  void visit(CallConstructorStatement callConstructorStatement);
+
 }
