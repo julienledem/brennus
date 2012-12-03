@@ -87,4 +87,8 @@ abstract public class ValueExpressionBuilder<T, EB, VEB> {
     return new MethodCallBuilder<T, EB, VEB>(factory, expression, methodName, expressionHandler).param();
   }
 
+  public VEB callNoParam(String methodName) {
+    return new MethodCallBuilder<T, EB, VEB>(factory, expression, methodName, expressionHandler).endCall();
+  }
+
 }
