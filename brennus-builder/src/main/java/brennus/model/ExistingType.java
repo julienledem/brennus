@@ -111,8 +111,12 @@ public class ExistingType extends Type {
             existing(method.getReturnType()),
             methodName,
             parameters,
-            new ArrayList<Statement>());
+            new ArrayList<Statement>(),
+            existing.isInterface());
       }
+    }
+    if (existing.getSuperclass() != null) {
+      return existing(existing.getSuperclass()).getMethod(methodName, parameterCount);
     }
     return null;
   }
@@ -143,7 +147,8 @@ public class ExistingType extends Type {
             VOID,
             "<init>",
             parameters,
-            new ArrayList<Statement>());
+            new ArrayList<Statement>(),
+            false);
       }
     }
     return null;

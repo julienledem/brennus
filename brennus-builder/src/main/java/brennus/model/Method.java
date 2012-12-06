@@ -10,14 +10,16 @@ public class Method {
   private final String name;
   private final List<Parameter> parameters;
   private final List<Statement> statements;
+  private final boolean interfaceMethod;
 
-  public Method(String typeName, MemberFlags memberFlags, Type returnType, String name, List<Parameter> parameters, List<Statement> statements) {
+  public Method(String typeName, MemberFlags memberFlags, Type returnType, String name, List<Parameter> parameters, List<Statement> statements, boolean interfaceMethod) {
     this.typeName = typeName;
     this.memberFlags = memberFlags;
     this.returnType = returnType;
     this.name = name;
     this.parameters = parameters;
     this.statements = statements;
+    this.interfaceMethod = interfaceMethod;
   }
 
   public String getName() {
@@ -57,12 +59,17 @@ public class Method {
     return signature.toString();
   }
 
+  public String getTypeName() {
+    return typeName;
+  }
+
+  public boolean isInterfaceMethod() {
+    return interfaceMethod;
+  }
+
   @Override
   public String toString() {
     return "["+getClass().getSimpleName()+" "+name+getSignature()+"]";
   }
 
-  public String getTypeName() {
-    return typeName;
-  }
 }

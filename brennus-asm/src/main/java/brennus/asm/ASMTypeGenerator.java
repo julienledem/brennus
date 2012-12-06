@@ -57,7 +57,9 @@ public class ASMTypeGenerator {
               "<init>",
               new ArrayList<Parameter>(),
               Arrays.<Statement>asList(new CallConstructorStatement(0,
-                  new CallConstructorExpression(Arrays.<Expression>asList())))));
+                  new CallConstructorExpression(Arrays.<Expression>asList()))
+              ),
+              false));
     }
     for (Method method : constructors) {
       classNode.methods.add(getMethodNode(futureType, method));

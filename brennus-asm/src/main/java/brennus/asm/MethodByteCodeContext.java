@@ -279,7 +279,7 @@ class MethodByteCodeContext implements Opcodes {
   }
 
   public LabelNode getLabel(String name) {
-    LabelNode labelNode = namedLabels .get(name);
+    LabelNode labelNode = namedLabels.get(name);
     if (labelNode == null) {
       labelNode = new LabelNode();
       namedLabels.put(name, labelNode);

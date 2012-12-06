@@ -1,5 +1,7 @@
 package brennus.asm;
 
+import static brennus.model.ExistingType.INT;
+
 import java.util.List;
 
 import brennus.MethodContext;
@@ -9,6 +11,7 @@ import brennus.model.CallConstructorStatement;
 import brennus.model.CallMethodExpression;
 import brennus.model.CaseStatement;
 import brennus.model.CastExpression;
+import brennus.model.ExistingType;
 import brennus.model.Expression;
 import brennus.model.ExpressionStatement;
 import brennus.model.ExpressionVisitor;
@@ -82,6 +85,7 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
   public void visit(SwitchStatement switchStatement) {
     methodByteCodeContext.incIndent("switch exp");
     Type expressionType = visit(switchStatement.getExpression());
+    methodByteCodeContext.handleConversion(expressionType, INT, "switch(exp): convert exp to int");
     methodByteCodeContext.decIndent();
     List<CaseStatement> caseStatements = switchStatement.getCaseStatements();
     int[] values = new int[caseStatements.size()];
@@ -117,7 +121,8 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
   public void visit(CaseStatement caseStatement) {
     Object value = caseStatement.getExpression() == null ? "default" : caseStatement.getliteralExpression().getValue();
     methodByteCodeContext.addLabel(caseStatement.getLine(), currentLabel, "case", value);
-    methodByteCodeContext.addInstruction(new FrameNode(F_SAME, 0, null, 0, null), "case", value);
+    // TODO: understand Frame ... :(
+    //methodByteCodeContext.addInstruction(new FrameNode(F_SAME, 0, null, 0, null), "case", value);
     methodByteCodeContext.incIndent("case", value);
     List<Statement> statements = caseStatement.getStatements();
     for (Statement statement : statements) {
@@ -201,12 +206,17 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
       }
 
       public void visit(CallMethodExpression callMethodExpression) {
-        throw new UnsupportedOperationException();
+        methodByteCodeContext.incIndent("if call", callMethodExpression.getMethodName());
+//        methodByteCodeContext.addIConst0("false");
+        ASMMethodGenerator.this.visit(callMethodExpression);
+        // if (false) else then
+        generateThenElse(IFEQ, ifStatement.getElseStatements(), ifStatement.getThenStatements());
+        methodByteCodeContext.decIndent();
       }
 
       public void visit(GetExpression getFieldExpression) {
         methodByteCodeContext.incIndent("if get", getFieldExpression.getFieldName());
-        methodByteCodeContext.addIConst0();
+//        methodByteCodeContext.addIConst0("false");
         ASMMethodGenerator.this.visit(getFieldExpression);
         // if (false) else then
         generateThenElse(IFEQ, ifStatement.getElseStatements(), ifStatement.getThenStatements());

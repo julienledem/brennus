@@ -42,6 +42,7 @@ public class ClassValidator {
   }
 
   private void validate(final MethodContext context, Statement statement) {
+    try {
     StatementVisitor statementVisitor = new StatementVisitor() {
 
       @Override
@@ -106,7 +107,9 @@ public class ClassValidator {
       }
     };
     statement.accept(statementVisitor);
-
+    } catch (RuntimeException e) {
+      throw new RuntimeException("error at line " + statement.getLine() + " of method "+context.getClassIdentifier()+"."+context.getMethod().getName()+context.getMethod().getSignature(), e);
+    }
   }
 
 }

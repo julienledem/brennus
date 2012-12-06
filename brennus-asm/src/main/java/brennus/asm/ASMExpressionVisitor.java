@@ -87,12 +87,18 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
       callMethodExpression.getCallee().accept(this);
       method = lastExpressionType.getMethod(methodName, parameterCount);
       if (method == null) {
-        throw new RuntimeException("can't find method "+methodName+" in hierarchy of "+lastExpressionType);
+        throw new RuntimeException("can't find method "+methodName+" with " + parameterCount + " parameters in hierarchy of "+lastExpressionType);
       }
     }
     List<Expression> parameters = callMethodExpression.getParameters();
     loadParameters(methodName, method, parameters);
-    methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKEVIRTUAL, method.getTypeName(), methodName, method.getSignature()), "call", methodName);
+    methodByteCodeContext.addInstruction(
+        new MethodInsnNode(
+                method.isInterfaceMethod() ? INVOKEINTERFACE : INVOKEVIRTUAL,
+                method.getTypeName(),
+                methodName,
+                method.getSignature()),
+                "call", methodName);
     lastExpressionType = method.getReturnType();
     methodByteCodeContext.decIndent();
   }

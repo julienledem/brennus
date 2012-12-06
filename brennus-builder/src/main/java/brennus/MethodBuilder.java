@@ -41,7 +41,7 @@ public class MethodBuilder extends StatementBuilder<MethodBuilder> {
   }
 
   public ClassBuilder endMethod() {
-    return methodHandler.handleMethod(new Method(classIdentifier, memberFlags, returnType, name, parameters, statements));
+    return methodHandler.handleMethod(new Method(classIdentifier, memberFlags, returnType, name, parameters, statements, false));
   }
 
   protected StatementHandler<MethodBuilder> statementHandler() {
