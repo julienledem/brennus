@@ -1,5 +1,7 @@
 package brennus.asm;
 
+import static brennus.model.Protection.PRIVATE;
+
 import java.util.List;
 
 import brennus.MethodContext;
@@ -18,6 +20,7 @@ import brennus.model.LiteralExpression;
 import brennus.model.Method;
 import brennus.model.Parameter;
 import brennus.model.ParameterAccessType;
+import brennus.model.Protection;
 import brennus.model.Type;
 import brennus.model.UnaryExpression;
 import brennus.model.VarAccessType;
@@ -90,11 +93,15 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
         throw new RuntimeException("can't find method "+methodName+" with " + parameterCount + " parameters in hierarchy of "+lastExpressionType);
       }
     }
+    if (method.getFlags().isStatic()) {
+      throw new UnsupportedOperationException();
+    }
     List<Expression> parameters = callMethodExpression.getParameters();
     loadParameters(methodName, method, parameters);
     methodByteCodeContext.addInstruction(
         new MethodInsnNode(
-                method.isInterfaceMethod() ? INVOKEINTERFACE : INVOKEVIRTUAL,
+                method.isInterfaceMethod() ? INVOKEINTERFACE :
+                  method.getFlags().getProtection() == PRIVATE ? INVOKESPECIAL : INVOKEVIRTUAL,
                 method.getTypeName(),
                 methodName,
                 method.getSignature()),
