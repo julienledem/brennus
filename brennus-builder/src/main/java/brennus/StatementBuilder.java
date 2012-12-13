@@ -3,6 +3,7 @@ package brennus;
 import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.ThenBuilder.IfStatementHandler;
 import brennus.SwitchBuilder.SwitchStatementsHandler;
+import brennus.model.DefineVarStatement;
 import brennus.model.Expression;
 import brennus.model.ExpressionStatement;
 import brennus.model.GotoStatement;
@@ -13,6 +14,7 @@ import brennus.model.SetStatement;
 import brennus.model.Statement;
 import brennus.model.SwitchStatement;
 import brennus.model.ThrowStatement;
+import brennus.model.Type;
 
 /**
  * statement builder
@@ -135,5 +137,9 @@ abstract public class StatementBuilder<T> {
 
   public T gotoLabel(String labelName) {
     return statementHandler().handleStatement(new GotoStatement(MethodContext.getSourceLineNumber(), labelName));
+  }
+
+  public T var(Type type, String varName) {
+    return statementHandler().handleStatement(new DefineVarStatement(MethodContext.getSourceLineNumber(), type, varName));
   }
 }

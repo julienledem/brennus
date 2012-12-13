@@ -17,6 +17,7 @@ import brennus.model.FieldAccessType;
 import brennus.model.GetExpression;
 import brennus.model.InstanceOfExpression;
 import brennus.model.LiteralExpression;
+import brennus.model.LocalVariableAccessType;
 import brennus.model.Method;
 import brennus.model.Parameter;
 import brennus.model.ParameterAccessType;
@@ -68,6 +69,15 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
         methodByteCodeContext.load(param.getType(), param.getIndex() + 1,
             "get param", getExpression.getFieldName());
         lastExpressionType = param.getType();
+      }
+      @Override
+      public void visit(LocalVariableAccessType localVariableAccessType) {
+        // TODO: check boxing
+        methodByteCodeContext.load(
+            localVariableAccessType.getType(),
+            methodContext.getMethod().getParameters().size() + 1 + localVariableAccessType.getVarIndex(),
+            "get local variable", getExpression.getFieldName());
+        lastExpressionType = localVariableAccessType.getType();
       }
     });
     methodByteCodeContext.decIndent();

@@ -28,4 +28,6 @@ public interface StatementVisitor {
 
   void visit(CallConstructorStatement callConstructorStatement);
 
+  void visit(DefineVarStatement defineVarStatement);
+
 }

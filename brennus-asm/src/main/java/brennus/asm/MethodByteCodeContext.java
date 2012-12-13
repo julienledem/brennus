@@ -136,6 +136,13 @@ class MethodByteCodeContext implements Opcodes {
     load(getLoad(type), i, comments);
   }
 
+  private void load(int load, int i, Object... comments) {
+    maxv = Math.max(maxv, i+1);
+    // TODO: better than this
+    stack++;
+    addInstruction(new VarInsnNode(load, i), comments);
+  }
+
   private int getLoad(Type type) {
     if (type.isPrimitive()) {
       // TODO: other primitive types
@@ -151,11 +158,27 @@ class MethodByteCodeContext implements Opcodes {
     }
   }
 
-  private void load(int load, int i, Object... comments) {
-    maxv = Math.max(maxv, i+1);
-    // TODO: better than this
-    stack++;
-    addInstruction(new VarInsnNode(load, i), comments);
+  public void store(Type type, int i, Object... comments) {
+    store(getStore(type), i, comments);
+  }
+
+  private void store(int store, int i, Object... comments) {
+    addInstruction(new VarInsnNode(store, i), comments);
+  }
+
+  private int getStore(Type type) {
+    if (type.isPrimitive()) {
+      // TODO: other primitive types
+      switch (type.getClassIdentifier().charAt(0)) {
+      case 'I':
+      case 'Z':
+        return ISTORE;
+      default:
+        throw new RuntimeException("Unsupported "+type);
+      }
+    } else {
+      return ASTORE;
+    }
   }
 
   public MethodNode getMethodNode() {
@@ -286,4 +309,5 @@ class MethodByteCodeContext implements Opcodes {
     }
     return labelNode;
   }
+
 }

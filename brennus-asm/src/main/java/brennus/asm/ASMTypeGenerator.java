@@ -27,6 +27,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.util.ASMifierClassVisitor;
 import org.objectweb.asm.util.CheckClassAdapter;
 
@@ -75,6 +76,7 @@ public class ASMTypeGenerator {
 //    classNode.accept(new ASMifierClassVisitor(new PrintWriter(System.out)));
     ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
     ClassVisitor cv = new CheckClassAdapter(cw, true);
+
 //    ClassVisitor cv = cw;
     classNode.accept(cv);
     return cw.toByteArray();

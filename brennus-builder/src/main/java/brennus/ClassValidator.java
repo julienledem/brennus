@@ -4,12 +4,14 @@ import java.util.List;
 
 import brennus.model.CallConstructorStatement;
 import brennus.model.CaseStatement;
+import brennus.model.DefineVarStatement;
 import brennus.model.ExpressionStatement;
 import brennus.model.FieldAccessType;
 import brennus.model.FutureType;
 import brennus.model.GotoStatement;
 import brennus.model.IfStatement;
 import brennus.model.LabelStatement;
+import brennus.model.LocalVariableAccessType;
 import brennus.model.Method;
 import brennus.model.ParameterAccessType;
 import brennus.model.ReturnStatement;
@@ -47,15 +49,18 @@ public class ClassValidator {
 
       @Override
       public void visit(SetStatement setStatement) {
-        VarAccessType varTypeToSet = context.getVarAccessType(setStatement.getTo());
-        varTypeToSet.accept(new VarAccessTypeVisitor() {
-          public void visit(ParameterAccessType parameterAccessType) {
-            // TODO
-          }
-          public void visit(FieldAccessType fieldAccessType) {
-            // TODO
-          }
-        });
+//        VarAccessType varTypeToSet = context.getVarAccessType(setStatement.getTo());
+//        varTypeToSet.accept(new VarAccessTypeVisitor() {
+//          public void visit(ParameterAccessType parameterAccessType) {
+//            // TODO
+//          }
+//          public void visit(FieldAccessType fieldAccessType) {
+//            // TODO
+//          }
+//          public void visit(LocalVariableAccessType localVariableAccessType) {
+//            // TODO
+//          }
+//        });
       }
 
       public void visit(ThrowStatement throwStatement) {
@@ -102,6 +107,12 @@ public class ClassValidator {
 
       @Override
       public void visit(CallConstructorStatement callConstructorStatement) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void visit(DefineVarStatement defineVarStatement) {
         // TODO Auto-generated method stub
 
       }

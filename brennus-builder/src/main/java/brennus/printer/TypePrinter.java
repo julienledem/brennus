@@ -3,17 +3,20 @@ package brennus.printer;
 import java.util.Collection;
 import java.util.List;
 
+import brennus.MethodContext;
 import brennus.model.BinaryExpression;
 import brennus.model.CallConstructorExpression;
 import brennus.model.CallConstructorStatement;
 import brennus.model.CallMethodExpression;
 import brennus.model.CaseStatement;
 import brennus.model.CastExpression;
+import brennus.model.DefineVarStatement;
 import brennus.model.ExistingType;
 import brennus.model.Expression;
 import brennus.model.ExpressionStatement;
 import brennus.model.ExpressionVisitor;
 import brennus.model.Field;
+import brennus.model.FieldAccessType;
 import brennus.model.FutureType;
 import brennus.model.GetExpression;
 import brennus.model.GotoStatement;
@@ -21,9 +24,11 @@ import brennus.model.IfStatement;
 import brennus.model.InstanceOfExpression;
 import brennus.model.LabelStatement;
 import brennus.model.LiteralExpression;
+import brennus.model.LocalVariableAccessType;
 import brennus.model.MemberFlags;
 import brennus.model.Method;
 import brennus.model.Parameter;
+import brennus.model.ParameterAccessType;
 import brennus.model.ReturnStatement;
 import brennus.model.SetStatement;
 import brennus.model.Statement;
@@ -33,6 +38,8 @@ import brennus.model.ThrowStatement;
 import brennus.model.Type;
 import brennus.model.TypeVisitor;
 import brennus.model.UnaryExpression;
+import brennus.model.VarAccessType;
+import brennus.model.VarAccessTypeVisitor;
 
 public class TypePrinter {
 
@@ -44,6 +51,7 @@ public class TypePrinter {
 class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
 
   private int indent;
+  private MethodContext context;
 
   private void printIndent() {
     for (int i = 0; i < indent; i++) {
@@ -69,8 +77,9 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
     indent += 2;
   }
 
-  private void printMethods(String typeName, List<Method> methods) {
+  private void printMethods(FutureType type, String typeName, List<Method> methods) {
     for (Method m : methods) {
+      context = new MethodContext(type, m);
       String methodName = m.getName();
       String returnType = m.getReturnType().getName();
       if (methodName.equals("<init>")) {
@@ -144,16 +153,16 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
     printFields(futureType.getStaticFields());
     println();
     println("// static methods");
-    printMethods(name, futureType.getStaticMethods());
+    printMethods(futureType, name, futureType.getStaticMethods());
     println();
     println("// fields");
     printFields(futureType.getFields());
     println();
     println("// constructors");
-    printMethods(name, futureType.getConstructors());
+    printMethods(futureType, name, futureType.getConstructors());
     println();
     println("// methods");
-    printMethods(name, futureType.getMethods());
+    printMethods(futureType, name, futureType.getMethods());
     println();
     decIndent();
     println("}");
@@ -216,8 +225,29 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
   }
 
   @Override
-  public void visit(SetStatement setStatement) {
-    println(setStatement.getTo() + " = " + toString(setStatement.getExpression()) + ";");
+  public void visit(final SetStatement setStatement) {
+    VarAccessType varAccessType = context.getVarAccessType(setStatement.getTo());
+    varAccessType.accept(new VarAccessTypeVisitor() {
+      public void visit(LocalVariableAccessType localVariableAccessType) {
+        print("", " // local variable");
+      }
+      public void visit(ParameterAccessType parameterAccessType) {
+        print("", " // parameter");
+      }
+      public void visit(FieldAccessType fieldAccessType) {
+        print("this.", " // field");
+      }
+      private void print(String prefix, String suffix) {
+        println(
+            prefix +
+            setStatement.getTo() +
+            " = " +
+            TypePrinterVisitor.this.toString(setStatement.getExpression()) +
+            ";" +
+            suffix);
+      }
+    });
+
   }
 
   @Override
@@ -252,6 +282,12 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
   @Override
   public void visit(CallConstructorStatement callConstructorStatement) {
     println(toString(callConstructorStatement.getExpression())+";");
+  }
+
+  @Override
+  public void visit(DefineVarStatement defineVarStatement) {
+    context.defineLocalVar(defineVarStatement.getType(), defineVarStatement.getVarName());
+    println(defineVarStatement.getType().getName() + " " + defineVarStatement.getVarName() + ";");
   }
 
 }

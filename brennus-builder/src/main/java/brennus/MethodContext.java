@@ -1,12 +1,15 @@
 package brennus;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import brennus.model.BoxingTypeConversion;
 import brennus.model.CastTypeConversion;
 import brennus.model.Field;
 import brennus.model.FieldAccessType;
 import brennus.model.FutureType;
+import brennus.model.LocalVariableAccessType;
 import brennus.model.Method;
 import brennus.model.Parameter;
 import brennus.model.ParameterAccessType;
@@ -40,6 +43,7 @@ public class MethodContext {
 
   private final FutureType type;
   private final Method method;
+  private Map<String, LocalVarContext> localVars = new HashMap<String, LocalVarContext>();
 
   public MethodContext(FutureType type, Method method) {
     this.type = type;
@@ -74,7 +78,7 @@ public class MethodContext {
   }
 
   public VarAccessType getVarAccessType(String varName) {
-    // TODO local vars
+
     Parameter param = getParam(varName);
     if (param != null) {
       return new ParameterAccessType(param);
@@ -83,7 +87,13 @@ public class MethodContext {
       if (field!=null) {
         return new FieldAccessType(field);
       } else {
-        throw new RuntimeException("can't resolve "+varName+" in current context "+this);
+        LocalVarContext localVarContext;
+        if (!localVars.containsKey(varName)) {
+          throw new RuntimeException("can not assign local variable " + varName +": not defined");
+        } else {
+          localVarContext = localVars.get(varName);
+        }
+        return new LocalVariableAccessType(varName, localVarContext.getIndex(), localVarContext.getType());
       }
     }
 
@@ -129,5 +139,14 @@ public class MethodContext {
 
   public FutureType getType() {
     return type;
+  }
+
+  public void defineLocalVar(Type type, String varName) {
+    // TODO: deal with scope
+    if (localVars.containsKey(varName)) {
+      throw new RuntimeException("Duplicate local variable "+varName+ " in method "+method.toString());
+    }
+    localVars.put(varName, new LocalVarContext(varName, localVars.size(), type));
+
   }
 }

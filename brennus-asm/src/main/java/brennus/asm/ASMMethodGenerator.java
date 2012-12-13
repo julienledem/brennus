@@ -11,6 +11,7 @@ import brennus.model.CallConstructorStatement;
 import brennus.model.CallMethodExpression;
 import brennus.model.CaseStatement;
 import brennus.model.CastExpression;
+import brennus.model.DefineVarStatement;
 import brennus.model.ExistingType;
 import brennus.model.Expression;
 import brennus.model.ExpressionStatement;
@@ -23,6 +24,8 @@ import brennus.model.IfStatement;
 import brennus.model.InstanceOfExpression;
 import brennus.model.LabelStatement;
 import brennus.model.LiteralExpression;
+import brennus.model.LocalVariableAccessType;
+import brennus.model.Parameter;
 import brennus.model.ParameterAccessType;
 import brennus.model.ReturnStatement;
 import brennus.model.SetStatement;
@@ -122,6 +125,7 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
     Object value = caseStatement.getExpression() == null ? "default" : caseStatement.getliteralExpression().getValue();
     methodByteCodeContext.addLabel(caseStatement.getLine(), currentLabel, "case", value);
     // TODO: understand Frame ... :(
+    // I use COMPUTE_FRAME in the generator
     //methodByteCodeContext.addInstruction(new FrameNode(F_SAME, 0, null, 0, null), "case", value);
     methodByteCodeContext.incIndent("case", value);
     List<Statement> statements = caseStatement.getStatements();
@@ -152,13 +156,26 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
     methodContext.getVarAccessType(setStatement.getTo()).accept(
     new VarAccessTypeVisitor() {
       public void visit(ParameterAccessType parameterAccessType) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        // TODO: type support
+        //        System.out.println(getExpression.getFieldName()+" "+param.getIndex());
+        Parameter param = parameterAccessType.getParam();
+        // TODO: check boxing
+        methodByteCodeContext.store(
+            param.getType(),
+            param.getIndex() + 1 /* this */,
+            "set param", setStatement.getTo());
       }
       public void visit(FieldAccessType fieldAccessType) {
         Field field = fieldAccessType.getField();
         methodByteCodeContext.handleConversion(expressionType, field.getType());
         methodByteCodeContext.addInstruction(new FieldInsnNode(PUTFIELD, methodContext.getClassIdentifier(), field.getName(), field.getSignature()), "set", setStatement.getTo());
+      }
+      public void visit(LocalVariableAccessType localVariableAccessType) {
+        // TODO: type support
+        methodByteCodeContext.store(
+            expressionType,
+            methodContext.getMethod().getParameters().size() + 1 /* this */ + localVariableAccessType.getVarIndex(),
+            "set local var", setStatement.getTo());
       }
     });
   }
@@ -207,7 +224,6 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
 
       public void visit(CallMethodExpression callMethodExpression) {
         methodByteCodeContext.incIndent("if call", callMethodExpression.getMethodName());
-//        methodByteCodeContext.addIConst0("false");
         ASMMethodGenerator.this.visit(callMethodExpression);
         // if (false) else then
         generateThenElse(IFEQ, ifStatement.getElseStatements(), ifStatement.getThenStatements());
@@ -216,7 +232,6 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
 
       public void visit(GetExpression getFieldExpression) {
         methodByteCodeContext.incIndent("if get", getFieldExpression.getFieldName());
-//        methodByteCodeContext.addIConst0("false");
         ASMMethodGenerator.this.visit(getFieldExpression);
         // if (false) else then
         generateThenElse(IFEQ, ifStatement.getElseStatements(), ifStatement.getThenStatements());
@@ -287,5 +302,10 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
   @Override
   public void visit(CallConstructorStatement callConstructorStatement) {
     visit(callConstructorStatement.getExpression());
+  }
+
+  @Override
+  public void visit(DefineVarStatement defineVarStatement) {
+    methodContext.defineLocalVar(defineVarStatement.getType(), defineVarStatement.getVarName());
   }
 }

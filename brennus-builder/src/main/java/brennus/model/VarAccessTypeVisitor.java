@@ -6,4 +6,6 @@ public interface VarAccessTypeVisitor {
 
   void visit(ParameterAccessType parameterAccessType);
 
+  void visit(LocalVariableAccessType localVariableAccessType);
+
 }
