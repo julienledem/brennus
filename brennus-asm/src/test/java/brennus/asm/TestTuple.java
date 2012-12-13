@@ -15,11 +15,12 @@ import static brennus.model.ExistingType.VOID;
 import static brennus.model.ExistingType.existing;
 import static brennus.model.Protection.PRIVATE;
 import static brennus.model.Protection.PUBLIC;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import brennus.asm.TestGeneration.DynamicClassLoader;
 import brennus.asm.ref.ReferenceClass;
 import brennus.model.FutureType;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 public class TestTuple {
@@ -200,33 +201,34 @@ public class TestTuple {
   private void testSetGet(Class<?> c) throws Exception {
     BaseClass t = (BaseClass)c.newInstance();
     t.set(0, "test");
-    Assert.assertEquals("test", t.get(0));
+    assertEquals("test", t.get(0));
     t.set(1, 12);
-    Assert.assertEquals(12, t.get(1));
+    assertEquals(12, t.get(1));
     t.set(2, 22l);
-    Assert.assertEquals(22l, t.get(2));
+    assertEquals(22l, t.get(2));
     t.set(3, 32f);
-    Assert.assertEquals(32f, t.get(3));
+    assertEquals(32f, t.get(3));
     t.set(4, 42d);
-    Assert.assertEquals(42d, t.get(4));
+    assertEquals(42d, t.get(4));
     t.set(5, (byte)52);
-    Assert.assertEquals((byte)52, t.get(5));
+    assertEquals((byte)52, t.get(5));
     t.set(6, 'a');
-    Assert.assertEquals('a', t.get(6));
+    assertEquals('a', t.get(6));
     t.set(7, true);
-    Assert.assertEquals(true, t.get(7));
+    assertEquals(true, t.get(7));
     t.set(7, false);
-    Assert.assertEquals(false, t.get(7));
+    assertEquals(false, t.get(7));
     t.set(8, (short)82);
-    Assert.assertEquals((short)82, t.get(8));
+    assertEquals((short)82, t.get(8));
     if (!(t instanceof ReferenceClass)) {
       try {
         t.set(123, null);
       } catch (RuntimeException e) {
-        Assert.assertEquals("TestTuple.java", e.getStackTrace()[1].getFileName());
-        Assert.assertEquals(114, e.getStackTrace()[1].getLineNumber());
-        // checking that we display the line number from the builder class
+        assertEquals("TestTuple.java", e.getStackTrace()[1].getFileName());
         e.printStackTrace();
+        // line number where the comment is in the test above
+        assertEquals("stackTrace line (from 2nd element) " + e.getStackTrace()[0] + " " + e.getStackTrace()[1] + " " + e.getStackTrace()[2], 115, e.getStackTrace()[1].getLineNumber());
+        // checking that we display the line number from the builder class
       }
     }
   }
@@ -239,12 +241,12 @@ public class TestTuple {
         t.set(0, good[0]);
       }
     }
-    Assert.assertEquals(o2, o1);
-    Assert.assertEquals(o1, o2);
+    assertEquals(o2, o1);
+    assertEquals(o1, o2);
     for (int i = 0; i <= 8; i++) {
       o1.set(i, bad[i]);
-      Assert.assertFalse(o2.equals(o1));
-      Assert.assertFalse(o1.equals(o2));
+      assertFalse(o2+".equals("+o1+") for i="+i, o2.equals(o1));
+      assertFalse(o1+".equals("+o2+") for i="+i, o1.equals(o2));
       o1.set(i, good[i]);
     }
   }
