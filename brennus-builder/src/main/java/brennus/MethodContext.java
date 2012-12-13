@@ -23,6 +23,9 @@ public class MethodContext {
 
   public static int getSourceLineNumber() {
     StackTraceElement creatingStackFrame = getCreatingStackFrame();
+    if (creatingStackFrame!=null && creatingStackFrame.getLineNumber()>0) {
+      System.out.println("creating stack frame: " + creatingStackFrame);
+    }
     return creatingStackFrame!=null && creatingStackFrame.getLineNumber()>0 ? creatingStackFrame.getLineNumber() : 0;
   }
 
