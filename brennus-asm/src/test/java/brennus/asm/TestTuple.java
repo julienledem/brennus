@@ -17,6 +17,7 @@ import static brennus.model.Protection.PRIVATE;
 import static brennus.model.Protection.PUBLIC;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import brennus.asm.TestGeneration.DynamicClassLoader;
 import brennus.asm.ref.ReferenceClass;
 import brennus.model.FutureType;
@@ -30,7 +31,7 @@ public class TestTuple {
     Class<? extends BaseClass> c = ReferenceClass.class;
     testSetGet(c);
 
-    FutureType testClass =
+    FutureType testClass = // line number
         startClass("brennus.asm.TestTuple$TestClass", existing(BaseClass.class))
           .field(PRIVATE, STRING, "a")
           .field(PRIVATE, INT, "b")
@@ -227,7 +228,10 @@ public class TestTuple {
         assertEquals("TestTuple.java", e.getStackTrace()[1].getFileName());
         e.printStackTrace();
         // line number where the comment is in the test above
-        assertEquals("stackTrace line (from 2nd element) " + e.getStackTrace()[0] + " " + e.getStackTrace()[1] + " " + e.getStackTrace()[2], 116, e.getStackTrace()[1].getLineNumber());
+        assertTrue(
+            "stackTrace line (from 2nd element) " + e.getStackTrace()[0] + " " + e.getStackTrace()[1] + " " + e.getStackTrace()[2],
+            // depending on the compiler version I get the actual line number or the line number from the beginning of the statement :(
+            (e.getStackTrace()[1].getLineNumber() == 34 || e.getStackTrace()[1].getLineNumber() == 116));
         // checking that we display the line number from the builder class
       }
     }
