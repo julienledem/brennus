@@ -1,7 +1,11 @@
 Brennus
 =======
 
-Builder pattern to generate java classes
+Builder pattern to generate java bytecode
+
+## Examples
+
+See [unit tests](https://github.com/julienledem/brennus/blob/master/brennus-asm/src/test/java/brennus/asm/TestGeneration.java)
 
 ## Build
 
