@@ -172,17 +172,17 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
 
   @Override
   public void visit(ReturnStatement returnStatement) {
-    println("return " + toString(returnStatement.getExpression())+";");
+    println("return " + toString(returnStatement.getExpression())+"; // line " + returnStatement.getLine());
   }
 
   @Override
   public void visit(ThrowStatement throwStatement) {
-    println("throw "+ toString(throwStatement.getExpression())+";");
+    println("throw "+ toString(throwStatement.getExpression())+"; // line " + throwStatement.getLine());
   }
 
   @Override
   public void visit(ExpressionStatement expressionStatement) {
-    println(toString(expressionStatement.getExpression())+";");
+    println(toString(expressionStatement.getExpression())+"; // line " + expressionStatement.getLine());
   }
 
   private String toString(Expression expression) {
@@ -193,7 +193,7 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
 
   @Override
   public void visit(SwitchStatement switchStatement) {
-    println("switch (" + toString(switchStatement.getExpression()) + ") {");
+    println("switch (" + toString(switchStatement.getExpression()) + ") { // line " + switchStatement.getLine());
     incIndent();
     Collection<CaseStatement> caseStatements = switchStatement.getCaseStatements();
     for (CaseStatement caseStatement : caseStatements) {
@@ -214,14 +214,16 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
     } else {
       caseType = "case " + toString(caseStatement.getExpression());
     }
-    println(caseType + ":");
+    println(caseType + ": // line " + caseStatement.getLine());
     incIndent();
     List<Statement> statements = caseStatement.getStatements();
     for (Statement statement : statements) {
       statement.accept(this);
     }
     decIndent();
-    println("break;");
+    if (caseStatement.isBreakCase()) {
+      println("break;");
+    }
   }
 
   @Override
@@ -244,7 +246,7 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
             " = " +
             TypePrinterVisitor.this.toString(setStatement.getExpression()) +
             ";" +
-            suffix);
+            suffix+" line "+setStatement.getLine());
       }
     });
 
@@ -252,7 +254,7 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
 
   @Override
   public void visit(IfStatement ifStatement) {
-    println("if ("+toString(ifStatement.getExpression())+") {");
+    println("if ("+toString(ifStatement.getExpression())+") { // line " + ifStatement.getLine());
     incIndent();
     for (Statement statement : ifStatement.getThenStatements()) {
       statement.accept(this);
@@ -271,23 +273,23 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
 
   @Override
   public void visit(LabelStatement labelStatement) {
-    println(labelStatement.getName() + ":");
+    println(labelStatement.getName() + ": // line " + labelStatement.getLine());
   }
 
   @Override
   public void visit(GotoStatement gotoStatement) {
-    println("goto " + gotoStatement.getName() + ";");
+    println("goto " + gotoStatement.getName() + "; // line " + gotoStatement.getLine());
   }
 
   @Override
   public void visit(CallConstructorStatement callConstructorStatement) {
-    println(toString(callConstructorStatement.getExpression())+";");
+    println(toString(callConstructorStatement.getExpression())+"; // line " + callConstructorStatement.getLine());
   }
 
   @Override
   public void visit(DefineVarStatement defineVarStatement) {
     context.defineLocalVar(defineVarStatement.getType(), defineVarStatement.getVarName());
-    println(defineVarStatement.getType().getName() + " " + defineVarStatement.getVarName() + ";");
+    println(defineVarStatement.getType().getName() + " " + defineVarStatement.getVarName() + "; // line " + defineVarStatement.getLine());
   }
 
 }

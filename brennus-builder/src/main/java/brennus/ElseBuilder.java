@@ -36,4 +36,8 @@ public class ElseBuilder<T> extends StatementBuilder<ElseBuilder<T>> {
   public T endIf() {
     return ifStatementHandler.handleStatement(new IfStatement(ifExpression, sourceLineNumber, thenStatements, elseStatements));
   }
+
+  public <S> S transform(Function<ElseBuilder<T>, S> function) {
+    return function.apply(this);
+  }
 }

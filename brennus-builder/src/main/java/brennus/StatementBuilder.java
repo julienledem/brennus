@@ -142,4 +142,5 @@ abstract public class StatementBuilder<T> {
   public T var(Type type, String varName) {
     return statementHandler().handleStatement(new DefineVarStatement(MethodContext.getSourceLineNumber(), type, varName));
   }
+
 }

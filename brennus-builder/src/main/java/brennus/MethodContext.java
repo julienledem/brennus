@@ -23,9 +23,6 @@ public class MethodContext {
 
   public static int getSourceLineNumber() {
     StackTraceElement creatingStackFrame = getCreatingStackFrame();
-    if (creatingStackFrame!=null && creatingStackFrame.getLineNumber()>0) {
-      System.out.println("creating stack frame: " + creatingStackFrame);
-    }
     return creatingStackFrame!=null && creatingStackFrame.getLineNumber()>0 ? creatingStackFrame.getLineNumber() : 0;
   }
 
@@ -38,9 +35,12 @@ public class MethodContext {
       if (!packageName.startsWith("java.")
           && !packageName.equals(builderPackageName)
           ) {
+//        System.out.println("creating stack frame: " + stackTraceElement);
         return stackTraceElement;
       }
+//      System.out.println("not creating stack frame: "+stackTraceElement);
     }
+//    System.out.println("not found creating stack frame");
     return null;
   }
 
@@ -92,7 +92,7 @@ public class MethodContext {
       } else {
         LocalVarContext localVarContext;
         if (!localVars.containsKey(varName)) {
-          throw new RuntimeException("can not assign local variable " + varName +": not defined");
+          throw new RuntimeException("can not access local variable " + varName +": not defined");
         } else {
           localVarContext = localVars.get(varName);
         }

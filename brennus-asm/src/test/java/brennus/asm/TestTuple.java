@@ -227,7 +227,7 @@ public class TestTuple {
         assertEquals("TestTuple.java", e.getStackTrace()[1].getFileName());
         e.printStackTrace();
         // line number where the comment is in the test above
-        assertEquals("stackTrace line (from 2nd element) " + e.getStackTrace()[0] + " " + e.getStackTrace()[1] + " " + e.getStackTrace()[2], 115, e.getStackTrace()[1].getLineNumber());
+        assertEquals("stackTrace line (from 2nd element) " + e.getStackTrace()[0] + " " + e.getStackTrace()[1] + " " + e.getStackTrace()[2], 116, e.getStackTrace()[1].getLineNumber());
         // checking that we display the line number from the builder class
       }
     }

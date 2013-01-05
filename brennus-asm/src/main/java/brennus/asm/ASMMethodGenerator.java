@@ -289,14 +289,12 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
 
   @Override
   public void visit(LabelStatement labelStatement) {
-    LabelNode labelNode = methodByteCodeContext.getLabel(labelStatement.getName());
-    methodByteCodeContext.addLabel(labelStatement.getLine(), labelNode, labelStatement.getName()+":");
+    methodByteCodeContext.addNamedLabel(labelStatement.getLine(), labelStatement.getName());
   }
 
   @Override
   public void visit(GotoStatement gotoStatement) {
-    LabelNode labelNode = methodByteCodeContext.getLabel(gotoStatement.getName());
-    methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, labelNode), "goto "+gotoStatement.getName());
+    methodByteCodeContext.gotoLabel(gotoStatement.getName());
   }
 
   @Override

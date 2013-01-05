@@ -42,4 +42,8 @@ public class ThenBuilder<T> extends StatementBuilder<ThenBuilder<T>> {
     return new ElseBuilder<T>(e, sourceLineNumber, ifStatementHandler, thenStatements);
   }
 
+  public <S> S transform(Function<ThenBuilder<T>, S> function) {
+    return function.apply(this);
+  }
+
 }

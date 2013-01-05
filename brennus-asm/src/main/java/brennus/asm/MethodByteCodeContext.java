@@ -2,8 +2,10 @@ package brennus.asm;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +28,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.LineNumberNode;
@@ -62,6 +65,7 @@ class MethodByteCodeContext implements Opcodes {
   private ASMifierMethodVisitor methodVisitor = new ASMifierMethodVisitor();
   private int currentOp;
   private Map<String, LabelNode> namedLabels = new HashMap<String, LabelNode>();
+  private Set<String> definedNamedLabels = new HashSet<String>();
 
   MethodByteCodeContext(MethodContext methodContext) {
     Method method = methodContext.getMethod();
@@ -147,9 +151,19 @@ class MethodByteCodeContext implements Opcodes {
     if (type.isPrimitive()) {
       // TODO: other primitive types
       switch (type.getClassIdentifier().charAt(0)) {
-      case 'I':
-      case 'Z':
+      case 'I': // int
+      case 'Z': // boolean
         return ILOAD;
+      case 'J': // long
+        return LLOAD;
+      case 'F': // float
+        return FLOAD;
+      case 'D': // double
+        return DLOAD;
+      case 'C': // char
+      case 'V': // void
+      case 'B': // byte
+      case 'S': // short
       default:
         throw new RuntimeException("Unsupported "+type);
       }
@@ -170,9 +184,19 @@ class MethodByteCodeContext implements Opcodes {
     if (type.isPrimitive()) {
       // TODO: other primitive types
       switch (type.getClassIdentifier().charAt(0)) {
-      case 'I':
-      case 'Z':
+      case 'I': // int
+      case 'Z': // boolean
         return ISTORE;
+      case 'J': // long
+        return LSTORE;
+      case 'F': // float
+        return FSTORE;
+      case 'D': // double
+        return DSTORE;
+      case 'C': // char
+      case 'V': // void
+      case 'B': // byte
+      case 'S': // short
       default:
         throw new RuntimeException("Unsupported "+type);
       }
@@ -189,6 +213,13 @@ class MethodByteCodeContext implements Opcodes {
         Math.max(1,
         methodContext.getMethod().getParameters().size())
         + stack, maxv);
+    // validate that all gotos jump to label that have been defined
+    // otherwise we can get "Execution can fall off end of the code" errors
+    for (String label : namedLabels.keySet()) {
+      if (!definedNamedLabels.contains(label)) {
+        throw new RuntimeException("\"goto "+label+"\" without corresponding \""+label+":\"");
+      }
+    }
     return methodNode;
   }
 
@@ -301,13 +332,24 @@ class MethodByteCodeContext implements Opcodes {
     addInstruction(new InsnNode(ICONST_1), comment);
   }
 
-  public LabelNode getLabel(String name) {
+  private LabelNode getLabel(String name) {
     LabelNode labelNode = namedLabels.get(name);
     if (labelNode == null) {
       labelNode = new LabelNode();
       namedLabels.put(name, labelNode);
     }
     return labelNode;
+  }
+
+  public void addNamedLabel(int line, String name) {
+    LabelNode labelNode = getLabel(name);
+    addLabel(line, labelNode, name+":");
+    definedNamedLabels.add(name);
+  }
+
+  public void gotoLabel(String name) {
+    LabelNode labelNode = getLabel(name);
+    addInstruction(new JumpInsnNode(GOTO, labelNode), "goto "+name);
   }
 
 }
