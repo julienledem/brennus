@@ -21,7 +21,6 @@ import brennus.model.LocalVariableAccessType;
 import brennus.model.Method;
 import brennus.model.Parameter;
 import brennus.model.ParameterAccessType;
-import brennus.model.Protection;
 import brennus.model.Type;
 import brennus.model.UnaryExpression;
 import brennus.model.VarAccessType;

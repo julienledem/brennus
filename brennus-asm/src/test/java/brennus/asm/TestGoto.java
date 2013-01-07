@@ -16,11 +16,9 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import brennus.MethodBuilder;
-import brennus.MethodDeclarationBuilder;
 import brennus.SwitchBuilder;
 import brennus.ThenBuilder;
 import brennus.asm.TestGeneration.DynamicClassLoader;
-import brennus.model.ExistingType;
 import brennus.model.FutureType;
 import brennus.printer.TypePrinter;
 

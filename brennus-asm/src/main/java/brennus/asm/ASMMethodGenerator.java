@@ -2,7 +2,10 @@ package brennus.asm;
 
 import static brennus.model.ExistingType.INT;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import brennus.MethodContext;
 import brennus.model.BinaryExpression;
@@ -12,7 +15,6 @@ import brennus.model.CallMethodExpression;
 import brennus.model.CaseStatement;
 import brennus.model.CastExpression;
 import brennus.model.DefineVarStatement;
-import brennus.model.ExistingType;
 import brennus.model.Expression;
 import brennus.model.ExpressionStatement;
 import brennus.model.ExpressionVisitor;
@@ -39,13 +41,12 @@ import brennus.model.VarAccessTypeVisitor;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LookupSwitchInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TableSwitchInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
 class ASMMethodGenerator implements Opcodes, StatementVisitor {
@@ -91,21 +92,35 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
     methodByteCodeContext.handleConversion(expressionType, INT, "switch(exp): convert exp to int");
     methodByteCodeContext.decIndent();
     List<CaseStatement> caseStatements = switchStatement.getCaseStatements();
+    int minCase = Integer.MAX_VALUE;
+    int maxCase = Integer.MIN_VALUE;
+    Map<Integer, CaseStatement> cases = new HashMap<Integer, CaseStatement>();
     int[] values = new int[caseStatements.size()];
     LabelNode[] labels = new LabelNode[caseStatements.size()];
-    for (int i = 0; i < labels.length; i++) {
+    for (int i = 0; i < caseStatements.size(); i++) {
+      CaseStatement caseStatement = caseStatements.get(i);
+      int caseValue = ((Integer)((LiteralExpression)caseStatement.getExpression()).getValue()).intValue();
+      values[i] = caseValue;
+      minCase = Math.min(minCase, caseValue);
+      maxCase = Math.max(caseValue, maxCase);
+      cases.put(caseValue, caseStatement);
       labels[i] = new LabelNode();
-      // TODO handle other values
-      values[i] = ((Integer)((LiteralExpression)caseStatements.get(i).getExpression()).getValue()).intValue();
     }
+    Arrays.sort(values);
     LabelNode defaultLabel = new LabelNode();
     endLabel = new LabelNode();
-    methodByteCodeContext.addInstruction(new LookupSwitchInsnNode(defaultLabel, values, labels), "switch(", switchStatement.getExpression(), ")");
-    int i=0;
+    // TODO: more cases
+    if (minCase == 0 && maxCase == values.length - 1) {
+      methodByteCodeContext.addInstruction(new TableSwitchInsnNode(minCase, maxCase, defaultLabel, labels), "switch(", switchStatement.getExpression(), ")");
+    } else {
+      methodByteCodeContext.addInstruction(new LookupSwitchInsnNode(defaultLabel, values, labels), "switch(", switchStatement.getExpression(), ")");
+    }
     methodByteCodeContext.incIndent("switch");
-    for (CaseStatement caseStatement : caseStatements) {
-      currentLabel = labels[i++];
-      caseStatement.accept(this);
+    System.out.println(Arrays.toString(values));
+    System.out.println(cases);
+    for (int i = 0; i < values.length; i++) {
+      currentLabel = labels[i];
+      cases.get(values[i]).accept(this);
       currentLabel = null;
     }
     if (switchStatement.getDefaultCaseStatement() != null) {
@@ -149,31 +164,41 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
 
   @Override
   public void visit(final SetStatement setStatement) {
-    methodByteCodeContext.loadThis("set", setStatement.getTo());
-    methodByteCodeContext.incIndent("set exp", setStatement.getTo());
-    final Type expressionType = visit(setStatement.getExpression());
-    methodByteCodeContext.decIndent();
     methodContext.getVarAccessType(setStatement.getTo()).accept(
     new VarAccessTypeVisitor() {
+      private Type evalExp() {
+        methodByteCodeContext.incIndent("set exp", setStatement.getTo());
+        Type expressionType = ASMMethodGenerator.this.visit(setStatement.getExpression());
+        methodByteCodeContext.decIndent();
+        return expressionType;
+      }
       public void visit(ParameterAccessType parameterAccessType) {
+        Type expressionType = evalExp();
         // TODO: type support
         //        System.out.println(getExpression.getFieldName()+" "+param.getIndex());
         Parameter param = parameterAccessType.getParam();
+        // TODO: long and double take 2 slots
         // TODO: check boxing
         methodByteCodeContext.store(
             param.getType(),
+            // TODO: static methods don't have this
             param.getIndex() + 1 /* this */,
             "set param", setStatement.getTo());
       }
       public void visit(FieldAccessType fieldAccessType) {
+        methodByteCodeContext.loadThis("set", setStatement.getTo());
+        Type expressionType = evalExp();
         Field field = fieldAccessType.getField();
         methodByteCodeContext.handleConversion(expressionType, field.getType());
         methodByteCodeContext.addInstruction(new FieldInsnNode(PUTFIELD, methodContext.getClassIdentifier(), field.getName(), field.getSignature()), "set", setStatement.getTo());
       }
       public void visit(LocalVariableAccessType localVariableAccessType) {
+        Type expressionType = evalExp();
         // TODO: type support
+        // TODO: long and double take 2 slots
         methodByteCodeContext.store(
             expressionType,
+            // TODO: static methods don't have this
             methodContext.getMethod().getParameters().size() + 1 /* this */ + localVariableAccessType.getVarIndex(),
             "set local var", setStatement.getTo());
       }
