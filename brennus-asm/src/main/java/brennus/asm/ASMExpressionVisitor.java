@@ -110,7 +110,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
     methodByteCodeContext.addInstruction(
         new MethodInsnNode(
                 method.isInterfaceMethod() ? INVOKEINTERFACE :
-                  method.getFlags().getProtection() == PRIVATE ? INVOKESPECIAL : INVOKEVIRTUAL,
+                  method.getFlags().getProtection() == PRIVATE || method.getFlags().isFinal() ? INVOKESPECIAL : INVOKEVIRTUAL,
                 method.getTypeName(),
                 methodName,
                 method.getSignature()),

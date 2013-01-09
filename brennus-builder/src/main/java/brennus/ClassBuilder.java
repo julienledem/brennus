@@ -128,7 +128,8 @@ public class ClassBuilder {
   // internals
 
   private MethodDeclarationBuilder startMethod(Protection protection, Type returnType, String methodName, final boolean isStatic) {
-    return new MethodDeclarationBuilder(this.name.replace(".", "/"), new MemberFlags(isStatic, protection), returnType, methodName, new MethodHandler() {
+    // TODO: allow final
+    return new MethodDeclarationBuilder(this.name.replace(".", "/"), new MemberFlags(isStatic, false, protection), returnType, methodName, new MethodHandler() {
       public ClassBuilder handleMethod(Method method) {
         (isStatic ? staticMethods : methods).add(method);
         return ClassBuilder.this;
@@ -137,7 +138,8 @@ public class ClassBuilder {
   }
 
   private void field(Protection protection, Type type, String name, boolean isStatic) {
-    (isStatic ? staticFields : fields).add(new Field(new MemberFlags(isStatic, protection), type, name));
+    // TODO: allow final
+    (isStatic ? staticFields : fields).add(new Field(new MemberFlags(isStatic, false, protection), type, name));
   }
 
 }

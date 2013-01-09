@@ -36,7 +36,7 @@ public class ConstructorBuilder extends StatementBuilder<ConstructorBuilder> {
   }
 
   public ClassBuilder endConstructor() {
-    return methodHandler.handleMethod(new Method(classIdentifier, new MemberFlags(false, protection), VOID, "<init>", parameters, statements, false));
+    return methodHandler.handleMethod(new Method(classIdentifier, new MemberFlags(false, false, protection), VOID, "<init>", parameters, statements, false));
   }
 
   protected StatementHandler<ConstructorBuilder> statementHandler() {

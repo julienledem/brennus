@@ -53,4 +53,7 @@ public class MethodBuilder extends StatementBuilder<MethodBuilder> {
     };
   }
 
+  public <S> S transform(Function<MethodBuilder, S> function) {
+    return function.apply(this);
+  }
 }

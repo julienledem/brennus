@@ -5,7 +5,9 @@ import java.util.List;
 
 import brennus.CaseBuilder.CaseStatementHandler;
 import brennus.model.CaseStatement;
+import brennus.model.CaseBlockStatement;
 import brennus.model.Expression;
+import brennus.model.GotoCaseStatement;
 import brennus.model.LiteralExpression;
 import brennus.model.SwitchStatement;
 
@@ -27,7 +29,7 @@ public class SwitchBuilder<T> {
   private final int line;
   private final SwitchStatementsHandler<T> switchStatementHandler;
   private final List<CaseStatement> statements = new ArrayList<CaseStatement>();
-  private CaseStatement defaultCaseStatement;
+  private CaseBlockStatement defaultCaseStatement;
 
   SwitchBuilder(Expression switchOnExpression, SwitchStatementsHandler<T> switchStatementHandler) {
     this.switchOnExpression = switchOnExpression;
@@ -37,11 +39,16 @@ public class SwitchBuilder<T> {
 
   public CaseBuilder<T> caseBlock(int value) {
     return new CaseBuilder<T>(new LiteralExpression(value), new CaseStatementHandler<T>() {
-      public SwitchBuilder<T> handleStatement(CaseStatement statement) {
+      public SwitchBuilder<T> handleStatement(CaseBlockStatement statement) {
         statements.add(statement);
         return SwitchBuilder.this;
       }
     });
+  }
+
+  public SwitchBuilder<T> gotoLabel(int value, String label) {
+    statements.add(new GotoCaseStatement(MethodContext.getSourceLineNumber(), value, label));
+    return this;
   }
 
   public CaseBuilder<T> defaultCase() {
@@ -49,7 +56,7 @@ public class SwitchBuilder<T> {
       throw new RuntimeException("already a default case "+defaultCaseStatement);
     }
     return new CaseBuilder<T>(null, new CaseStatementHandler<T>() {
-      public SwitchBuilder<T> handleStatement(CaseStatement statement) {
+      public SwitchBuilder<T> handleStatement(CaseBlockStatement statement) {
         defaultCaseStatement = statement;
         return SwitchBuilder.this;
       }

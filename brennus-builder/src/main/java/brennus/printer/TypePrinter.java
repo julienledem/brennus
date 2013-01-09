@@ -4,11 +4,12 @@ import java.util.Collection;
 import java.util.List;
 
 import brennus.MethodContext;
+import brennus.model.CaseStatement;
 import brennus.model.BinaryExpression;
 import brennus.model.CallConstructorExpression;
 import brennus.model.CallConstructorStatement;
 import brennus.model.CallMethodExpression;
-import brennus.model.CaseStatement;
+import brennus.model.CaseBlockStatement;
 import brennus.model.CastExpression;
 import brennus.model.DefineVarStatement;
 import brennus.model.ExistingType;
@@ -19,6 +20,7 @@ import brennus.model.Field;
 import brennus.model.FieldAccessType;
 import brennus.model.FutureType;
 import brennus.model.GetExpression;
+import brennus.model.GotoCaseStatement;
 import brennus.model.GotoStatement;
 import brennus.model.IfStatement;
 import brennus.model.InstanceOfExpression;
@@ -207,7 +209,7 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
   }
 
   @Override
-  public void visit(CaseStatement caseStatement) {
+  public void visit(CaseBlockStatement caseStatement) {
     String caseType;
     if (caseStatement.getExpression() == null) {
       caseType = "default";
@@ -290,6 +292,20 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
   public void visit(DefineVarStatement defineVarStatement) {
     context.defineLocalVar(defineVarStatement.getType(), defineVarStatement.getVarName());
     println(defineVarStatement.getType().getName() + " " + defineVarStatement.getVarName() + "; // line " + defineVarStatement.getLine());
+  }
+
+  @Override
+  public void visit(GotoCaseStatement gotoCaseStatement) {
+    String caseType;
+    if (gotoCaseStatement.getExpression() == null) {
+      caseType = "default";
+    } else {
+      caseType = "case " + toString(gotoCaseStatement.getExpression());
+    }
+    println(caseType + ": // line " + gotoCaseStatement.getLine());
+    incIndent();
+      println("goto "+gotoCaseStatement.getLabel()+";");
+    decIndent();
   }
 
 }

@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.Map;
 
 import brennus.MethodContext;
+import brennus.model.CaseStatement;
 import brennus.model.BinaryExpression;
 import brennus.model.CallConstructorExpression;
 import brennus.model.CallConstructorStatement;
 import brennus.model.CallMethodExpression;
-import brennus.model.CaseStatement;
+import brennus.model.CaseBlockStatement;
+import brennus.model.CaseStatementVisitor;
 import brennus.model.CastExpression;
 import brennus.model.DefineVarStatement;
 import brennus.model.Expression;
@@ -21,6 +23,7 @@ import brennus.model.ExpressionVisitor;
 import brennus.model.Field;
 import brennus.model.FieldAccessType;
 import brennus.model.GetExpression;
+import brennus.model.GotoCaseStatement;
 import brennus.model.GotoStatement;
 import brennus.model.IfStatement;
 import brennus.model.InstanceOfExpression;
@@ -96,7 +99,7 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
     int maxCase = Integer.MIN_VALUE;
     Map<Integer, CaseStatement> cases = new HashMap<Integer, CaseStatement>();
     int[] values = new int[caseStatements.size()];
-    LabelNode[] labels = new LabelNode[caseStatements.size()];
+    final LabelNode[] labels = new LabelNode[caseStatements.size()];
     for (int i = 0; i < caseStatements.size(); i++) {
       CaseStatement caseStatement = caseStatements.get(i);
       int caseValue = ((Integer)((LiteralExpression)caseStatement.getExpression()).getValue()).intValue();
@@ -104,20 +107,30 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
       minCase = Math.min(minCase, caseValue);
       maxCase = Math.max(caseValue, maxCase);
       cases.put(caseValue, caseStatement);
-      labels[i] = new LabelNode();
     }
     Arrays.sort(values);
+    for (int i = 0; i < values.length; i++) {
+      final int index = i;
+      cases.get(values[i]).accept(new CaseStatementVisitor() {
+        @Override
+        public void visit(GotoCaseStatement gotoCaseStatement) {
+          labels[index] = methodByteCodeContext.getLabelForSwitchGotoCase(gotoCaseStatement.getLabel());
+        }
+        @Override
+        public void visit(CaseBlockStatement caseBlockStatement) {
+          labels[index] = new LabelNode();
+        }
+      });
+    }
     LabelNode defaultLabel = new LabelNode();
     endLabel = new LabelNode();
     // TODO: more cases
-    if (minCase == 0 && maxCase == values.length - 1) {
+    if ((maxCase - minCase) == values.length - 1) {
       methodByteCodeContext.addInstruction(new TableSwitchInsnNode(minCase, maxCase, defaultLabel, labels), "switch(", switchStatement.getExpression(), ")");
     } else {
       methodByteCodeContext.addInstruction(new LookupSwitchInsnNode(defaultLabel, values, labels), "switch(", switchStatement.getExpression(), ")");
     }
     methodByteCodeContext.incIndent("switch");
-    System.out.println(Arrays.toString(values));
-    System.out.println(cases);
     for (int i = 0; i < values.length; i++) {
       currentLabel = labels[i];
       cases.get(values[i]).accept(this);
@@ -136,7 +149,7 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
   }
 
   @Override
-  public void visit(CaseStatement caseStatement) {
+  public void visit(CaseBlockStatement caseStatement) {
     Object value = caseStatement.getExpression() == null ? "default" : caseStatement.getliteralExpression().getValue();
     methodByteCodeContext.addLabel(caseStatement.getLine(), currentLabel, "case", value);
     // TODO: understand Frame ... :(
@@ -151,6 +164,11 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
       methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, endLabel), "break case");
     }
     methodByteCodeContext.decIndent();
+  }
+
+  @Override
+  public void visit(GotoCaseStatement gotoCaseStatement) {
+    // nothing to do
   }
 
   @Override
@@ -331,4 +349,5 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
   public void visit(DefineVarStatement defineVarStatement) {
     methodContext.defineLocalVar(defineVarStatement.getType(), defineVarStatement.getVarName());
   }
+
 }

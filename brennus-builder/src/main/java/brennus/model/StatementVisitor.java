@@ -14,7 +14,7 @@ public interface StatementVisitor {
 
   void visit(SwitchStatement switchStatement);
 
-  void visit(CaseStatement caseStatement);
+  void visit(CaseBlockStatement caseStatement);
 
   void visit(ThrowStatement throwStatement);
 
@@ -29,5 +29,7 @@ public interface StatementVisitor {
   void visit(CallConstructorStatement callConstructorStatement);
 
   void visit(DefineVarStatement defineVarStatement);
+
+  void visit(GotoCaseStatement gotoCaseStatement);
 
 }

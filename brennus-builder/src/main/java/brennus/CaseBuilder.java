@@ -3,7 +3,7 @@ package brennus;
 import java.util.ArrayList;
 import java.util.List;
 
-import brennus.model.CaseStatement;
+import brennus.model.CaseBlockStatement;
 import brennus.model.LiteralExpression;
 import brennus.model.Statement;
 
@@ -17,7 +17,7 @@ import brennus.model.Statement;
 public class CaseBuilder<T> extends StatementBuilder<CaseBuilder<T>> {
 
   public interface CaseStatementHandler<T> {
-    SwitchBuilder<T> handleStatement(CaseStatement caseStatement);
+    SwitchBuilder<T> handleStatement(CaseBlockStatement caseStatement);
   }
 
   private final LiteralExpression literalExpression;
@@ -32,7 +32,7 @@ public class CaseBuilder<T> extends StatementBuilder<CaseBuilder<T>> {
   }
 
   public SwitchBuilder<T> endCase() {
-    return statementHandler.handleStatement(new CaseStatement(line, literalExpression, statements, false));
+    return statementHandler.handleStatement(new CaseBlockStatement(line, literalExpression, statements, false));
   }
 
   protected StatementHandler<CaseBuilder<T>> statementHandler() {
@@ -45,7 +45,10 @@ public class CaseBuilder<T> extends StatementBuilder<CaseBuilder<T>> {
   }
 
   public SwitchBuilder<T> breakCase() {
-    return statementHandler.handleStatement(new CaseStatement(line, literalExpression, statements, true));
+    return statementHandler.handleStatement(new CaseBlockStatement(line, literalExpression, statements, true));
   }
 
+  public <S> S transform(Function<CaseBuilder<T>, S> function) {
+    return function.apply(this);
+  }
 }

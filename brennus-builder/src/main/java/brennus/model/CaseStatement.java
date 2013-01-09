@@ -1,34 +1,11 @@
 package brennus.model;
 
-import static brennus.model.ExceptionHandlingVisitor.wrap;
+abstract public class CaseStatement extends Statement {
 
-import java.util.List;
-
-public class CaseStatement extends Statement {
-
-  private final List<Statement> statements;
-  private final boolean breakCase;
-
-  public CaseStatement(int line, LiteralExpression value, List<Statement> statements, boolean breakCase) {
+  public CaseStatement(LiteralExpression value, int line) {
     super(value, line);
-    this.statements = statements;
-    this.breakCase = breakCase;
   }
 
-  @Override
-  public void accept(StatementVisitor statementVisitor) {
-    wrap(statementVisitor).visit(this);
-  }
+  abstract public void accept(CaseStatementVisitor visitor);
 
-  public List<Statement> getStatements() {
-    return statements;
-  }
-
-  public boolean isBreakCase() {
-    return breakCase;
-  }
-
-  public LiteralExpression getliteralExpression() {
-    return (LiteralExpression)getExpression();
-  }
 }

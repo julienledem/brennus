@@ -23,4 +23,5 @@ public class SwitchValueExpressionBuilder<T> extends ValueExpressionBuilder<Swit
   public SwitchBuilder<T> switchBlock() {
     return super.end();
   }
+
 }

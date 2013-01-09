@@ -3,11 +3,12 @@ package brennus;
 import java.util.List;
 
 import brennus.model.CallConstructorStatement;
-import brennus.model.CaseStatement;
+import brennus.model.CaseBlockStatement;
 import brennus.model.DefineVarStatement;
 import brennus.model.ExpressionStatement;
 import brennus.model.FieldAccessType;
 import brennus.model.FutureType;
+import brennus.model.GotoCaseStatement;
 import brennus.model.GotoStatement;
 import brennus.model.IfStatement;
 import brennus.model.LabelStatement;
@@ -68,7 +69,7 @@ public class ClassValidator {
 
       }
 
-      public void visit(CaseStatement caseStatement) {
+      public void visit(CaseBlockStatement caseStatement) {
         // TODO Auto-generated method stub
 
       }
@@ -113,6 +114,12 @@ public class ClassValidator {
 
       @Override
       public void visit(DefineVarStatement defineVarStatement) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void visit(GotoCaseStatement gotoCaseStatement) {
         // TODO Auto-generated method stub
 
       }

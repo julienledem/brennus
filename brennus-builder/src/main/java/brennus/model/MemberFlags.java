@@ -14,18 +14,22 @@ public class MemberFlags {
   private final Keyword[] keywords;
 
   private final boolean isStatic;
+  private final boolean isFinal;
   private final Protection protection;
+
 
   public MemberFlags(Keyword[] keywords) {
     this.keywords = keywords;
     this.protection = Protection.getProtection(keywords);
     this.isStatic = StaticStatus.isStatic(keywords);
+    this.isFinal = FinalStatus.isFinal(keywords);
   }
 
-  public MemberFlags(boolean isStatic, Protection protection) {
+  public MemberFlags(boolean isStatic, boolean isFinal, Protection protection) {
     this.keywords = isStatic ? new Keyword[] { STATIC, protection } : new Keyword[] { protection };
     this.protection = protection;
     this.isStatic = isStatic;
+    this.isFinal = isFinal;
   }
 
   public Protection getProtection() {
@@ -47,12 +51,12 @@ public class MemberFlags {
   public static MemberFlags fromReflection(java.lang.reflect.Method method) {
     int modifiers = method.getModifiers();
     Protection protection = getProtection(modifiers);
-    return new MemberFlags(Modifier.isStatic(modifiers), protection);
+    return new MemberFlags(Modifier.isStatic(modifiers), Modifier.isFinal(modifiers), protection);
   }
 
   public static MemberFlags fromReflection(Constructor<?> constructor) {
     Protection protection = getProtection(constructor.getModifiers());
-    return new MemberFlags(false, protection);
+    return new MemberFlags(false, false, protection);
   }
 
   private static Protection getProtection(int modifiers) {
@@ -67,6 +71,10 @@ public class MemberFlags {
       protection = DEFAULT;
     }
     return protection;
+  }
+
+  public boolean isFinal() {
+    return isFinal;
   }
 
 }

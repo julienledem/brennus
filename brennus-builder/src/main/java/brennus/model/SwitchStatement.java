@@ -7,10 +7,10 @@ import java.util.List;
 
 public class SwitchStatement extends Statement {
 
-  private final List<CaseStatement> caseStatements;
-  private final CaseStatement defaultCaseStatement;
+  private final List< CaseStatement> caseStatements;
+  private final CaseBlockStatement defaultCaseStatement;
 
-  public SwitchStatement(int line, Expression expression, List<CaseStatement> caseStatements, CaseStatement defaultCaseStatement) {
+  public SwitchStatement(int line, Expression expression, List<CaseStatement> caseStatements, CaseBlockStatement defaultCaseStatement) {
     super(expression, line);
     this.caseStatements = Collections.unmodifiableList(caseStatements);
     this.defaultCaseStatement = defaultCaseStatement;
@@ -26,7 +26,7 @@ public class SwitchStatement extends Statement {
     return caseStatements;
   }
 
-  public CaseStatement getDefaultCaseStatement() {
+  public CaseBlockStatement getDefaultCaseStatement() {
     return defaultCaseStatement;
   }
 

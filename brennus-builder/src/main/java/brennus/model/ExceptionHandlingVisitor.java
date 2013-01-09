@@ -27,6 +27,10 @@ class ExceptionHandlingVisitor {
     return wrap(varAccessTypeVisitor, VarAccessTypeVisitor.class);
   }
 
+  static CaseStatementVisitor wrap(CaseStatementVisitor visitor) {
+    return wrap(visitor, CaseStatementVisitor.class);
+  }
+
   @SuppressWarnings("unchecked")
   private static <T> T wrap(final T visitor, Class<T> interf) {
     return (T)Proxy.newProxyInstance(ExceptionHandlingVisitor.class.getClassLoader(), new Class<?>[] {interf}, new InvocationHandler() {

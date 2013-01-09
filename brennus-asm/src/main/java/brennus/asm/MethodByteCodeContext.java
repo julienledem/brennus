@@ -332,6 +332,10 @@ class MethodByteCodeContext implements Opcodes {
     addInstruction(new InsnNode(ICONST_1), comment);
   }
 
+  public LabelNode getLabelForSwitchGotoCase(String name) {
+    return getLabel(name);
+  }
+
   private LabelNode getLabel(String name) {
     LabelNode labelNode = namedLabels.get(name);
     if (labelNode == null) {

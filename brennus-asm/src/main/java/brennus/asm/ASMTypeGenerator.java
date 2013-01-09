@@ -53,7 +53,7 @@ public class ASMTypeGenerator {
       constructors = Arrays.asList(
           new Method(
               futureType.getName(),
-              new MemberFlags(false, PUBLIC),
+              new MemberFlags(false, false, PUBLIC),
               VOID,
               "<init>",
               new ArrayList<Parameter>(),
