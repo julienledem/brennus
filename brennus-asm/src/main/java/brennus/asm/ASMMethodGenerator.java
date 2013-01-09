@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import brennus.LocalVarContext;
 import brennus.MethodContext;
 import brennus.model.CaseStatement;
 import brennus.model.BinaryExpression;
@@ -200,7 +201,7 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
         methodByteCodeContext.store(
             param.getType(),
             // TODO: static methods don't have this
-            param.getIndex() + 1 /* this */,
+            methodByteCodeContext.getParamByteCodeIndex(param.getIndex()),
             "set param", setStatement.getTo());
       }
       public void visit(FieldAccessType fieldAccessType) {
@@ -216,8 +217,7 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
         // TODO: long and double take 2 slots
         methodByteCodeContext.store(
             expressionType,
-            // TODO: static methods don't have this
-            methodContext.getMethod().getParameters().size() + 1 /* this */ + localVariableAccessType.getVarIndex(),
+            methodByteCodeContext.getLocalVariableByteCodeIndex(localVariableAccessType.getVarIndex()),
             "set local var", setStatement.getTo());
       }
     });
@@ -347,7 +347,8 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
 
   @Override
   public void visit(DefineVarStatement defineVarStatement) {
-    methodContext.defineLocalVar(defineVarStatement.getType(), defineVarStatement.getVarName());
+    LocalVarContext context = methodContext.defineLocalVar(defineVarStatement.getType(), defineVarStatement.getVarName());
+    methodByteCodeContext.defineLocalVar(context.getType(), context.getName(), context.getIndex());
   }
 
 }

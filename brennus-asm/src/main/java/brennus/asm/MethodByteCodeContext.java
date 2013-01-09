@@ -1,5 +1,6 @@
 package brennus.asm;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import brennus.model.CastTypeConversion;
 import brennus.model.ExistingType;
 import brennus.model.MemberFlags;
 import brennus.model.Method;
+import brennus.model.Parameter;
 import brennus.model.PrimitiveType;
 import brennus.model.Type;
 import brennus.model.TypeConversion;
@@ -66,12 +68,24 @@ class MethodByteCodeContext implements Opcodes {
   private int currentOp;
   private Map<String, LabelNode> namedLabels = new HashMap<String, LabelNode>();
   private Set<String> definedNamedLabels = new HashSet<String>();
+  private int currentLocalVariableByteCodeIndex = 0;
+  private List<Integer> localVarIndexToBytecodeIndex = new ArrayList<Integer>();
+  private List<Integer> paramIndexToBytecodeIndex = new ArrayList<Integer>();
 
   MethodByteCodeContext(MethodContext methodContext) {
     Method method = methodContext.getMethod();
     logger.fine(method.toString());
     this.methodNode = new MethodNode(getAccess(method.getFlags()), method.getName(), method.getSignature(), null, null);
     this.methodContext = methodContext;
+    List<Parameter> parameters = methodContext.getMethod().getParameters();
+    if (!methodContext.getMethod().isStatic()) {
+      currentLocalVariableByteCodeIndex = 1;
+    }
+    for (Parameter parameter : parameters) {
+      paramIndexToBytecodeIndex.add(currentLocalVariableByteCodeIndex);
+      incLocalVarIndex(parameter.getType());
+    }
+
   }
 
   public void addInstruction(AbstractInsnNode insnNode, Object... comments) {
@@ -177,6 +191,7 @@ class MethodByteCodeContext implements Opcodes {
   }
 
   private void store(int store, int i, Object... comments) {
+    maxv = Math.max(maxv, i+1);
     addInstruction(new VarInsnNode(store, i), comments);
   }
 
@@ -209,10 +224,10 @@ class MethodByteCodeContext implements Opcodes {
     if (methodContext.getReturnType().equals(ExistingType.VOID)) {
       addInstruction(new InsnNode(RETURN), "end of method");
     }
+    // TODO: seriously fix the following
     methodNode.visitMaxs(
-        Math.max(1,
-        methodContext.getMethod().getParameters().size())
-        + stack, maxv);
+        Math.max(1, maxv) + stack,
+        Math.max(maxv + 1, currentLocalVariableByteCodeIndex));
     // validate that all gotos jump to label that have been defined
     // otherwise we can get "Execution can fall off end of the code" errors
     for (String label : namedLabels.keySet()) {
@@ -354,6 +369,46 @@ class MethodByteCodeContext implements Opcodes {
   public void gotoLabel(String name) {
     LabelNode labelNode = getLabel(name);
     addInstruction(new JumpInsnNode(GOTO, labelNode), "goto "+name);
+  }
+
+  public int getLocalVariableByteCodeIndex(int varIndex) {
+    // TODO: long and double take 2 slots
+    // TODO: static methods don't have this
+//    return methodContext.getMethod().getParameters().size() + 1 /* this */ + varIndex;
+    return localVarIndexToBytecodeIndex.get(varIndex);
+  }
+
+  public void defineLocalVar(Type type, String name, int index) {
+    localVarIndexToBytecodeIndex.add(currentLocalVariableByteCodeIndex);
+    incLocalVarIndex(type);
+  }
+
+  private void incLocalVarIndex(Type type) {
+    if (!type.isPrimitive()) {
+      ++ currentLocalVariableByteCodeIndex;
+    } else {
+      switch (type.getClassIdentifier().charAt(0)) {
+      case 'I': // int
+      case 'Z': // boolean
+      case 'F': // float
+      case 'C': // char
+      case 'V': // void
+      case 'B': // byte
+      case 'S': // short
+        ++ currentLocalVariableByteCodeIndex;
+        break;
+      case 'J': // long
+      case 'D': // double
+        currentLocalVariableByteCodeIndex += 2;
+        break;
+      default:
+        throw new RuntimeException("Unsupported "+type);
+      }
+    }
+  }
+
+  public int getParamByteCodeIndex(int paramIndex) {
+    return paramIndexToBytecodeIndex.get(paramIndex);
   }
 
 }

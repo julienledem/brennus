@@ -65,7 +65,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
         //        System.out.println(getExpression.getFieldName()+" "+param.getIndex());
         Parameter param = parameterAccessType.getParam();
         // TODO: check boxing
-        methodByteCodeContext.load(param.getType(), param.getIndex() + 1,
+        methodByteCodeContext.load(param.getType(), methodByteCodeContext.getParamByteCodeIndex(param.getIndex()),
             "get param", getExpression.getFieldName());
         lastExpressionType = param.getType();
       }
@@ -74,7 +74,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
         // TODO: check boxing
         methodByteCodeContext.load(
             localVariableAccessType.getType(),
-            methodContext.getMethod().getParameters().size() + 1 + localVariableAccessType.getVarIndex(),
+            methodByteCodeContext.getLocalVariableByteCodeIndex(localVariableAccessType.getVarIndex()),
             "get local variable", getExpression.getFieldName());
         lastExpressionType = localVariableAccessType.getType();
       }

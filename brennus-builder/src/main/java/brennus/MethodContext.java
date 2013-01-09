@@ -144,12 +144,13 @@ public class MethodContext {
     return type;
   }
 
-  public void defineLocalVar(Type type, String varName) {
+  public LocalVarContext defineLocalVar(Type type, String varName) {
     // TODO: deal with scope
     if (localVars.containsKey(varName)) {
       throw new RuntimeException("Duplicate local variable "+varName+ " in method "+method.toString());
     }
-    localVars.put(varName, new LocalVarContext(varName, localVars.size(), type));
-
+    LocalVarContext context = new LocalVarContext(varName, localVars.size(), type);
+    localVars.put(varName, context);
+    return context;
   }
 }

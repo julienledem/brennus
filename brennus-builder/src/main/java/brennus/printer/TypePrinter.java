@@ -302,9 +302,9 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
     } else {
       caseType = "case " + toString(gotoCaseStatement.getExpression());
     }
-    println(caseType + ": // line " + gotoCaseStatement.getLine());
+    println(caseType + ": // line " + gotoCaseStatement.getLine() + " goto case");
     incIndent();
-      println("goto "+gotoCaseStatement.getLabel()+";");
+      println("goto "+gotoCaseStatement.getLabel()+"; // actually directly jumping to this label");
     decIndent();
   }
 
