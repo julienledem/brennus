@@ -18,10 +18,11 @@ public class ThenBuilder<T> extends StatementBuilder<ThenBuilder<T>> {
   private final int sourceLineNumber;
   private final List<Statement> thenStatements = new ArrayList<Statement>();
 
-  ThenBuilder(Expression e, IfStatementHandler<T> ifStatementHandler) {
+  ThenBuilder(Expression e, IfStatementHandler<T> ifStatementHandler, Builder builder) {
+    super(builder);
     this.e = e;
     this.ifStatementHandler = ifStatementHandler;
-    this.sourceLineNumber = MethodContext.getSourceLineNumber();
+    this.sourceLineNumber = builder.getSourceLineNumber();
   }
 
   @Override
@@ -39,7 +40,7 @@ public class ThenBuilder<T> extends StatementBuilder<ThenBuilder<T>> {
   }
 
   public ElseBuilder<T> elseBlock() {
-    return new ElseBuilder<T>(e, sourceLineNumber, ifStatementHandler, thenStatements);
+    return new ElseBuilder<T>(e, sourceLineNumber, ifStatementHandler, thenStatements, builder);
   }
 
   public <S> S transform(Function<ThenBuilder<T>, S> function) {

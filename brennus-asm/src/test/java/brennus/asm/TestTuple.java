@@ -1,6 +1,5 @@
 package brennus.asm;
 
-import static brennus.ClassBuilder.startClass;
 import static brennus.model.ExistingType.BOOLEAN;
 import static brennus.model.ExistingType.BYTE;
 import static brennus.model.ExistingType.CHAR;
@@ -18,6 +17,7 @@ import static brennus.model.Protection.PUBLIC;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import brennus.Builder;
 import brennus.asm.TestGeneration.DynamicClassLoader;
 import brennus.asm.ref.ReferenceClass;
 import brennus.model.FutureType;
@@ -31,8 +31,8 @@ public class TestTuple {
     Class<? extends BaseClass> c = ReferenceClass.class;
     testSetGet(c);
 
-    FutureType testClass = // line number
-        startClass("brennus.asm.TestTuple$TestClass", existing(BaseClass.class))
+    FutureType testClass = new Builder()// line number
+        .startClass("brennus.asm.TestTuple$TestClass", existing(BaseClass.class))
           .field(PRIVATE, STRING, "a")
           .field(PRIVATE, INT, "b")
           .field(PRIVATE, LONG, "c")

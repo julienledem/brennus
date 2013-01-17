@@ -1,24 +1,23 @@
 package brennus.example;
 
-import static brennus.ClassBuilder.*;
-import static brennus.model.ExistingType.*;
-import static brennus.model.Protection.*;
-import brennus.ClassBuilder;
-import brennus.MethodBuilder;
-import brennus.SwitchBuilder;
+import static brennus.model.ExistingType.INT;
+import static brennus.model.ExistingType.OBJECT;
+import static brennus.model.ExistingType.STRING;
+import static brennus.model.ExistingType.existing;
+import static brennus.model.Protection.PRIVATE;
+import static brennus.model.Protection.PUBLIC;
+import brennus.Builder;
 import brennus.model.Type;
 import brennus.printer.TypePrinter;
 
-
 import org.junit.Test;
-
 
 public class TestClassBuilder {
 
   @Test
   public void testBuilder() {
-    Type testClass =
-        startClass("test.TestClass", existing(TestClassBuilder.class))
+    Type testClass = new Builder()
+        .startClass("test.TestClass", existing(TestClassBuilder.class))
           .field(PRIVATE, STRING, "foo")
           .field(PRIVATE, INT, "bar")
           .startMethod(PUBLIC, STRING, "getFoo")

@@ -24,11 +24,13 @@ public class ConstructorDeclarationBuilder {
   private final Protection protection;
   private final List<Parameter> parameters = new ArrayList<Parameter>();
   private final MethodHandler methodHandler;
+  private final Builder builder;
 
-  ConstructorDeclarationBuilder(String classIdentifier, Protection protection, MethodHandler methodHandler) {
+  ConstructorDeclarationBuilder(String classIdentifier, Protection protection, MethodHandler methodHandler, Builder builder) {
         this.classIdentifier = classIdentifier;
         this.protection = protection;
         this.methodHandler = methodHandler;
+        this.builder = builder;
   }
 
   /**
@@ -43,13 +45,13 @@ public class ConstructorDeclarationBuilder {
   }
 
   private ConstructorCallBuilder innerContructorCall() {
-    final int sourceLineNumber = MethodContext.getSourceLineNumber();
+    final int sourceLineNumber = builder.getSourceLineNumber();
     return new ConstructorCallBuilder(new ConstructorCallExpressionBuilderFactory(),
         new ExpressionHandler<ConstructorBuilder>() {
       public ConstructorBuilder handleExpression(Expression e) {
         CallConstructorStatement callConstructorStatement = new CallConstructorStatement(sourceLineNumber, e);
         return
-            new ConstructorBuilder(classIdentifier, protection, parameters, methodHandler)
+            new ConstructorBuilder(classIdentifier, protection, parameters, methodHandler, builder)
             .statementHandler()
             .handleStatement(callConstructorStatement);
       }

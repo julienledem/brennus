@@ -25,6 +25,12 @@ import brennus.model.Type;
  */
 abstract public class StatementBuilder<T> {
 
+  protected final Builder builder;
+
+  protected StatementBuilder(Builder builder) {
+    this.builder = builder;
+  }
+
   interface StatementHandler<T> {
     T handleStatement(Statement statement);
   }
@@ -39,7 +45,7 @@ abstract public class StatementBuilder<T> {
    * @return an expression builder
    */
   final public ReturnExpressionBuilder<T> returnExp() {
-    final int sourceLineNumber = MethodContext.getSourceLineNumber();
+    final int sourceLineNumber = builder.getSourceLineNumber();
     return new ReturnExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {
         return statementHandler().handleStatement(new ReturnStatement(sourceLineNumber, e));
@@ -65,7 +71,7 @@ abstract public class StatementBuilder<T> {
           public T handleStatement(SwitchStatement switchStatement) {
             return statementHandler().handleStatement(switchStatement);
           }
-        });
+        }, builder);
       }
     });
   }
@@ -75,7 +81,7 @@ abstract public class StatementBuilder<T> {
    * @return an expression builder
    */
   final public ThrowExpressionBuilder<T> throwExp() {
-    final int sourceLineNumber = MethodContext.getSourceLineNumber();
+    final int sourceLineNumber = builder.getSourceLineNumber();
     return new ThrowExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {
         return statementHandler().handleStatement(new ThrowStatement(sourceLineNumber, e));
@@ -88,7 +94,7 @@ abstract public class StatementBuilder<T> {
    * @return an expression builder
    */
   final public SetExpressionBuilder<T> set(final String to) {
-    final int sourceLineNumber = MethodContext.getSourceLineNumber();
+    final int sourceLineNumber = builder.getSourceLineNumber();
     return new SetExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {
         return statementHandler().handleStatement(new SetStatement(sourceLineNumber, to, e));
@@ -111,7 +117,7 @@ abstract public class StatementBuilder<T> {
           public T handleStatement(IfStatement ifStatement) {
             return statementHandler().handleStatement(ifStatement);
           }
-        });
+        }, builder);
       }
     });
   }
@@ -121,7 +127,7 @@ abstract public class StatementBuilder<T> {
    * @return an expression builder
    */
   final public ExecExpressionBuilder<T> exec() {
-    final int sourceLineNumber = MethodContext.getSourceLineNumber();
+    final int sourceLineNumber = builder.getSourceLineNumber();
     return new ExecExpressionBuilder<T>(new ExpressionHandler<T>() {
       public T handleExpression(Expression e) {
         return statementHandler().handleStatement(new ExpressionStatement(sourceLineNumber, e));
@@ -131,16 +137,16 @@ abstract public class StatementBuilder<T> {
 
 
   final public T label(String labelName) {
-    return statementHandler().handleStatement(new LabelStatement(MethodContext.getSourceLineNumber(), labelName));
+    return statementHandler().handleStatement(new LabelStatement(builder.getSourceLineNumber(), labelName));
   }
 
 
   public T gotoLabel(String labelName) {
-    return statementHandler().handleStatement(new GotoStatement(MethodContext.getSourceLineNumber(), labelName));
+    return statementHandler().handleStatement(new GotoStatement(builder.getSourceLineNumber(), labelName));
   }
 
   public T var(Type type, String varName) {
-    return statementHandler().handleStatement(new DefineVarStatement(MethodContext.getSourceLineNumber(), type, varName));
+    return statementHandler().handleStatement(new DefineVarStatement(builder.getSourceLineNumber(), type, varName));
   }
 
 }

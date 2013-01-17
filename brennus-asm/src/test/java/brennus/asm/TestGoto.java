@@ -1,6 +1,5 @@
 package brennus.asm;
 
-import static brennus.ClassBuilder.startClass;
 import static brennus.model.ExistingType.VOID;
 import static brennus.model.ExistingType.existing;
 import static brennus.model.Protection.PUBLIC;
@@ -15,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import brennus.Builder;
 import brennus.MethodBuilder;
 import brennus.SwitchBuilder;
 import brennus.ThenBuilder;
@@ -59,8 +59,8 @@ public class TestGoto {
   @Test
   public void testGoto() throws Exception {
 
-    FutureType testClass =
-        startClass("brennus.asm.TestGoto$TestClass", existing(FSA.class))
+    FutureType testClass = new Builder()
+        .startClass("brennus.asm.TestGoto$TestClass", existing(FSA.class))
           .startMethod(PUBLIC, VOID, "exec")
             .label("a")
             .exec().callOnThis("state").literal("a").endCall().endExec()
@@ -95,7 +95,8 @@ public class TestGoto {
         {0,1,2,3}
     };
 
-    MethodBuilder m = startClass("brennus.asm.TestGoto$TestClass2", existing(FSA2.class))
+    MethodBuilder m = new Builder()
+      .startClass("brennus.asm.TestGoto$TestClass2", existing(FSA2.class))
           .startMethod(PUBLIC, VOID, "exec").param(existing(Iterator.class), "it")
           .gotoLabel("start")
           .label("start");

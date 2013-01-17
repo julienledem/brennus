@@ -28,7 +28,8 @@ public class ConstructorBuilder extends StatementBuilder<ConstructorBuilder> {
   private final List<Statement> statements = new ArrayList<Statement>();
 
 
-  ConstructorBuilder(String classIdentifier, Protection protection, List<Parameter> parameters, MethodHandler methodHandler) {
+  ConstructorBuilder(String classIdentifier, Protection protection, List<Parameter> parameters, MethodHandler methodHandler, Builder builder) {
+    super(builder);
     this.classIdentifier = classIdentifier;
     this.protection = protection;
     this.parameters = parameters;

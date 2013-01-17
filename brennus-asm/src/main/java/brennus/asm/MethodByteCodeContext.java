@@ -24,10 +24,8 @@ import brennus.model.TypeConversionVisitor;
 import brennus.model.UnboxingTypeConversion;
 
 import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
@@ -39,7 +37,6 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.ASMifierMethodVisitor;
-import org.objectweb.asm.util.TraceMethodVisitor;
 
 class MethodByteCodeContext implements Opcodes {
   private static final Logger logger = Logger.getLogger(MethodByteCodeContext.class.getName());

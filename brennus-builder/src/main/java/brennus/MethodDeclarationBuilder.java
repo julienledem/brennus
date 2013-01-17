@@ -25,12 +25,13 @@ public class MethodDeclarationBuilder extends StatementBuilder<MethodBuilder> {
   private final List<Parameter> parameters = new ArrayList<Parameter>();
 
   MethodDeclarationBuilder(String classIdentifier, MemberFlags memberFlags,
-      Type returnType, String methodName, MethodHandler methodHandler) {
-        this.classIdentifier = classIdentifier;
-        this.memberFlags = memberFlags;
-        this.returnType = returnType;
-        this.methodName = methodName;
-        this.methodHandler = methodHandler;
+      Type returnType, String methodName, MethodHandler methodHandler, Builder builder) {
+    super(builder);
+    this.classIdentifier = classIdentifier;
+    this.memberFlags = memberFlags;
+    this.returnType = returnType;
+    this.methodName = methodName;
+    this.methodHandler = methodHandler;
   }
 
   /**
@@ -45,7 +46,7 @@ public class MethodDeclarationBuilder extends StatementBuilder<MethodBuilder> {
   }
 
   protected StatementHandler<MethodBuilder> statementHandler() {
-    return new MethodBuilder(classIdentifier, memberFlags, returnType, methodName, parameters, methodHandler).statementHandler();
+    return new MethodBuilder(classIdentifier, memberFlags, returnType, methodName, parameters, methodHandler, builder).statementHandler();
   }
 
 }

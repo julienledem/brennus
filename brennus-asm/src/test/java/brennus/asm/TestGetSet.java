@@ -1,6 +1,5 @@
 package brennus.asm;
 
-import static brennus.ClassBuilder.startClass;
 import static brennus.model.ExistingType.INT;
 import static brennus.model.ExistingType.STRING;
 import static brennus.model.ExistingType.VOID;
@@ -12,12 +11,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.Assert;
-
-import org.junit.Test;
-
+import brennus.Builder;
 import brennus.asm.TestGeneration.DynamicClassLoader;
 import brennus.model.FutureType;
 import brennus.printer.TypePrinter;
+
+import org.junit.Test;
 
 public class TestGetSet {
 
@@ -35,8 +34,8 @@ public class TestGetSet {
 
   @Test
   public void testGetSet() throws Exception {
-    FutureType testClass =
-        startClass("brennus.asm.TestGetSet$TestClass", existing(Base.class))
+    FutureType testClass = new Builder()
+        .startClass("brennus.asm.TestGetSet$TestClass", existing(Base.class))
           .field(PUBLIC, STRING, "stringField")
           .field(PUBLIC, INT, "intField")
           .startMethod(PUBLIC, VOID, "method").param(STRING, "stringParam").param(INT, "intParam")

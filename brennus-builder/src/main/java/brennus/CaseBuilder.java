@@ -25,10 +25,11 @@ public class CaseBuilder<T> extends StatementBuilder<CaseBuilder<T>> {
   private final List<Statement> statements = new ArrayList<Statement>();
   private final int line;
 
-  CaseBuilder(LiteralExpression literalExpression, CaseStatementHandler<T> statementHandler) {
+  CaseBuilder(LiteralExpression literalExpression, CaseStatementHandler<T> statementHandler, Builder builder) {
+    super(builder);
     this.literalExpression = literalExpression;
     this.statementHandler = statementHandler;
-    line = MethodContext.getSourceLineNumber();
+    line = builder.getSourceLineNumber();
   }
 
   public SwitchBuilder<T> endCase() {

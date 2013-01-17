@@ -1,9 +1,17 @@
 package brennus.asm;
 
-import static brennus.ClassBuilder.startClass;
-import static brennus.model.ExistingType.*;
-import static brennus.model.Protection.*;
-import static junit.framework.Assert.*;
+import static brennus.model.ExistingType.BOOLEAN;
+import static brennus.model.ExistingType.INT;
+import static brennus.model.ExistingType.OBJECT;
+import static brennus.model.ExistingType.STRING;
+import static brennus.model.ExistingType.VOID;
+import static brennus.model.ExistingType.existing;
+import static brennus.model.Protection.PRIVATE;
+import static brennus.model.Protection.PUBLIC;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
 
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -11,8 +19,8 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import brennus.BaseTestClass;
+import brennus.Builder;
 import brennus.TestClass;
-import brennus.asm.ASMTypeGenerator;
 import brennus.model.FutureType;
 import brennus.printer.TypePrinter;
 
@@ -31,8 +39,8 @@ public class TestGeneration {
 
   @Test
   public void testGeneration() throws Exception {
-    FutureType testClass =
-        startClass("test.TestClass", existing(BaseTestClass.class))
+    FutureType testClass = new Builder()
+        .startClass("test.TestClass", existing(BaseTestClass.class))
 
           .field(PRIVATE, STRING, "foo")
           .field(PRIVATE, INT, "bar")

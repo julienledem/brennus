@@ -30,11 +30,13 @@ public class SwitchBuilder<T> {
   private final SwitchStatementsHandler<T> switchStatementHandler;
   private final List<CaseStatement> statements = new ArrayList<CaseStatement>();
   private CaseBlockStatement defaultCaseStatement;
+  private final Builder builder;
 
-  SwitchBuilder(Expression switchOnExpression, SwitchStatementsHandler<T> switchStatementHandler) {
+  SwitchBuilder(Expression switchOnExpression, SwitchStatementsHandler<T> switchStatementHandler, Builder builder) {
     this.switchOnExpression = switchOnExpression;
     this.switchStatementHandler = switchStatementHandler;
-    this.line = MethodContext.getSourceLineNumber();
+    this.builder = builder;
+    this.line = builder.getSourceLineNumber();
   }
 
   public CaseBuilder<T> caseBlock(int value) {
@@ -43,11 +45,11 @@ public class SwitchBuilder<T> {
         statements.add(statement);
         return SwitchBuilder.this;
       }
-    });
+    }, builder);
   }
 
   public SwitchBuilder<T> gotoLabel(int value, String label) {
-    statements.add(new GotoCaseStatement(MethodContext.getSourceLineNumber(), value, label));
+    statements.add(new GotoCaseStatement(builder.getSourceLineNumber(), value, label));
     return this;
   }
 
@@ -60,7 +62,7 @@ public class SwitchBuilder<T> {
         defaultCaseStatement = statement;
         return SwitchBuilder.this;
       }
-    });
+    }, builder);
   }
 
   public T endSwitch() {

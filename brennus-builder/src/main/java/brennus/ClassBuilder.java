@@ -28,11 +28,13 @@ public class ClassBuilder {
   private final List<Method> staticMethods = new ArrayList<Method>();
   private final List<Method> constructors = new ArrayList<Method>();
   private final String sourceFile;
+  private final Builder builder;
 
-  private ClassBuilder(String name, Type extending) {
+  ClassBuilder(String name, Type extending, Builder builder) {
     this.name = name;
     this.extending = extending;
-    StackTraceElement creatingStackFrame = MethodContext.getCreatingStackFrame();
+    this.builder = builder;
+    StackTraceElement creatingStackFrame = builder.getCreatingStackFrame();
     if (creatingStackFrame == null) {
       sourceFile = "generated";
     } else {
@@ -41,24 +43,6 @@ public class ClassBuilder {
   }
 
   // builder methods
-
-  /**
-   * startClass(name, extending)[.[static]field(protection, type, name)]*[.start[Static]Method(protection, return, name){statements}.endMethod()]*.endClass()
-   * @param name the fully qualified name of the class
-   * @return a ClassBuilder
-   */
-  public static ClassBuilder startClass(String name, Type extending) {
-    return new ClassBuilder(name, extending);
-  }
-
-  /**
-   * startClass(name, extending)[.[static]field(protection, type, name)]*[.start[Static]Method(protection, return, name){statements}.endMethod()]*.endClass()
-   * @param name the fully qualified name of the class
-   * @return a ClassBuilder
-   */
-  public static ClassBuilder startClass(String name) {
-    return new ClassBuilder(name, ExistingType.OBJECT);
-  }
 
   /**
    * @param protection public/package/protected/private
@@ -122,7 +106,7 @@ public class ClassBuilder {
         constructors.add(method);
         return ClassBuilder.this;
       }
-    });
+    }, builder);
   }
 
   // internals
@@ -134,7 +118,7 @@ public class ClassBuilder {
         (isStatic ? staticMethods : methods).add(method);
         return ClassBuilder.this;
       }
-    });
+    }, builder);
   }
 
   private void field(Protection protection, Type type, String name, boolean isStatic) {

@@ -31,7 +31,8 @@ public class MethodBuilder extends StatementBuilder<MethodBuilder> {
   private final List<Statement> statements = new ArrayList<Statement>();
 
 
-  MethodBuilder(String classIdentifier, MemberFlags memberFlags, Type returnType, String name, List<Parameter> parameters, MethodHandler methodHandler) {
+  MethodBuilder(String classIdentifier, MemberFlags memberFlags, Type returnType, String name, List<Parameter> parameters, MethodHandler methodHandler, Builder builder) {
+    super(builder);
     this.classIdentifier = classIdentifier;
     this.memberFlags = memberFlags;
     this.returnType = returnType;
