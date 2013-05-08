@@ -79,7 +79,7 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
     indent += 2;
   }
 
-  private void printMethods(FutureType type, String typeName, List<Method> methods) {
+  private void printMethods(FutureType type, String typeName, Iterable<Method> methods) {
     for (Method m : methods) {
       context = new MethodContext(type, m);
       String methodName = m.getName();
@@ -122,7 +122,7 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
               m.getProtection().name().toLowerCase();
   }
 
-  private void printFields(List<Field> fields) {
+  private void printFields(Iterable<Field> fields) {
     for (Field f : fields) {
       println(
           getKeywords(f.getFlags()) + " " + f.getType().getName() + " " + f.getName() + ";"

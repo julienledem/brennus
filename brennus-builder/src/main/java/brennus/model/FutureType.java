@@ -5,25 +5,27 @@ import static brennus.model.ExceptionHandlingVisitor.wrap;
 import java.util.Collections;
 import java.util.List;
 
+import brennus.ImmutableList;
+
 public final class FutureType extends Type {
 
   private final String name;
   private final Type extending;
-  private final List<Field> fields;
-  private final List<Field> staticFields;
-  private final List<Method> methods;
-  private final List<Method> staticMethods;
+  private final ImmutableList<Field> fields;
+  private final ImmutableList<Field> staticFields;
+  private final ImmutableList<Method> methods;
+  private final ImmutableList<Method> staticMethods;
   private final String sourceFile;
-  private final List<Method> constructors;
+  private final ImmutableList<Method> constructors;
 
-  public FutureType(String name, Type extending, List<Field> fields, List<Field> staticFields, List<Method> methods, List<Method> staticMethods, List<Method> constructors, String sourceFile) {
+  public FutureType(String name, Type extending, ImmutableList<Field> fields, ImmutableList<Field> staticFields, ImmutableList<Method> methods, ImmutableList<Method> staticMethods, ImmutableList<Method> constructors, String sourceFile) {
     this.name = name;
     this.extending = extending;
-    this.fields = Collections.unmodifiableList(fields);
-    this.staticFields = Collections.unmodifiableList(staticFields);
-    this.methods = Collections.unmodifiableList(methods);
-    this.staticMethods = Collections.unmodifiableList(staticMethods);
-    this.constructors = Collections.unmodifiableList(constructors);
+    this.fields = fields;
+    this.staticFields = staticFields;
+    this.methods = methods;
+    this.staticMethods = staticMethods;
+    this.constructors = constructors;
     this.sourceFile = sourceFile;
   }
 
@@ -40,23 +42,23 @@ public final class FutureType extends Type {
     return extending;
   }
 
-  public List<Field> getFields() {
+  public ImmutableList<Field> getFields() {
     return fields;
   }
 
-  public List<Field> getStaticFields() {
+  public ImmutableList<Field> getStaticFields() {
     return staticFields;
   }
 
-  public List<Method> getMethods() {
+  public ImmutableList<Method> getMethods() {
     return methods;
   }
 
-  public List<Method> getStaticMethods() {
+  public ImmutableList<Method> getStaticMethods() {
     return staticMethods;
   }
 
-  public List<Method> getConstructors() {
+  public ImmutableList<Method> getConstructors() {
     return constructors;
   }
 

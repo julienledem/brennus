@@ -1,8 +1,5 @@
 package brennus;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import brennus.MethodBuilder.MethodHandler;
 import brennus.model.ExistingType;
 import brennus.model.Field;
@@ -18,28 +15,60 @@ import brennus.model.Type;
  * @author Julien Le Dem
  *
  */
-public class ClassBuilder {
+public final class ClassBuilder {
 
   private final String name;
-  private Type extending;
-  private final List<Field> fields = new ArrayList<Field>();
-  private final List<Field> staticFields = new ArrayList<Field>();
-  private final List<Method> methods = new ArrayList<Method>();
-  private final List<Method> staticMethods = new ArrayList<Method>();
-  private final List<Method> constructors = new ArrayList<Method>();
+  private final Type extending;
+  private final ImmutableList<Field> fields;
+  private final ImmutableList<Field> staticFields;
+  private final ImmutableList<Method> methods;
+  private final ImmutableList<Method> staticMethods;
+  private final ImmutableList<Method> constructors;
   private final String sourceFile;
   private final Builder builder;
 
   ClassBuilder(String name, Type extending, Builder builder) {
+    this(
+        name,
+        extending,
+        ImmutableList.<Field>empty(),
+        ImmutableList.<Field>empty(),
+        ImmutableList.<Method>empty(),
+        ImmutableList.<Method>empty(),
+        ImmutableList.<Method>empty(),
+        getSourceFile(builder.getCreatingStackFrame()),
+        builder
+        );
+  }
+
+  private static String getSourceFile(StackTraceElement creatingStackFrame) {
+    if (creatingStackFrame == null) {
+      return "generated";
+    } else {
+      return creatingStackFrame.getFileName();
+    }
+  }
+
+  private ClassBuilder(
+      String name,
+      Type extending,
+      ImmutableList<Field> fields,
+      ImmutableList<Field> staticFields,
+      ImmutableList<Method> methods,
+      ImmutableList<Method> staticMethods,
+      ImmutableList<Method> constructors,
+      String sourceFile,
+      Builder builder) {
+    super();
     this.name = name;
     this.extending = extending;
+    this.fields = fields;
+    this.staticFields = staticFields;
+    this.methods = methods;
+    this.staticMethods = staticMethods;
+    this.constructors = constructors;
+    this.sourceFile = sourceFile;
     this.builder = builder;
-    StackTraceElement creatingStackFrame = builder.getCreatingStackFrame();
-    if (creatingStackFrame == null) {
-      sourceFile = "generated";
-    } else {
-      sourceFile = creatingStackFrame.getFileName();
-    }
   }
 
   // builder methods
@@ -51,8 +80,7 @@ public class ClassBuilder {
    * @return this
    */
   public ClassBuilder field(Protection protection, Type type, String name) {
-    field(protection, type, name, false);
-    return this;
+    return addField(protection, type, name, false);
   }
 
   /**
@@ -62,8 +90,7 @@ public class ClassBuilder {
    * @return this
    */
   public ClassBuilder staticField(Protection protection, Type type, String name) {
-    field(protection, type, name, true);
-    return this;
+    return addField(protection, type, name, true);
   }
 
   /**
@@ -103,8 +130,7 @@ public class ClassBuilder {
   public ConstructorDeclarationBuilder startConstructor(Protection protection) {
     return new ConstructorDeclarationBuilder(this.name.replace(".", "/"), protection, new MethodHandler() {
       public ClassBuilder handleMethod(Method method) {
-        constructors.add(method);
-        return ClassBuilder.this;
+        return addConstructor(method);
       }
     }, builder);
   }
@@ -115,15 +141,70 @@ public class ClassBuilder {
     // TODO: allow final
     return new MethodDeclarationBuilder(this.name.replace(".", "/"), new MemberFlags(isStatic, false, protection), returnType, methodName, new MethodHandler() {
       public ClassBuilder handleMethod(Method method) {
-        (isStatic ? staticMethods : methods).add(method);
-        return ClassBuilder.this;
+        return addMethod(isStatic, method);
       }
     }, builder);
   }
 
-  private void field(Protection protection, Type type, String name, boolean isStatic) {
-    // TODO: allow final
-    (isStatic ? staticFields : fields).add(new Field(new MemberFlags(isStatic, false, protection), type, name));
+  private ClassBuilder newClassBuilder(
+      ImmutableList<Field> newFields,
+      ImmutableList<Field> newStaticFields,
+      ImmutableList<Method> newMethods,
+      ImmutableList<Method> newStaticMethods,
+      ImmutableList<Method> newConstructors) {
+    return new ClassBuilder(
+        this.name,
+        this.extending,
+        newFields,
+        newStaticFields,
+        newMethods,
+        newStaticMethods,
+        newConstructors,
+        this.sourceFile,
+        this.builder);
+
+  }
+
+  private ClassBuilder addField(Protection protection, Type type, String name, boolean isStatic) {
+    ImmutableList<Field> newFields = this.fields;
+    ImmutableList<Field> newStaticFields = this.staticFields;
+    final Field newField = new Field(new MemberFlags(isStatic, false, protection), type, name);
+    if (isStatic) {
+      newStaticFields = newStaticFields.append(newField);
+    } else {
+      newFields = newFields.append(newField);
+    }
+    return newClassBuilder(
+        newFields,
+        newStaticFields,
+        this.methods,
+        this.staticMethods,
+        this.constructors);
+  }
+
+  private ClassBuilder addConstructor(Method constructor) {
+    return newClassBuilder(
+        this.fields,
+        this.staticFields,
+        this.methods,
+        this.staticMethods,
+        this.constructors.append(constructor));
+  }
+
+  private ClassBuilder addMethod(final boolean isStatic, Method method) {
+    ImmutableList<Method> newMethods = this.methods;
+    ImmutableList<Method> newStaticMethods = this.staticMethods;
+    if (isStatic) {
+      newStaticMethods = newStaticMethods.append(method);
+    } else {
+      newMethods = newMethods.append(method);
+    }
+    return newClassBuilder(
+        this.fields,
+        this.staticFields,
+        newMethods,
+        newStaticMethods,
+        this.constructors);
   }
 
 }

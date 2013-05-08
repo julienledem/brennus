@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import brennus.ImmutableList;
 import brennus.MethodContext;
 import brennus.model.CallConstructorExpression;
 import brennus.model.CallConstructorStatement;
@@ -41,16 +42,16 @@ public class ASMTypeGenerator {
     classNode.sourceFile = futureType.getSourceFile();
     classNode.name = futureType.getClassIdentifier();
     classNode.superName = futureType.getExtending().getClassIdentifier();
-    List<Field> fields = futureType.getFields();
+    Iterable<Field> fields = futureType.getFields();
     for (Field field : fields) {
       classNode.fields.add(new FieldNode(
           MethodByteCodeContext.getAccess(field.getFlags()), field.getName(), field.getSignature(), null, null));
     }
 
-    List<Method> constructors = futureType.getConstructors();
+    ImmutableList<Method> constructors = futureType.getConstructors();
     if (constructors.isEmpty()) {
       // Add default constructor
-      constructors = Arrays.asList(
+      constructors = ImmutableList.from(Arrays.asList(
           new Method(
               futureType.getName(),
               new MemberFlags(false, false, PUBLIC),
@@ -60,7 +61,7 @@ public class ASMTypeGenerator {
               Arrays.<Statement>asList(new CallConstructorStatement(0,
                   new CallConstructorExpression(Arrays.<Expression>asList()))
               ),
-              false));
+              false)));
     }
     for (Method method : constructors) {
       classNode.methods.add(getMethodNode(futureType, method));

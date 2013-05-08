@@ -48,7 +48,7 @@ public class MethodContext {
     return field;
   }
 
-  private Field getField(List<Field> fields, String varName) {
+  private Field getField(ImmutableList<Field> fields, String varName) {
     for (Field field : fields) {
       if (field.getName().equals(varName)) {
         return field;
