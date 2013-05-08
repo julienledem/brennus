@@ -2,7 +2,7 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
-public class UnboxingTypeConversion extends TypeConversion {
+public final class UnboxingTypeConversion extends TypeConversion {
 
   private final PrimitiveType primitiveType;
 

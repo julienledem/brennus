@@ -2,7 +2,7 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
-public class FieldAccessType extends VarAccessType {
+public final class FieldAccessType extends VarAccessType {
 
   private final Field field;
 

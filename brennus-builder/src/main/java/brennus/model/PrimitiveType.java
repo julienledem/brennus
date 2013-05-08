@@ -1,6 +1,6 @@
 package brennus.model;
 
-public class PrimitiveType extends ExistingType {
+public final class PrimitiveType extends ExistingType {
 
   private final Type boxedType;
 

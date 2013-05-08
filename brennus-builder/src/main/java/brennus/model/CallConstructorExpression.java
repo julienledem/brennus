@@ -1,14 +1,16 @@
 package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
+import static java.util.Collections.unmodifiableList;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class CallConstructorExpression extends Expression {
+public final class CallConstructorExpression extends Expression {
   private final List<Expression> parameters;
 
   public CallConstructorExpression(List<Expression> parameters) {
-    this.parameters = parameters;
+    this.parameters = unmodifiableList(new ArrayList<Expression>(parameters));
   }
 
   @Override

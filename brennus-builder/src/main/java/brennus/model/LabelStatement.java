@@ -2,7 +2,7 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
-public class LabelStatement extends Statement {
+public final class LabelStatement extends Statement {
 
   private final String name;
 

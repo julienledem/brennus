@@ -3,7 +3,7 @@ package brennus.model;
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
 
-public class ReturnStatement extends Statement {
+public final class ReturnStatement extends Statement {
 
   public ReturnStatement(int line, Expression expression) {
     super(expression, line);

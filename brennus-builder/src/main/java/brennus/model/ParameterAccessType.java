@@ -2,7 +2,7 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
-public class ParameterAccessType extends VarAccessType {
+public final class ParameterAccessType extends VarAccessType {
 
   private final Parameter param;
 

@@ -1,6 +1,6 @@
 package brennus.model;
 
-public class Parameter {
+public final class Parameter {
 
   private final Type type;
   private final String name;

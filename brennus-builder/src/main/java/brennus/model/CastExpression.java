@@ -2,7 +2,7 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
-public class CastExpression extends Expression {
+public final class CastExpression extends Expression {
 
   private final Type type;
   private final Expression expression;

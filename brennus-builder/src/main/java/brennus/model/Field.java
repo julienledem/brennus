@@ -2,7 +2,7 @@ package brennus.model;
 
 public final class Field {
 
-  private MemberFlags flags;
+  private final MemberFlags flags;
   private final Type type;
   private final String name;
 

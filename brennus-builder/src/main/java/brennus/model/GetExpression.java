@@ -2,7 +2,7 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
-public class GetExpression extends Expression {
+public final class GetExpression extends Expression {
 
   private final String fieldName;
 

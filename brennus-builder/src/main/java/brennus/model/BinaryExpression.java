@@ -2,7 +2,7 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
-public class BinaryExpression extends Expression {
+public final class BinaryExpression extends Expression {
 
   private final Expression leftExpression;
   private final BinaryOperator operator;

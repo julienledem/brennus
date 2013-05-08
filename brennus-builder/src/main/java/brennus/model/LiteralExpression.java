@@ -2,7 +2,7 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
-public class LiteralExpression extends Expression {
+public final class LiteralExpression extends Expression {
 
   private final Object value;
   private final ExistingType type;

@@ -2,7 +2,7 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
-public class DefineVarStatement extends Statement {
+public final class DefineVarStatement extends Statement {
 
   private final String varName;
   private final Type type;

@@ -3,7 +3,7 @@ package brennus.model;
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
 
-public class GotoCaseStatement extends CaseStatement {
+public final class GotoCaseStatement extends CaseStatement {
 
   private final String label;
 

@@ -2,7 +2,7 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
-public class CastTypeConversion extends TypeConversion {
+public final class CastTypeConversion extends TypeConversion {
 
   private final Type type;
 

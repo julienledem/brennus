@@ -9,7 +9,7 @@ import static brennus.model.StaticStatus.STATIC;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
-public class MemberFlags {
+public final class MemberFlags {
 
   private final Keyword[] keywords;
 

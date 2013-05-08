@@ -1,10 +1,12 @@
 package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
+import static java.util.Collections.unmodifiableList;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class CallMethodExpression extends Expression {
+public final class CallMethodExpression extends Expression {
 
   private final Expression callee;
   private final String methodName;
@@ -13,7 +15,7 @@ public class CallMethodExpression extends Expression {
   public CallMethodExpression(Expression callee, String methodName, List<Expression> parameters) {
     this.callee = callee;
     this.methodName = methodName;
-    this.parameters = parameters;
+    this.parameters = unmodifiableList(new ArrayList<Expression>(parameters));
   }
 
   public String getMethodName() {

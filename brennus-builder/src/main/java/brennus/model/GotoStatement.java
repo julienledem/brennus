@@ -2,7 +2,7 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
-public class GotoStatement extends Statement {
+public final class GotoStatement extends Statement {
 
   private final String name;
 

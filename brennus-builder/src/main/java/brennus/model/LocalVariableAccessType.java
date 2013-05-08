@@ -2,7 +2,7 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
-public class LocalVariableAccessType extends VarAccessType {
+public final class LocalVariableAccessType extends VarAccessType {
 
   private final String varName;
   private final int varIndex;

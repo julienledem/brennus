@@ -1,8 +1,11 @@
 package brennus.model;
 
+import static java.util.Collections.unmodifiableList;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class Method {
+public final class Method {
 
   private final String typeName;
   private final MemberFlags memberFlags;
@@ -17,8 +20,8 @@ public class Method {
     this.memberFlags = memberFlags;
     this.returnType = returnType;
     this.name = name;
-    this.parameters = parameters;
-    this.statements = statements;
+    this.parameters = unmodifiableList(new ArrayList<Parameter>(parameters));
+    this.statements = unmodifiableList(new ArrayList<Statement>(statements));
     this.interfaceMethod = interfaceMethod;
   }
 

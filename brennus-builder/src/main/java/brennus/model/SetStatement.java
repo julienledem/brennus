@@ -3,7 +3,7 @@ package brennus.model;
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
 
-public class SetStatement extends Statement {
+public final class SetStatement extends Statement {
 
   private final String to;
 

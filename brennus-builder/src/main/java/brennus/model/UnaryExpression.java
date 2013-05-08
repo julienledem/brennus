@@ -2,7 +2,7 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
-public class UnaryExpression extends Expression {
+public final class UnaryExpression extends Expression {
 
   private final UnaryOperator operator;
   private final Expression expression;

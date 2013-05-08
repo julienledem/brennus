@@ -2,7 +2,7 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
-public class ThrowStatement extends Statement {
+public final class ThrowStatement extends Statement {
 
   public ThrowStatement(int line, Expression expression) {
     super(expression, line);
