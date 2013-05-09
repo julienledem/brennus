@@ -3,23 +3,18 @@ package brennus.asm;
 import static brennus.model.ExistingType.VOID;
 import static brennus.model.Protection.PUBLIC;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import brennus.ImmutableList;
 import brennus.MethodContext;
 import brennus.model.CallConstructorExpression;
 import brennus.model.CallConstructorStatement;
-import brennus.model.ExistingType;
 import brennus.model.Expression;
 import brennus.model.Field;
 import brennus.model.FutureType;
 import brennus.model.MemberFlags;
 import brennus.model.Method;
 import brennus.model.Parameter;
-import brennus.model.Protection;
 import brennus.model.Statement;
 
 import org.objectweb.asm.ClassVisitor;
@@ -28,8 +23,6 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.analysis.Analyzer;
-import org.objectweb.asm.util.ASMifierClassVisitor;
 import org.objectweb.asm.util.CheckClassAdapter;
 
 public class ASMTypeGenerator {
@@ -59,7 +52,7 @@ public class ASMTypeGenerator {
               "<init>",
               ImmutableList.<Parameter>empty(),
               ImmutableList.from(Arrays.<Statement>asList(new CallConstructorStatement(0,
-                  new CallConstructorExpression(Arrays.<Expression>asList()))
+                  new CallConstructorExpression(ImmutableList.<Expression>empty()))
               )),
               false)));
     }

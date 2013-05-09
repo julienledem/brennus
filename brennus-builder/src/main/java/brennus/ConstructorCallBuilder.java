@@ -16,12 +16,23 @@ public class ConstructorCallBuilder {
 
   private final ExpressionBuilderFactory<ConstructorBuilder, ConstructorCallExpressionBuilder, ConstructorCallValueExpressionBuilder> factory;
   private final ExpressionHandler<ConstructorBuilder> expressionHandler;
-  private final List<Expression> parameters = new ArrayList<Expression>();
+  private final ImmutableList<Expression> parameters;
 
   ConstructorCallBuilder(ConstructorCallExpressionBuilderFactory factory, ExpressionHandler<ConstructorBuilder> expressionHandler) {
+    this(
+        factory,
+        expressionHandler,
+        ImmutableList.<Expression>empty());
+  }
+
+  private ConstructorCallBuilder(
+      ExpressionBuilderFactory<ConstructorBuilder, ConstructorCallExpressionBuilder, ConstructorCallValueExpressionBuilder> factory,
+      ExpressionHandler<ConstructorBuilder> expressionHandler,
+      ImmutableList<Expression> parameters) {
     super();
     this.factory = factory;
     this.expressionHandler = expressionHandler;
+    this.parameters = parameters;
   }
 
   /**
@@ -32,8 +43,10 @@ public class ConstructorCallBuilder {
     return new ConstructorParamExpressionBuilder(
         new ExpressionHandler<ConstructorCallBuilder>() {
           public ConstructorCallBuilder handleExpression(Expression e) {
-            parameters.add(e);
-            return ConstructorCallBuilder.this;
+            return new ConstructorCallBuilder(
+                factory,
+                expressionHandler,
+                parameters.append(e));
           }
     });
   }

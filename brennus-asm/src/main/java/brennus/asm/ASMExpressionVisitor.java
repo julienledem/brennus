@@ -1,9 +1,6 @@
 package brennus.asm;
 
 import static brennus.model.Protection.PRIVATE;
-
-import java.util.List;
-
 import brennus.ImmutableList;
 import brennus.MethodContext;
 import brennus.model.BinaryExpression;
@@ -106,7 +103,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
     if (method.getFlags().isStatic()) {
       throw new UnsupportedOperationException();
     }
-    List<Expression> parameters = callMethodExpression.getParameters();
+    ImmutableList<Expression> parameters = callMethodExpression.getParameters();
     loadParameters(methodName, method, parameters);
     methodByteCodeContext.addInstruction(
         new MethodInsnNode(
@@ -131,9 +128,9 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
   }
 
   private void loadParameters(String methodName, Method method,
-      List<Expression> parameters) {
+      ImmutableList<Expression> parameters) {
     methodByteCodeContext.incIndent("pass", parameters.size(), "params to", methodName);
-    List<Expression> parameterValues = parameters;
+    ImmutableList<Expression> parameterValues = parameters;
     ImmutableList<Parameter> parameterTypes = method.getParameters();
     if (parameterTypes.size() != parameterValues.size()) {
       throw new RuntimeException("parameters passed do not match, parameters declared in "+method);

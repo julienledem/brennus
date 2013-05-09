@@ -1,8 +1,5 @@
 package brennus;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.model.CallMethodExpression;
 import brennus.model.Expression;
@@ -15,20 +12,35 @@ import brennus.model.Expression;
  * @param <EB>
  * @param <VEB> type of the expression builders
  */
-public class MethodCallBuilder<T, EB, VEB> {
+public final class MethodCallBuilder<T, EB, VEB> {
 
   private final ExpressionBuilderFactory<T, EB, VEB> factory;
   private final Expression callee;
   private final String methodName;
   private final ExpressionHandler<T> expressionHandler;
-  private final List<Expression> parameters = new ArrayList<Expression>();
+  private final ImmutableList<Expression> parameters;
 
   MethodCallBuilder(ExpressionBuilderFactory<T, EB, VEB> factory, Expression callee, String methodName, ExpressionHandler<T> expressionHandler) {
+    this(
+        factory,
+        callee,
+        methodName,
+        expressionHandler,
+        ImmutableList.<Expression>empty());
+  }
+
+  private MethodCallBuilder(
+      ExpressionBuilderFactory<T, EB, VEB> factory,
+      Expression callee,
+      String methodName,
+      ExpressionHandler<T> expressionHandler,
+      ImmutableList<Expression> parameters) {
     super();
     this.factory = factory;
     this.callee = callee;
-    this.expressionHandler = expressionHandler;
     this.methodName = methodName;
+    this.expressionHandler = expressionHandler;
+    this.parameters = parameters;
   }
 
   /**
@@ -39,8 +51,12 @@ public class MethodCallBuilder<T, EB, VEB> {
     return new ParamExpressionBuilder<T, EB, VEB>(
         new ExpressionHandler<MethodCallBuilder<T, EB, VEB>>() {
           public MethodCallBuilder<T, EB, VEB> handleExpression(Expression e) {
-            parameters.add(e);
-            return MethodCallBuilder.this;
+            return new MethodCallBuilder<T, EB, VEB>(
+                factory,
+                callee,
+                methodName,
+                expressionHandler,
+                parameters.append(e));
           }
     });
   }

@@ -1,21 +1,18 @@
 package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
-import static java.util.Collections.unmodifiableList;
-
-import java.util.ArrayList;
-import java.util.List;
+import brennus.ImmutableList;
 
 public final class CallMethodExpression extends Expression {
 
   private final Expression callee;
   private final String methodName;
-  private final List<Expression> parameters;
+  private final ImmutableList<Expression> parameters;
 
-  public CallMethodExpression(Expression callee, String methodName, List<Expression> parameters) {
+  public CallMethodExpression(Expression callee, String methodName, ImmutableList<Expression> parameters) {
     this.callee = callee;
     this.methodName = methodName;
-    this.parameters = unmodifiableList(new ArrayList<Expression>(parameters));
+    this.parameters = parameters;
   }
 
   public String getMethodName() {
@@ -27,7 +24,7 @@ public final class CallMethodExpression extends Expression {
     wrap(expressionVisitor).visit(this);
   }
 
-  public List<Expression> getParameters() {
+  public ImmutableList<Expression> getParameters() {
     return parameters;
   }
 

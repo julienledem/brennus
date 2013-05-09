@@ -338,7 +338,7 @@ class ExpressionStringifierVisitor implements ExpressionVisitor {
     }
     sb.append("."+callMethodExpression.getMethodName()+"(");
     boolean first = true;
-    List<Expression> parameters = callMethodExpression.getParameters();
+    Iterable<Expression> parameters = callMethodExpression.getParameters();
     for (Expression expression : parameters) {
       if (first) {
         first = false;
@@ -385,7 +385,7 @@ class ExpressionStringifierVisitor implements ExpressionVisitor {
   public void visit(CallConstructorExpression callConstructorExpression) {
     sb.append("super(");
     boolean first = true;
-    List<Expression> parameters = callConstructorExpression.getParameters();
+    Iterable<Expression> parameters = callConstructorExpression.getParameters();
     for (Expression expression : parameters) {
       if (first) {
         first = false;
