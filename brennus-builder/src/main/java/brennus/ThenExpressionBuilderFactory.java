@@ -3,7 +3,7 @@ package brennus;
 import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.model.Expression;
 
-class ThenExpressionBuilderFactory<T>
+final class ThenExpressionBuilderFactory<T>
     implements
     ExpressionBuilderFactory<ThenBuilder<T>, ThenExpressionBuilder<T>, ThenValueExpressionBuilder<T>> {
 

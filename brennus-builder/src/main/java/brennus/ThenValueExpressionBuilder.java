@@ -9,7 +9,7 @@ import brennus.model.Expression;
  *
  * @param <T> type of the parent
  */
-public class ThenValueExpressionBuilder<T> extends ValueExpressionBuilder<ThenBuilder<T>, ThenExpressionBuilder<T>, ThenValueExpressionBuilder<T>> {
+public final class ThenValueExpressionBuilder<T> extends ValueExpressionBuilder<ThenBuilder<T>, ThenExpressionBuilder<T>, ThenValueExpressionBuilder<T>> {
 
   ThenValueExpressionBuilder(ExpressionHandler<ThenBuilder<T>> expressionHandler, Expression expression) {
     super(new ThenExpressionBuilderFactory<T>(), expressionHandler, expression);

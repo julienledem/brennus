@@ -9,7 +9,7 @@ import brennus.model.Expression;
  *
  * @param <T> type of the parent
  */
-public class SwitchValueExpressionBuilder<T> extends ValueExpressionBuilder<SwitchBuilder<T>, SwitchExpressionBuilder<T>, SwitchValueExpressionBuilder<T>> {
+public final class SwitchValueExpressionBuilder<T> extends ValueExpressionBuilder<SwitchBuilder<T>, SwitchExpressionBuilder<T>, SwitchValueExpressionBuilder<T>> {
 
   SwitchValueExpressionBuilder(ExpressionHandler<SwitchBuilder<T>> expressionHandler,
       Expression expression) {

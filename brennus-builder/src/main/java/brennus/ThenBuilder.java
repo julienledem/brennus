@@ -4,7 +4,7 @@ import brennus.model.Expression;
 import brennus.model.IfStatement;
 import brennus.model.Statement;
 
-public class ThenBuilder<T> extends StatementBuilder<ThenBuilder<T>> {
+public final class ThenBuilder<T> extends StatementBuilder<ThenBuilder<T>> {
 
   static interface IfStatementHandler<T> {
     T handleStatement(IfStatement ifStatement);

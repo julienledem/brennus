@@ -1,7 +1,7 @@
 package brennus;
 
 
-public class SwitchExpressionBuilder<T> extends
+public final class SwitchExpressionBuilder<T> extends
     ExpressionBuilder<SwitchBuilder<T>, SwitchExpressionBuilder<T>, SwitchValueExpressionBuilder<T>> {
 
   SwitchExpressionBuilder(
