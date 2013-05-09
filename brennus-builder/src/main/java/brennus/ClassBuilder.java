@@ -138,7 +138,6 @@ public final class ClassBuilder {
   // internals
 
   private MethodDeclarationBuilder startMethod(Protection protection, Type returnType, String methodName, final boolean isStatic) {
-    // TODO: allow final
     return new MethodDeclarationBuilder(this.name.replace(".", "/"), new MemberFlags(isStatic, false, protection), returnType, methodName, new MethodHandler() {
       public ClassBuilder handleMethod(Method method) {
         return addMethod(isStatic, method);

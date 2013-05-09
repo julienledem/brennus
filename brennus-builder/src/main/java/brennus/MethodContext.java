@@ -18,12 +18,11 @@ import brennus.model.TypeConversion;
 import brennus.model.UnboxingTypeConversion;
 import brennus.model.VarAccessType;
 
-public class MethodContext {
+public final class MethodContext {
 
   private final FutureType type;
   private final Method method;
-  // TODO: immutable
-  private Map<String, LocalVarContext> localVars = new HashMap<String, LocalVarContext>();
+  private final Map<String, LocalVarContext> localVars = new HashMap<String, LocalVarContext>();
 
   public MethodContext(FutureType type, Method method) {
     this.type = type;
