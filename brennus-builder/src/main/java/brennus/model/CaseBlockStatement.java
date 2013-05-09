@@ -1,19 +1,16 @@
 package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
-import static java.util.Collections.unmodifiableList;
-
-import java.util.ArrayList;
-import java.util.List;
+import brennus.ImmutableList;
 
 public final class CaseBlockStatement extends CaseStatement {
 
-  private final List<Statement> statements;
+  private final ImmutableList<Statement> statements;
   private final boolean breakCase;
 
-  public CaseBlockStatement(int line, LiteralExpression value, List<Statement> statements, boolean breakCase) {
+  public CaseBlockStatement(int line, LiteralExpression value, ImmutableList<Statement> statements, boolean breakCase) {
     super(value, line);
-    this.statements = unmodifiableList(new ArrayList<Statement>(statements));
+    this.statements = statements;
     this.breakCase = breakCase;
   }
 
@@ -22,7 +19,7 @@ public final class CaseBlockStatement extends CaseStatement {
     wrap(statementVisitor).visit(this);
   }
 
-  public List<Statement> getStatements() {
+  public ImmutableList<Statement> getStatements() {
     return statements;
   }
 

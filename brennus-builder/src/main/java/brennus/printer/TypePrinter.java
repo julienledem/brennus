@@ -218,7 +218,7 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
     }
     println(caseType + ": // line " + caseStatement.getLine());
     incIndent();
-    List<Statement> statements = caseStatement.getStatements();
+    Iterable<Statement> statements = caseStatement.getStatements();
     for (Statement statement : statements) {
       statement.accept(this);
     }

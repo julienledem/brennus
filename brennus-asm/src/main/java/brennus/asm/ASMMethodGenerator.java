@@ -157,8 +157,7 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
     // I use COMPUTE_FRAME in the generator
     //methodByteCodeContext.addInstruction(new FrameNode(F_SAME, 0, null, 0, null), "case", value);
     methodByteCodeContext.incIndent("case", value);
-    List<Statement> statements = caseStatement.getStatements();
-    for (Statement statement : statements) {
+    for (Statement statement : caseStatement.getStatements()) {
       this.visit(statement);
     }
     if (caseStatement.isBreakCase()) {
