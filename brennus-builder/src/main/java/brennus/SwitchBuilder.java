@@ -1,11 +1,8 @@
 package brennus;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import brennus.CaseBuilder.CaseStatementHandler;
-import brennus.model.CaseStatement;
 import brennus.model.CaseBlockStatement;
+import brennus.model.CaseStatement;
 import brennus.model.Expression;
 import brennus.model.GotoCaseStatement;
 import brennus.model.LiteralExpression;
@@ -19,7 +16,7 @@ import brennus.model.SwitchStatement;
  *
  * @param <T> the type of the parent to return on completion
  */
-public class SwitchBuilder<T> {
+public final class SwitchBuilder<T> {
 
   interface SwitchStatementsHandler<T> {
     T handleStatement(SwitchStatement switchStatement);
@@ -28,29 +25,59 @@ public class SwitchBuilder<T> {
   private final Expression switchOnExpression;
   private final int line;
   private final SwitchStatementsHandler<T> switchStatementHandler;
-  private final List<CaseStatement> statements = new ArrayList<CaseStatement>();
-  private CaseBlockStatement defaultCaseStatement;
+  private final ImmutableList<CaseStatement> statements;
+  private final CaseBlockStatement defaultCaseStatement;
   private final Builder builder;
 
   SwitchBuilder(Expression switchOnExpression, SwitchStatementsHandler<T> switchStatementHandler, Builder builder) {
+    this(
+        switchOnExpression,
+        builder.getSourceLineNumber(),
+        switchStatementHandler,
+        ImmutableList.<CaseStatement>empty(),
+        null,
+        builder);
+  }
+
+  private SwitchBuilder(Expression switchOnExpression, int line,
+      SwitchStatementsHandler<T> switchStatementHandler,
+      ImmutableList<CaseStatement> statements,
+      CaseBlockStatement defaultCaseStatement, Builder builder) {
+    super();
     this.switchOnExpression = switchOnExpression;
+    this.line = line;
     this.switchStatementHandler = switchStatementHandler;
+    this.statements = statements;
+    this.defaultCaseStatement = defaultCaseStatement;
     this.builder = builder;
-    this.line = builder.getSourceLineNumber();
+  }
+
+  private SwitchBuilder<T> newSwitchBuilder(
+      ImmutableList<CaseStatement> newStatements,
+      CaseBlockStatement newDefaultCaseStatement) {
+    return new SwitchBuilder<T>(
+        switchOnExpression,
+        line,
+        switchStatementHandler,
+        newStatements,
+        newDefaultCaseStatement,
+        builder);
   }
 
   public CaseBuilder<T> caseBlock(int value) {
     return new CaseBuilder<T>(new LiteralExpression(value), new CaseStatementHandler<T>() {
       public SwitchBuilder<T> handleStatement(CaseBlockStatement statement) {
-        statements.add(statement);
-        return SwitchBuilder.this;
+        return newSwitchBuilder(
+            statements.append(statement),
+            defaultCaseStatement);
       }
     }, builder);
   }
 
   public SwitchBuilder<T> gotoLabel(int value, String label) {
-    statements.add(new GotoCaseStatement(builder.getSourceLineNumber(), value, label));
-    return this;
+    return newSwitchBuilder(
+        statements.append(new GotoCaseStatement(builder.getSourceLineNumber(), value, label)),
+        defaultCaseStatement);
   }
 
   public CaseBuilder<T> defaultCase() {
@@ -59,8 +86,9 @@ public class SwitchBuilder<T> {
     }
     return new CaseBuilder<T>(null, new CaseStatementHandler<T>() {
       public SwitchBuilder<T> handleStatement(CaseBlockStatement statement) {
-        defaultCaseStatement = statement;
-        return SwitchBuilder.this;
+        return newSwitchBuilder(
+            statements,
+            statement);
       }
     }, builder);
   }

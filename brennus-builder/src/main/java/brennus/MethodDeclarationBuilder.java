@@ -12,7 +12,7 @@ import brennus.model.Type;
  * @author Julien Le Dem
  *
  */
-public class MethodDeclarationBuilder extends StatementBuilder<MethodBuilder> {
+public final class MethodDeclarationBuilder extends StatementBuilder<MethodBuilder> {
 
   private final String classIdentifier;
   private final MemberFlags memberFlags;

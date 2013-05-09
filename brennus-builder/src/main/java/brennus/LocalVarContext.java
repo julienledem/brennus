@@ -2,7 +2,7 @@ package brennus;
 
 import brennus.model.Type;
 
-public class LocalVarContext {
+public final class LocalVarContext {
 
   private final String name;
   private final int index;

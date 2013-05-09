@@ -1,19 +1,16 @@
 package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
-import static java.util.Collections.unmodifiableList;
-
-import java.util.ArrayList;
-import java.util.List;
+import brennus.ImmutableList;
 
 public final class SwitchStatement extends Statement {
 
-  private final List< CaseStatement> caseStatements;
+  private final ImmutableList<CaseStatement> caseStatements;
   private final CaseBlockStatement defaultCaseStatement;
 
-  public SwitchStatement(int line, Expression expression, List<CaseStatement> caseStatements, CaseBlockStatement defaultCaseStatement) {
+  public SwitchStatement(int line, Expression expression, ImmutableList<CaseStatement> caseStatements, CaseBlockStatement defaultCaseStatement) {
     super(expression, line);
-    this.caseStatements = unmodifiableList(new ArrayList<CaseStatement>(caseStatements));
+    this.caseStatements = caseStatements;
     this.defaultCaseStatement = defaultCaseStatement;
 
   }
@@ -23,7 +20,7 @@ public final class SwitchStatement extends Statement {
     wrap(statementVisitor).visit(this);
   }
 
-  public List<CaseStatement> getCaseStatements() {
+  public ImmutableList<CaseStatement> getCaseStatements() {
     return caseStatements;
   }
 

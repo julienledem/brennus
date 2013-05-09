@@ -1,7 +1,7 @@
 package brennus;
 
 
-public class ExecExpressionBuilder<T> extends
+public final class ExecExpressionBuilder<T> extends
     ExpressionBuilder<T, ExecExpressionBuilder<T>, ExecValueExpressionBuilder<T>> {
 
   ExecExpressionBuilder(ExpressionHandler<T> expressionHandler) {

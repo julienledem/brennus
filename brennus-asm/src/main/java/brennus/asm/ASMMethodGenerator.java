@@ -4,18 +4,17 @@ import static brennus.model.ExistingType.INT;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import brennus.ImmutableList;
 import brennus.LocalVarContext;
 import brennus.MethodContext;
-import brennus.model.CaseStatement;
 import brennus.model.BinaryExpression;
 import brennus.model.CallConstructorExpression;
 import brennus.model.CallConstructorStatement;
 import brennus.model.CallMethodExpression;
 import brennus.model.CaseBlockStatement;
+import brennus.model.CaseStatement;
 import brennus.model.CaseStatementVisitor;
 import brennus.model.CastExpression;
 import brennus.model.DefineVarStatement;
@@ -96,7 +95,7 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
     Type expressionType = visit(switchStatement.getExpression());
     methodByteCodeContext.handleConversion(expressionType, INT, "switch(exp): convert exp to int");
     methodByteCodeContext.decIndent();
-    List<CaseStatement> caseStatements = switchStatement.getCaseStatements();
+    ImmutableList<CaseStatement> caseStatements = switchStatement.getCaseStatements();
     int minCase = Integer.MAX_VALUE;
     int maxCase = Integer.MIN_VALUE;
     Map<Integer, CaseStatement> cases = new HashMap<Integer, CaseStatement>();

@@ -9,7 +9,7 @@ import brennus.model.Expression;
  *
  * @param <T> type of the parent
  */
-public class ParamValueExpressionBuilder<T, EB, VEB> extends ValueExpressionBuilder<MethodCallBuilder<T, EB, VEB>, ParamExpressionBuilder<T, EB, VEB>, ParamValueExpressionBuilder<T, EB, VEB>> {
+public final class ParamValueExpressionBuilder<T, EB, VEB> extends ValueExpressionBuilder<MethodCallBuilder<T, EB, VEB>, ParamExpressionBuilder<T, EB, VEB>, ParamValueExpressionBuilder<T, EB, VEB>> {
 
   ParamValueExpressionBuilder(
       ExpressionHandler<MethodCallBuilder<T, EB, VEB>> expressionHandler,

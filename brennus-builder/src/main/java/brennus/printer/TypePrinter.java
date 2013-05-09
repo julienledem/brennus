@@ -197,7 +197,7 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
   public void visit(SwitchStatement switchStatement) {
     println("switch (" + toString(switchStatement.getExpression()) + ") { // line " + switchStatement.getLine());
     incIndent();
-    Collection<CaseStatement> caseStatements = switchStatement.getCaseStatements();
+    Iterable<CaseStatement> caseStatements = switchStatement.getCaseStatements();
     for (CaseStatement caseStatement : caseStatements) {
       caseStatement.accept(this);
     }

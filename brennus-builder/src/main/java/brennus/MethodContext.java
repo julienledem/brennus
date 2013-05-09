@@ -22,6 +22,7 @@ public class MethodContext {
 
   private final FutureType type;
   private final Method method;
+  // TODO: immutable
   private Map<String, LocalVarContext> localVars = new HashMap<String, LocalVarContext>();
 
   public MethodContext(FutureType type, Method method) {

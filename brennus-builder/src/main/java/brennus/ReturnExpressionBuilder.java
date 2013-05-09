@@ -1,7 +1,7 @@
 package brennus;
 
 
-public class ReturnExpressionBuilder<T> extends
+public final class ReturnExpressionBuilder<T> extends
     ExpressionBuilder<T, ReturnExpressionBuilder<T>, ReturnValueExpressionBuilder<T>> {
 
   ReturnExpressionBuilder(

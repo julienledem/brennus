@@ -3,7 +3,7 @@ package brennus;
 import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.model.Expression;
 
-class ParamExpressionBuilderFactory<T, EB, VEB>
+final class ParamExpressionBuilderFactory<T, EB, VEB>
     implements
     ExpressionBuilderFactory<MethodCallBuilder<T, EB, VEB>, ParamExpressionBuilder<T, EB, VEB>, ParamValueExpressionBuilder<T, EB, VEB>> {
 
