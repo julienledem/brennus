@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-class ExceptionHandlingVisitor {
+final class ExceptionHandlingVisitor {
 
   static TypeVisitor wrap(final TypeVisitor typeVisitor) {
     return wrap(typeVisitor, TypeVisitor.class);
