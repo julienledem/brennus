@@ -1,7 +1,7 @@
 package brennus;
 
 
-public class ConstructorCallExpressionBuilder extends
+public final class ConstructorCallExpressionBuilder extends
   ExpressionBuilder<ConstructorBuilder, ConstructorCallExpressionBuilder, ConstructorCallValueExpressionBuilder> {
 
   ConstructorCallExpressionBuilder(ExpressionHandler<ConstructorBuilder> expressionHandler) {

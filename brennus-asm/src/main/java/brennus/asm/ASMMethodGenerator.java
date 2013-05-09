@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import brennus.ImmutableList;
 import brennus.LocalVarContext;
 import brennus.MethodContext;
 import brennus.model.CaseStatement;
@@ -308,7 +309,7 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
     methodByteCodeContext.decIndent();
   }
 
-  private void generateThenElse(int jumpInst, List<Statement> thenStatements, List<Statement> elseStatements) {
+  private void generateThenElse(int jumpInst, ImmutableList<Statement> thenStatements, ImmutableList<Statement> elseStatements) {
     LabelNode thenNode = new LabelNode();
     LabelNode endNode = new LabelNode();
     methodByteCodeContext.addInstruction(new JumpInsnNode(jumpInst, thenNode), "IF exp GOTO label else keep going");

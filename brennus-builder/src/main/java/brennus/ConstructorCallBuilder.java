@@ -1,8 +1,5 @@
 package brennus;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.model.CallConstructorExpression;
 import brennus.model.Expression;
@@ -12,7 +9,7 @@ import brennus.model.Expression;
  * @author Julien Le Dem
  *
  */
-public class ConstructorCallBuilder {
+public final class ConstructorCallBuilder {
 
   private final ExpressionBuilderFactory<ConstructorBuilder, ConstructorCallExpressionBuilder, ConstructorCallValueExpressionBuilder> factory;
   private final ExpressionHandler<ConstructorBuilder> expressionHandler;

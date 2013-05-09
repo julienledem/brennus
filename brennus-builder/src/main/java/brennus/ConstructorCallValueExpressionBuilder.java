@@ -3,7 +3,7 @@ package brennus;
 import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.model.Expression;
 
-public class ConstructorCallValueExpressionBuilder extends
+public final class ConstructorCallValueExpressionBuilder extends
     ValueExpressionBuilder<ConstructorBuilder, ConstructorCallExpressionBuilder, ConstructorCallValueExpressionBuilder> {
 
   ConstructorCallValueExpressionBuilder(ExpressionHandler<ConstructorBuilder> expressionHandler,

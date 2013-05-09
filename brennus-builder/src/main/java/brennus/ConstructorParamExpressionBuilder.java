@@ -1,7 +1,7 @@
 package brennus;
 
 
-public class ConstructorParamExpressionBuilder extends ExpressionBuilder<ConstructorCallBuilder, ConstructorParamExpressionBuilder, ConstructorParamValueExpressionBuilder> {
+public final class ConstructorParamExpressionBuilder extends ExpressionBuilder<ConstructorCallBuilder, ConstructorParamExpressionBuilder, ConstructorParamValueExpressionBuilder> {
 
   ConstructorParamExpressionBuilder(
       ExpressionHandler<ConstructorCallBuilder> expressionHandler) {

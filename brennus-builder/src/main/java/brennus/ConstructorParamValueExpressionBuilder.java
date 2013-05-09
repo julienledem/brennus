@@ -8,7 +8,7 @@ import brennus.model.Expression;
  * @author Julien Le Dem
  *
  */
-public class ConstructorParamValueExpressionBuilder extends ValueExpressionBuilder<ConstructorCallBuilder, ConstructorParamExpressionBuilder, ConstructorParamValueExpressionBuilder> {
+public final class ConstructorParamValueExpressionBuilder extends ValueExpressionBuilder<ConstructorCallBuilder, ConstructorParamExpressionBuilder, ConstructorParamValueExpressionBuilder> {
 
   ConstructorParamValueExpressionBuilder(
       ExpressionHandler<ConstructorCallBuilder> expressionHandler,

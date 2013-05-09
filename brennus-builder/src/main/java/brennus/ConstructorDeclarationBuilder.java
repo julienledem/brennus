@@ -15,7 +15,7 @@ import brennus.model.Type;
  * @author Julien Le Dem
  *
  */
-public class ConstructorDeclarationBuilder {
+public final class ConstructorDeclarationBuilder {
 
   private final String classIdentifier;
   private final Protection protection;

@@ -1,19 +1,16 @@
 package brennus.model;
 import static brennus.model.ExceptionHandlingVisitor.wrap;
-import static java.util.Collections.unmodifiableList;
-
-import java.util.ArrayList;
-import java.util.List;
+import brennus.ImmutableList;
 
 public final class IfStatement extends Statement {
 
-  private final List<Statement> thenStatements;
-  private final List<Statement> elseStatements;
+  private final ImmutableList<Statement> thenStatements;
+  private final ImmutableList<Statement> elseStatements;
 
-  public IfStatement(Expression ifExpression, int line, List<Statement> thenStatements, List<Statement> elseStatements) {
+  public IfStatement(Expression ifExpression, int line, ImmutableList<Statement> thenStatements, ImmutableList<Statement> elseStatements) {
     super(ifExpression, line);
-    this.thenStatements = unmodifiableList(new ArrayList<Statement>(thenStatements));
-    this.elseStatements = unmodifiableList(new ArrayList<Statement>(elseStatements));
+    this.thenStatements = thenStatements;
+    this.elseStatements = elseStatements;
   }
 
   @Override
@@ -21,11 +18,11 @@ public final class IfStatement extends Statement {
     wrap(statementVisitor).visit(this);
   }
 
-  public List<Statement> getThenStatements() {
+  public ImmutableList<Statement> getThenStatements() {
     return thenStatements;
   }
 
-  public List<Statement> getElseStatements() {
+  public ImmutableList<Statement> getElseStatements() {
     return elseStatements;
   }
 
