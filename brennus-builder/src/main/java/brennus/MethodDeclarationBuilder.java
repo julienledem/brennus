@@ -1,8 +1,5 @@
 package brennus;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import brennus.MethodBuilder.MethodHandler;
 import brennus.model.MemberFlags;
 import brennus.model.Parameter;
@@ -22,17 +19,43 @@ public class MethodDeclarationBuilder extends StatementBuilder<MethodBuilder> {
   private final Type returnType;
   private final String methodName;
   private final MethodHandler methodHandler;
-  private final List<Parameter> parameters = new ArrayList<Parameter>();
+  private final ImmutableList<Parameter> parameters;
 
-  MethodDeclarationBuilder(String classIdentifier, MemberFlags memberFlags,
-      Type returnType, String methodName, MethodHandler methodHandler, Builder builder) {
+  MethodDeclarationBuilder(
+      String classIdentifier,
+      MemberFlags memberFlags,
+      Type returnType,
+      String methodName,
+      MethodHandler methodHandler,
+      Builder builder) {
+    this(
+        builder,
+        classIdentifier,
+        memberFlags,
+        returnType,
+        methodName,
+        methodHandler,
+        ImmutableList.<Parameter>empty());
+  }
+
+
+  private MethodDeclarationBuilder(
+      Builder builder,
+      String classIdentifier,
+      MemberFlags memberFlags,
+      Type returnType,
+      String methodName,
+      MethodHandler methodHandler,
+      ImmutableList<Parameter> parameters) {
     super(builder);
     this.classIdentifier = classIdentifier;
     this.memberFlags = memberFlags;
     this.returnType = returnType;
     this.methodName = methodName;
     this.methodHandler = methodHandler;
+    this.parameters = parameters;
   }
+
 
   /**
    * declares a parameter
@@ -41,8 +64,14 @@ public class MethodDeclarationBuilder extends StatementBuilder<MethodBuilder> {
    * @return this
    */
   public MethodDeclarationBuilder param(Type type, String name) {
-    parameters.add(new Parameter(type, name, parameters.size()));
-    return this;
+    return new MethodDeclarationBuilder(
+            builder,
+            classIdentifier,
+            memberFlags,
+            returnType,
+            methodName,
+            methodHandler,
+            parameters.append(new Parameter(type, name, parameters.size())));
   }
 
   protected StatementHandler<MethodBuilder> statementHandler() {

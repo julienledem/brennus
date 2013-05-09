@@ -1,8 +1,5 @@
 package brennus;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.MethodBuilder.MethodHandler;
 import brennus.model.CallConstructorStatement;
@@ -22,15 +19,31 @@ public class ConstructorDeclarationBuilder {
 
   private final String classIdentifier;
   private final Protection protection;
-  private final List<Parameter> parameters = new ArrayList<Parameter>();
+  private final ImmutableList<Parameter> parameters;
   private final MethodHandler methodHandler;
   private final Builder builder;
 
   ConstructorDeclarationBuilder(String classIdentifier, Protection protection, MethodHandler methodHandler, Builder builder) {
-        this.classIdentifier = classIdentifier;
-        this.protection = protection;
-        this.methodHandler = methodHandler;
-        this.builder = builder;
+    this(
+        classIdentifier,
+        protection,
+        ImmutableList.<Parameter>empty(),
+        methodHandler,
+        builder);
+  }
+
+  private ConstructorDeclarationBuilder(
+      String classIdentifier,
+      Protection protection,
+      ImmutableList<Parameter> parameters,
+      MethodHandler methodHandler,
+      Builder builder) {
+    super();
+    this.classIdentifier = classIdentifier;
+    this.protection = protection;
+    this.parameters = parameters;
+    this.methodHandler = methodHandler;
+    this.builder = builder;
   }
 
   /**
@@ -40,8 +53,12 @@ public class ConstructorDeclarationBuilder {
    * @return this
    */
   public ConstructorDeclarationBuilder param(Type type, String name) {
-    parameters.add(new Parameter(type, name, parameters.size()));
-    return this;
+    return new ConstructorDeclarationBuilder(
+        classIdentifier,
+        protection,
+        parameters.append(new Parameter(type, name, parameters.size())),
+        methodHandler,
+        builder);
   }
 
   private ConstructorCallBuilder innerContructorCall() {

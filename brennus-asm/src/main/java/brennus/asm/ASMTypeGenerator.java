@@ -57,10 +57,10 @@ public class ASMTypeGenerator {
               new MemberFlags(false, false, PUBLIC),
               VOID,
               "<init>",
-              new ArrayList<Parameter>(),
-              Arrays.<Statement>asList(new CallConstructorStatement(0,
+              ImmutableList.<Parameter>empty(),
+              ImmutableList.from(Arrays.<Statement>asList(new CallConstructorStatement(0,
                   new CallConstructorExpression(Arrays.<Expression>asList()))
-              ),
+              )),
               false)));
     }
     for (Method method : constructors) {
@@ -86,8 +86,7 @@ public class ASMTypeGenerator {
   private MethodNode getMethodNode(FutureType futureType, Method method) {
     MethodContext methodContext = new MethodContext(futureType, method);
     ASMMethodGenerator statementVisitor = new ASMMethodGenerator(methodContext);
-    List<Statement> statements = method.getStatements();
-    for (Statement statement : statements) {
+    for (Statement statement : method.getStatements()) {
       statementVisitor.visit(statement);
     }
     MethodNode methodNode = statementVisitor.getMethodNode();

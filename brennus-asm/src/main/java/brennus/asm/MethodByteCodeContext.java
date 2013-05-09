@@ -74,7 +74,7 @@ class MethodByteCodeContext implements Opcodes {
     logger.fine(method.toString());
     this.methodNode = new MethodNode(getAccess(method.getFlags()), method.getName(), method.getSignature(), null, null);
     this.methodContext = methodContext;
-    List<Parameter> parameters = methodContext.getMethod().getParameters();
+    Iterable<Parameter> parameters = methodContext.getMethod().getParameters();
     if (!methodContext.getMethod().isStatic()) {
       currentLocalVariableByteCodeIndex = 1;
     }

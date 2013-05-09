@@ -104,7 +104,7 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
     }
   }
 
-  private String paramString(List<Parameter> parameters) {
+  private String paramString(Iterable<Parameter> parameters) {
     String result = null;
     for (Parameter parameter : parameters) {
       if (result == null) {

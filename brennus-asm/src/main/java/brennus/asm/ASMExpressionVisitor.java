@@ -4,6 +4,7 @@ import static brennus.model.Protection.PRIVATE;
 
 import java.util.List;
 
+import brennus.ImmutableList;
 import brennus.MethodContext;
 import brennus.model.BinaryExpression;
 import brennus.model.CallConstructorExpression;
@@ -133,7 +134,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
       List<Expression> parameters) {
     methodByteCodeContext.incIndent("pass", parameters.size(), "params to", methodName);
     List<Expression> parameterValues = parameters;
-    List<Parameter> parameterTypes = method.getParameters();
+    ImmutableList<Parameter> parameterTypes = method.getParameters();
     if (parameterTypes.size() != parameterValues.size()) {
       throw new RuntimeException("parameters passed do not match, parameters declared in "+method);
     }

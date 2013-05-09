@@ -37,7 +37,7 @@ public class ClassValidator {
 
   private void validate(FutureType type, Method method) {
     MethodContext context = new MethodContext(type, method);
-    List<Statement> statements = method.getStatements();
+    Iterable<Statement> statements = method.getStatements();
     for (Statement statement : statements) {
       validate(context, statement);
     }

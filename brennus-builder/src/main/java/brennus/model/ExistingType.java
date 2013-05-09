@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import brennus.ImmutableList;
+
 public class ExistingType extends Type {
 
   private static final Map<Class<?>, PrimitiveType> primitives = new HashMap<Class<?>, PrimitiveType>();
@@ -104,14 +106,14 @@ public class ExistingType extends Type {
     for (java.lang.reflect.Method method : declaredMethods) {
       Class<?>[] parameterTypes = method.getParameterTypes();
       if (method.getName().equals(methodName) && parameterTypes.length == parameterCount) {
-        ArrayList<Parameter> parameters = convertParameters(parameterTypes);
+        ImmutableList<Parameter> parameters = convertParameters(parameterTypes);
         return new Method(
             this.getClassIdentifier(),
             MemberFlags.fromReflection(method),
             existing(method.getReturnType()),
             methodName,
             parameters,
-            new ArrayList<Statement>(),
+            ImmutableList.<Statement>empty(),
             existing.isInterface());
       }
     }
@@ -121,7 +123,7 @@ public class ExistingType extends Type {
     return null;
   }
 
-  private ArrayList<Parameter> convertParameters(Class<?>[] parameterTypes) {
+  private ImmutableList<Parameter> convertParameters(Class<?>[] parameterTypes) {
     ArrayList<Parameter> parameters = new ArrayList<Parameter>();
     for (int i = 0; i < parameterTypes.length; i++) {
       Class<?> paramClass = parameterTypes[i];
@@ -132,7 +134,7 @@ public class ExistingType extends Type {
               i));
 
     }
-    return parameters;
+    return ImmutableList.from(parameters);
   }
 
   @Override
@@ -140,14 +142,14 @@ public class ExistingType extends Type {
     for (java.lang.reflect.Constructor<?> constructor : existing.getConstructors()) {
       Class<?>[] parameterTypes = constructor.getParameterTypes();
       if (parameterTypes.length == parameterCount) {
-        ArrayList<Parameter> parameters = convertParameters(parameterTypes);
+        ImmutableList<Parameter> parameters = convertParameters(parameterTypes);
         return new Method(
             this.getClassIdentifier(),
             MemberFlags.fromReflection(constructor),
             VOID,
             "<init>",
             parameters,
-            new ArrayList<Statement>(),
+            ImmutableList.<Statement>empty(),
             false);
       }
     }

@@ -1,10 +1,6 @@
 package brennus;
 
 import static brennus.model.ExistingType.VOID;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import brennus.MethodBuilder.MethodHandler;
 import brennus.model.MemberFlags;
 import brennus.model.Method;
@@ -19,21 +15,38 @@ import brennus.model.Statement;
  * @author Julien Le Dem
  *
  */
-public class ConstructorBuilder extends StatementBuilder<ConstructorBuilder> {
+public final class ConstructorBuilder extends StatementBuilder<ConstructorBuilder> {
 
   private final String classIdentifier;
   private final Protection protection;
-  private final List<Parameter> parameters;
+  private final ImmutableList<Parameter> parameters;
   private final MethodHandler methodHandler;
-  private final List<Statement> statements = new ArrayList<Statement>();
+  private final ImmutableList<Statement> statements;
 
 
-  ConstructorBuilder(String classIdentifier, Protection protection, List<Parameter> parameters, MethodHandler methodHandler, Builder builder) {
+  ConstructorBuilder(String classIdentifier, Protection protection, ImmutableList<Parameter> parameters, MethodHandler methodHandler, Builder builder) {
+    this(
+        builder,
+        classIdentifier,
+        protection,
+        parameters,
+        methodHandler,
+        ImmutableList.<Statement>empty());
+  }
+
+  private ConstructorBuilder(
+      Builder builder,
+      String classIdentifier,
+      Protection protection,
+      ImmutableList<Parameter> parameters,
+      MethodHandler methodHandler,
+      ImmutableList<Statement> statements) {
     super(builder);
     this.classIdentifier = classIdentifier;
     this.protection = protection;
     this.parameters = parameters;
     this.methodHandler = methodHandler;
+    this.statements = statements;
   }
 
   public ClassBuilder endConstructor() {
@@ -43,8 +56,13 @@ public class ConstructorBuilder extends StatementBuilder<ConstructorBuilder> {
   protected StatementHandler<ConstructorBuilder> statementHandler() {
     return new StatementHandler<ConstructorBuilder>() {
       public ConstructorBuilder handleStatement(Statement statement) {
-        statements.add(statement);
-        return ConstructorBuilder.this;
+        return new ConstructorBuilder(
+            builder,
+            classIdentifier,
+            protection,
+            parameters,
+            methodHandler,
+            statements.append(statement));
       }
     };
   }

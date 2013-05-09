@@ -1,10 +1,6 @@
 package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
-
-import java.util.Collections;
-import java.util.List;
-
 import brennus.ImmutableList;
 
 public final class FutureType extends Type {

@@ -1,9 +1,6 @@
 package brennus.model;
 
-import static java.util.Collections.unmodifiableList;
-
-import java.util.ArrayList;
-import java.util.List;
+import brennus.ImmutableList;
 
 public final class Method {
 
@@ -11,17 +8,17 @@ public final class Method {
   private final MemberFlags memberFlags;
   private final Type returnType;
   private final String name;
-  private final List<Parameter> parameters;
-  private final List<Statement> statements;
+  private final ImmutableList<Parameter> parameters;
+  private final ImmutableList<Statement> statements;
   private final boolean interfaceMethod;
 
-  public Method(String typeName, MemberFlags memberFlags, Type returnType, String name, List<Parameter> parameters, List<Statement> statements, boolean interfaceMethod) {
+  public Method(String typeName, MemberFlags memberFlags, Type returnType, String name, ImmutableList<Parameter> parameters, ImmutableList<Statement> statements, boolean interfaceMethod) {
     this.typeName = typeName;
     this.memberFlags = memberFlags;
     this.returnType = returnType;
     this.name = name;
-    this.parameters = unmodifiableList(new ArrayList<Parameter>(parameters));
-    this.statements = unmodifiableList(new ArrayList<Statement>(statements));
+    this.parameters = parameters;
+    this.statements = statements;
     this.interfaceMethod = interfaceMethod;
   }
 
@@ -33,7 +30,7 @@ public final class Method {
     return returnType;
   }
 
-  public List<Statement> getStatements() {
+  public ImmutableList<Statement> getStatements() {
     return statements;
   }
 
@@ -45,7 +42,7 @@ public final class Method {
     return memberFlags;
   }
 
-  public List<Parameter> getParameters() {
+  public ImmutableList<Parameter> getParameters() {
     return parameters;
   }
 

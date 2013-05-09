@@ -1,7 +1,6 @@
 package brennus;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import brennus.model.BoxingTypeConversion;
@@ -31,7 +30,7 @@ public class MethodContext {
   }
 
   private Parameter getParam(String fieldName) {
-    List<Parameter> parameters = method.getParameters();
+    Iterable<Parameter> parameters = method.getParameters();
     for (Parameter parameter : parameters) {
       if (parameter.getName().equals(fieldName)) {
         return parameter;

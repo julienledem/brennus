@@ -1,8 +1,5 @@
 package brennus;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import brennus.model.MemberFlags;
 import brennus.model.Method;
 import brennus.model.Parameter;
@@ -16,7 +13,7 @@ import brennus.model.Type;
  * @author Julien Le Dem
  *
  */
-public class MethodBuilder extends StatementBuilder<MethodBuilder> {
+public final class MethodBuilder extends StatementBuilder<MethodBuilder> {
 
   interface MethodHandler {
     ClassBuilder handleMethod(Method method);
@@ -26,12 +23,31 @@ public class MethodBuilder extends StatementBuilder<MethodBuilder> {
   private final MemberFlags memberFlags;
   private final Type returnType;
   private final String name;
-  private final List<Parameter> parameters;
+  private final ImmutableList<Parameter> parameters;
   private final MethodHandler methodHandler;
-  private final List<Statement> statements = new ArrayList<Statement>();
+  private final ImmutableList<Statement> statements;
 
+  MethodBuilder(String classIdentifier, MemberFlags memberFlags, Type returnType, String name, ImmutableList<Parameter> parameters, MethodHandler methodHandler, Builder builder) {
+    this(
+        builder,
+        classIdentifier,
+        memberFlags,
+        returnType,
+        name,
+        parameters,
+        methodHandler,
+        ImmutableList.<Statement>empty());
+  }
 
-  MethodBuilder(String classIdentifier, MemberFlags memberFlags, Type returnType, String name, List<Parameter> parameters, MethodHandler methodHandler, Builder builder) {
+  private MethodBuilder(
+      Builder builder,
+      String classIdentifier,
+      MemberFlags memberFlags,
+      Type returnType,
+      String name,
+      ImmutableList<Parameter> parameters,
+      MethodHandler methodHandler,
+      ImmutableList<Statement> statements) {
     super(builder);
     this.classIdentifier = classIdentifier;
     this.memberFlags = memberFlags;
@@ -39,6 +55,7 @@ public class MethodBuilder extends StatementBuilder<MethodBuilder> {
     this.name = name;
     this.parameters = parameters;
     this.methodHandler = methodHandler;
+    this.statements = statements;
   }
 
   public ClassBuilder endMethod() {
@@ -48,8 +65,15 @@ public class MethodBuilder extends StatementBuilder<MethodBuilder> {
   protected StatementHandler<MethodBuilder> statementHandler() {
     return new StatementHandler<MethodBuilder>() {
       public MethodBuilder handleStatement(Statement statement) {
-        statements.add(statement);
-        return MethodBuilder.this;
+        return new MethodBuilder(
+            builder,
+            classIdentifier,
+            memberFlags,
+            returnType,
+            name,
+            parameters,
+            methodHandler,
+            statements.append(statement));
       }
     };
   }

@@ -41,4 +41,12 @@ public final class ImmutableList<T> implements Iterable<T> {
     return content.isEmpty();
   }
 
+  public int size() {
+    return content.size();
+  }
+
+  public T get(int i) {
+    return content.get(i);
+  }
+
 }
