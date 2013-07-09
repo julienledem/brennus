@@ -1,4 +1,4 @@
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>net.ledem</groupId>
@@ -8,6 +8,7 @@
 
   <name>Brennus</name>
   <url>https://github.com/julienledem/brennus</url>
+  <description>Brennus provides a builder pattern and the logic to simplify generating bytecode. It uses ASM under the hood for bytecode generation.</description> 
 
   <scm>
     <connection>scm:git:git@github.com:julienledem/brennus.git</connection>
