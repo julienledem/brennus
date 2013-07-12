@@ -15,6 +15,14 @@ mvn test
 The build runs in [Travis CI](http://travis-ci.org/julienledem/brennus):
 [![Build Status](https://secure.travis-ci.org/julienledem/brennus.png)](http://travis-ci.org/julienledem/brennus)
 
+## Release
+
+    <dependency>
+      <groupId>net.ledem</groupId>
+      <artifactId>brennus</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+
 ## Author
 
 * Julien Le Dem <http://twitter.com/J_>
