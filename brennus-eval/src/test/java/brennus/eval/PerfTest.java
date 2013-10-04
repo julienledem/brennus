@@ -19,16 +19,20 @@ public class PerfTest {
     }
   }
 
+  private static final int entrySize = 10000;
+
   private static void testPerf(int depth) {
     System.out.println(SPACE + "DEPTH: " + depth);
-    Object[] values = new Object[Type.values().length];
-    for (int i = 0; i < values.length; i++) {
-      values[i] = TestEval.randomValue(Type.values()[i]);
+    ParametersArray[] p = new ParametersArray[entrySize];
+    for (int i = 0; i < entrySize; i++) {
+      Object[] values = new Object[Type.values().length];
+      for (int j = 0; j < values.length; j++) {
+        values[j] = TestEval.randomValue(Type.values()[j]);
+      }
+      p[i] = new ParametersArray(values);
     }
-    ParametersArray p = new ParametersArray(values);
     Type t = DOUBLE;
     DynamicExpression e = TestEval.generateRandomExp(depth, t);
-    System.out.println(p);
     System.out.println(e);
     long t0 = System.currentTimeMillis();
     Expression ce = compiler.compileExpression(e);
@@ -41,12 +45,15 @@ public class PerfTest {
   }
 
   private static void compare(
-      ParametersArray p,
+      ParametersArray[] p,
       DynamicExpression e, Expression ce, int n) {
+//  System.gc();
     System.out.print("<");
     long t0 = eval(p, e, n);
+    double tot1 = tot;
     System.out.print("><");
     long t1 = eval(p, ce, n);
+    double tot2 = tot;
     System.out.print(">");
     String message = "1E" + (int)Math.log10(n) + " " + msPerMil(n, t0) + " -> " + msPerMil(n, t1) + " ";
     while (message.length() < 25) {
@@ -55,7 +62,7 @@ public class PerfTest {
     if (t0 > 0) {
       message += (((float)(t1 * 10000 / t0))/100) + "%";
     }
-    System.out.println(SPACE + message);
+    System.out.println(SPACE + message + ((tot2 - tot1) != 0.0 ? " !!!": ""));
   }
 
   private static String msPerMil(int n, long ms) {
@@ -64,12 +71,11 @@ public class PerfTest {
 
   public static double tot = 0;
 
-  private static long eval(ParametersArray p, Expression e, int n) {
-//    System.gc();
+  private static long eval(ParametersArray[] p, Expression e, int n) {
     long t0 = System.currentTimeMillis();
     tot = 0;
     for (int i = 0; i < n; i++) {
-      tot += e.evalDouble(p);
+      tot += e.evalDouble(p[i % entrySize]);
     }
     long t1 = System.currentTimeMillis();
     long t = t1 - t0;
