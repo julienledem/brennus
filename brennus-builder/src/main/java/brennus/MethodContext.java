@@ -103,7 +103,7 @@ public final class MethodContext {
       }
     } else {
       // TODO: add cast in between primitives
-      throw new UnsupportedOperationException("TODO");
+      throw new UnsupportedOperationException("TODO: convert " + from + " to " + to);
     }
 
   }

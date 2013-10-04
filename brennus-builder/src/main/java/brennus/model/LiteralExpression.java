@@ -12,6 +12,21 @@ public final class LiteralExpression extends Expression {
     this.type = ExistingType.INT;
   }
 
+  public LiteralExpression(long value) {
+    this.value = value;
+    this.type = ExistingType.LONG;
+  }
+
+  public LiteralExpression(float value) {
+    this.value = value;
+    this.type = ExistingType.FLOAT;
+  }
+
+  public LiteralExpression(double value) {
+    this.value = value;
+    this.type = ExistingType.DOUBLE;
+  }
+
   public LiteralExpression(String value) {
     this.value = value;
     this.type = ExistingType.STRING;

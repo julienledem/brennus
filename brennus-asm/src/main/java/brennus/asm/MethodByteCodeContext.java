@@ -289,7 +289,7 @@ class MethodByteCodeContext implements Opcodes {
     addInstruction(new IntInsnNode(BIPUSH, intValue), comments);
   }
 
-  public void ldc(String value, Object... comments) {
+  public void ldc(Object value, Object... comments) {
     // TODO: better than this
     stack++;
     addInstruction(new LdcInsnNode(value), comments);
@@ -303,11 +303,17 @@ class MethodByteCodeContext implements Opcodes {
     if (type.isPrimitive()) {
       // TODO: other primitive types
       switch (type.getClassIdentifier().charAt(0)) {
-      case 'I':
-      case 'Z':
+      case 'I': // int
+      case 'Z': // boolean
         return IRETURN;
+      case 'J': // long
+        return LRETURN;
+      case 'F': // float
+        return FRETURN;
+      case 'D': // float
+        return DRETURN;
       default:
-        throw new RuntimeException("Unsupported "+type);
+        throw new RuntimeException("Unsupported " + type + " " + type.getClassIdentifier().charAt(0));
       }
     } else {
       return ARETURN;

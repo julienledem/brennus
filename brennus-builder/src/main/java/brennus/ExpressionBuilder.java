@@ -13,7 +13,7 @@ import brennus.model.UnaryOperator;
  *
  * @param <T> the type of the parent to return on completion
  */
-abstract public class ExpressionBuilder<T, EB, VEB> {
+abstract public class ExpressionBuilder<T, EB, VEB extends ValueExpressionBuilder<T, EB, VEB>> {
 
   interface ExpressionHandler<T> {
     T handleExpression(Expression e);
@@ -61,6 +61,18 @@ abstract public class ExpressionBuilder<T, EB, VEB> {
 
   public VEB literal(int i) {
     return newValueExpressionBuilder(expressionHandler, new LiteralExpression(i));
+  }
+
+  public VEB literal(long l) {
+    return newValueExpressionBuilder(expressionHandler, new LiteralExpression(l));
+  }
+
+  public VEB literal(float f) {
+    return newValueExpressionBuilder(expressionHandler, new LiteralExpression(f));
+  }
+
+  public VEB literal(double d) {
+    return newValueExpressionBuilder(expressionHandler, new LiteralExpression(d));
   }
 
   public VEB literal(String string) {

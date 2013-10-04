@@ -65,6 +65,7 @@
   <modules>
     <module>brennus-builder</module>
     <module>brennus-asm</module>
+    <module>brennus-eval</module>
   </modules>
 
   <dependencies>

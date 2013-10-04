@@ -49,4 +49,8 @@ public final class ImmutableList<T> implements Iterable<T> {
     return content.get(i);
   }
 
+  @Override
+  public String toString() {
+    return content.toString();
+  }
 }

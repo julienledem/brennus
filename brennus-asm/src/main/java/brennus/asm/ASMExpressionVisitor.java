@@ -122,6 +122,12 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
     methodByteCodeContext.incIndent("call super constructor");
     methodByteCodeContext.loadThis();
     Method constructor = methodContext.getType().getSuperConstructor(callConstructorExpression.getParameters().size());
+    if (constructor == null) {
+      throw new RuntimeException(
+          "can't find constructor with "
+              + callConstructorExpression.getParameters().size() + " parameters in "
+              + methodContext.getType().getExtending() + " parent of " + methodContext.getType());
+    }
     loadParameters("<init>", constructor, callConstructorExpression.getParameters());
     methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKESPECIAL, methodContext.getType().getExtending().getClassIdentifier(), "<init>", constructor.getSignature()), "super(...)");
     methodByteCodeContext.decIndent();
@@ -151,7 +157,19 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
     lastExpressionType = literalExpression.getType();
     // TODO: support other types
     if (literalExpression.getType().getExisting().equals(Integer.TYPE)) {
-      methodByteCodeContext.push(BIPUSH, ((Integer)literalExpression.getValue()).intValue(), "int literal", literalExpression.getValue());
+      int intValue = ((Integer)literalExpression.getValue()).intValue();
+      if (intValue >= -128 && intValue <= 127) {
+        // http://www.vmth.ucdavis.edu/incoming/Jasmin/ref-_bipush.html
+        methodByteCodeContext.push(BIPUSH, intValue, "int literal", literalExpression.getValue());
+      } else {
+        methodByteCodeContext.ldc((Integer)literalExpression.getValue(), "int literal", literalExpression.getValue());
+      }
+    } else if (literalExpression.getType().getExisting().equals(Long.TYPE)) {
+        methodByteCodeContext.ldc((Long)literalExpression.getValue(), "long literal", literalExpression.getValue());
+    } else if (literalExpression.getType().getExisting().equals(Float.TYPE)) {
+      methodByteCodeContext.ldc((Float)literalExpression.getValue(), "float literal", literalExpression.getValue());
+    } else if (literalExpression.getType().getExisting().equals(Double.TYPE)) {
+      methodByteCodeContext.ldc((Double)literalExpression.getValue(), "double literal", literalExpression.getValue());
     } else if (literalExpression.getType().getExisting().equals(String.class)) {
       methodByteCodeContext.ldc((String)literalExpression.getValue(), "String literal", literalExpression.getValue());
     } else if (literalExpression.getType().getExisting().equals(Boolean.TYPE)) {
