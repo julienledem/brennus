@@ -45,7 +45,7 @@ public class ExpressionCompiler {
     default: throw new UnsupportedOperationException(e.returnType.name());
     }
     final ReturnExpressionBuilder<MethodBuilder> b = new Builder()
-    .startClass("brennus.eval.ExpressionCompiler$Expression" + (++id), existing(Expression.class))
+    .startClass("brennus.eval.ExpressionCompiler$Expression" + (++id), existing(GeneratedExpression.class))
       .startMethod(PUBLIC, type, camelCase("eval", e.returnType.name())).param(existing(Parameters.class), "parameters")
         .returnExp();
     FutureType c = eval(b, e).endReturn().endMethod().endClass();

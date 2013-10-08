@@ -7,6 +7,9 @@ import static brennus.eval.DynamicExpression.Type.INT;
 import static brennus.eval.DynamicExpression.UnaryExpression.UnaryOperator.NOT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
+import java.util.List;
+
 import brennus.eval.DynamicExpression.BinaryExpression;
 import brennus.eval.DynamicExpression.BinaryExpression.ArithmeticOperator;
 import brennus.eval.DynamicExpression.BinaryExpression.BooleanOperator;
@@ -261,6 +264,10 @@ public class TestEval {
     case BOOLEAN: return (r < 500);
     default: throw new UnsupportedOperationException(t.name());
     }
+  }
+
+  static <T> T random(List<T> vals) {
+    return vals.get((int)(Math.random() * vals.size()));
   }
 
   static <T> T random(T[] vals) {

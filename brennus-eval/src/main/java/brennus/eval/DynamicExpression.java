@@ -1,6 +1,11 @@
 package brennus.eval;
 
 import static brennus.eval.DynamicExpression.Type.BOOLEAN;
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+
+import java.util.List;
+
 import brennus.eval.DynamicExpression.BinaryExpression.ArithmeticOperator;
 import brennus.eval.DynamicExpression.BinaryExpression.BooleanOperator;
 import brennus.eval.DynamicExpression.BinaryExpression.ComparisonOperator;
@@ -20,8 +25,7 @@ public abstract class DynamicExpression extends Expression {
     INT, LONG,
     FLOAT, DOUBLE,
     BOOLEAN;
-    //  TODO: immutable
-    static final public Type[] numericTypes = { INT, LONG, FLOAT, DOUBLE };
+    static final public List<Type> numericTypes = unmodifiableList(asList(INT, LONG, FLOAT, DOUBLE));
   }
 
   public static final class BinaryExpression extends DynamicExpression {
