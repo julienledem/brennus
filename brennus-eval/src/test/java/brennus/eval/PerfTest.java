@@ -62,7 +62,8 @@ public class PerfTest {
     if (t0 > 0) {
       message += (((float)(t1 * 10000 / t0))/100) + "%";
     }
-    System.out.println(SPACE + message + ((tot2 - tot1) != 0.0 ? " !!!": ""));
+    final double diff = tot2 - tot1;
+    System.out.println(SPACE + message + (diff != 0.0 ? " !!! " + diff + " = " + tot2 + " - " + tot1 : ""));
   }
 
   private static String msPerMil(int n, long ms) {
