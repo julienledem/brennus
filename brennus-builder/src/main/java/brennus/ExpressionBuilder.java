@@ -12,6 +12,8 @@ import brennus.model.UnaryOperator;
  * @author Julien Le Dem
  *
  * @param <T> the type of the parent to return on completion
+ * @param <EB> the actual type of this expression builder
+ * @param <VEB> the type returned when starting expression values
  */
 abstract public class ExpressionBuilder<T, EB, VEB extends ValueExpressionBuilder<T, EB, VEB>> {
 
@@ -85,6 +87,12 @@ abstract public class ExpressionBuilder<T, EB, VEB extends ValueExpressionBuilde
 
   public EB not() {
     return unaryOperator(NOT);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <R> R transform(Function<EB, R> function) {
+    // TODO: figure if the generic type can be defined correctly
+    return function.apply((EB)this);
   }
 
 }

@@ -78,4 +78,9 @@ public final class MethodDeclarationBuilder extends StatementBuilder<MethodBuild
     return new MethodBuilder(classIdentifier, memberFlags, returnType, methodName, parameters, methodHandler, builder).statementHandler();
   }
 
+
+  public <R> R transform(Function<MethodDeclarationBuilder, R> function) {
+    return function.apply(this);
+  }
+
 }

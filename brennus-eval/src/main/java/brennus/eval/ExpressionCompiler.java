@@ -120,7 +120,7 @@ public class ExpressionCompiler {
     });
   }
 
-  public String camelCase(String... s) {
+  public static String camelCase(String... s) {
     StringBuilder sb = new StringBuilder();
     if (s.length > 0) {
       sb.append(s[0].toLowerCase());
