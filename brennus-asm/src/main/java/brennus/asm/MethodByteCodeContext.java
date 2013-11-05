@@ -42,17 +42,18 @@ class MethodByteCodeContext implements Opcodes {
   private static final Logger logger = Logger.getLogger(MethodByteCodeContext.class.getName());
 
   public static int getAccess(MemberFlags flags) {
+    int acc = (flags.isStatic() ? ACC_STATIC : 0) | (flags.isFinal() ? ACC_FINAL : 0);
     switch (flags.getProtection()) {
     case PRIVATE:
-      return ACC_PRIVATE;
+      return acc | ACC_PRIVATE;
     case PUBLIC:
-      return ACC_PUBLIC;
+      return acc | ACC_PUBLIC;
     case PROTECTED:
-      return ACC_PROTECTED;
+      return acc | ACC_PROTECTED;
     case DEFAULT:
-      return 0;
+      return acc;
     default:
-        throw new RuntimeException("Unexpected "+flags.getProtection());
+        throw new RuntimeException("Unexpected " + flags.getProtection());
     }
   }
 

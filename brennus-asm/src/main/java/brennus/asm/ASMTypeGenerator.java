@@ -3,7 +3,9 @@ package brennus.asm;
 import static brennus.model.ExistingType.VOID;
 import static brennus.model.Protection.PUBLIC;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import brennus.ImmutableList;
 import brennus.MethodContext;
@@ -35,6 +37,10 @@ public class ASMTypeGenerator {
     classNode.sourceFile = futureType.getSourceFile();
     classNode.name = futureType.getClassIdentifier();
     classNode.superName = futureType.getExtending().getClassIdentifier();
+    if (classNode.name.indexOf('$') != -1) {
+      String declaringClass = classNode.name.substring(0, classNode.name.lastIndexOf("$"));
+      classNode.outerClass = declaringClass;
+    }
     Iterable<Field> fields = futureType.getFields();
     for (Field field : fields) {
       classNode.fields.add(new FieldNode(
@@ -61,6 +67,10 @@ public class ASMTypeGenerator {
     }
 
     for (Method method : futureType.getMethods()) {
+      classNode.methods.add(getMethodNode(futureType, method));
+    }
+
+    for (Method method : futureType.getStaticMethods()) {
       classNode.methods.add(getMethodNode(futureType, method));
     }
 
