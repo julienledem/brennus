@@ -79,7 +79,7 @@ public final class MethodDeclarationBuilder extends StatementBuilder<MethodBuild
   }
 
 
-  public <R> R transform(Function<MethodDeclarationBuilder, R> function) {
+  public <R> R map(Function<MethodDeclarationBuilder, R> function) {
     return function.apply(this);
   }
 

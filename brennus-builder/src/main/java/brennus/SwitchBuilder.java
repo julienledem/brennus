@@ -97,7 +97,7 @@ public final class SwitchBuilder<T> {
     return switchStatementHandler.handleStatement(new SwitchStatement(line, switchOnExpression, statements, defaultCaseStatement));
   }
 
-  public <U> U transform(Function<SwitchBuilder<T>, U> function) {
+  public <U> U map(Function<SwitchBuilder<T>, U> function) {
     return function.apply(this);
   }
 

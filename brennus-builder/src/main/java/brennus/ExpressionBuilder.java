@@ -90,7 +90,7 @@ abstract public class ExpressionBuilder<T, EB, VEB extends ValueExpressionBuilde
   }
 
   @SuppressWarnings("unchecked")
-  public <R> R transform(Function<EB, R> function) {
+  public <R> R map(Function<EB, R> function) {
     // TODO: figure if the generic type can be defined correctly
     return function.apply((EB)this);
   }

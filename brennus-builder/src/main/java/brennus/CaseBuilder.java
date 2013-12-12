@@ -64,7 +64,7 @@ public final class CaseBuilder<T> extends StatementBuilder<CaseBuilder<T>> {
     return statementHandler.handleStatement(new CaseBlockStatement(line, literalExpression, statements, true));
   }
 
-  public <S> S transform(Function<CaseBuilder<T>, S> function) {
+  public <S> S map(Function<CaseBuilder<T>, S> function) {
     return function.apply(this);
   }
 }
