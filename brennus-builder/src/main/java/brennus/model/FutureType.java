@@ -81,11 +81,33 @@ public final class FutureType extends Type {
         return method;
       }
     }
-    if (extending!=null) {
+    if (extending != null) {
       return extending.getMethod(methodName, parameterCount);
     }
     return null;
   }
+
+  @Override
+  public Field getField(String varName) {
+    Field field = getField(getFields(), varName);
+    if (field == null) {
+      field = getField(getStaticFields(), varName);
+    }
+    if (field == null && extending != null) {
+      field = extending.getField(varName);
+    }
+    return field;
+  }
+
+  private Field getField(ImmutableList<Field> fields, String varName) {
+    for (Field field : fields) {
+      if (field.getName().equals(varName)) {
+        return field;
+      }
+    }
+    return null;
+  }
+
 
   @Override
   public boolean isAssignableFrom(Type type) {

@@ -49,14 +49,21 @@ public final class MemberFlags {
   }
 
   public static MemberFlags fromReflection(java.lang.reflect.Method method) {
-    int modifiers = method.getModifiers();
-    Protection protection = getProtection(modifiers);
-    return new MemberFlags(Modifier.isStatic(modifiers), Modifier.isFinal(modifiers), protection);
+    return fromModifiers(method.getModifiers());
   }
 
   public static MemberFlags fromReflection(Constructor<?> constructor) {
     Protection protection = getProtection(constructor.getModifiers());
     return new MemberFlags(false, false, protection);
+  }
+
+  public static MemberFlags fromReflection(java.lang.reflect.Field field) {
+    return fromModifiers(field.getModifiers());
+  }
+
+  private static MemberFlags fromModifiers(int modifiers) {
+    Protection protection = getProtection(modifiers);
+    return new MemberFlags(Modifier.isStatic(modifiers), Modifier.isFinal(modifiers), protection);
   }
 
   private static Protection getProtection(int modifiers) {

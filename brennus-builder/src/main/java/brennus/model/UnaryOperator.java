@@ -2,7 +2,8 @@ package brennus.model;
 
 public enum UnaryOperator implements Operator {
 
-  NOT("!");
+  NOT("!"),
+  ISNULL("null ==");
 
   private final String representation;
 

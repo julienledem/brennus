@@ -123,6 +123,23 @@ public class ExistingType extends Type {
     return null;
   }
 
+  @Override
+  public Field getField(String name) {
+    // TODO: add static
+    java.lang.reflect.Field field;
+    try {
+      field = existing.getField(name);
+    } catch (NoSuchFieldException e) {
+      return null;
+    } catch (SecurityException e) {
+      return null;
+    }
+    if (field != null) {
+      return new Field(MemberFlags.fromReflection(field), existing(field.getType()), field.getName());
+    }
+    return null;
+  }
+
   private ImmutableList<Parameter> convertParameters(Class<?>[] parameterTypes) {
     ArrayList<Parameter> parameters = new ArrayList<Parameter>();
     for (int i = 0; i < parameterTypes.length; i++) {
@@ -139,7 +156,7 @@ public class ExistingType extends Type {
 
   @Override
   public Method getConstructor(int parameterCount) {
-    for (java.lang.reflect.Constructor<?> constructor : existing.getConstructors()) {
+    for (java.lang.reflect.Constructor<?> constructor : existing.getDeclaredConstructors()) {
       Class<?>[] parameterTypes = constructor.getParameterTypes();
       if (parameterTypes.length == parameterCount) {
         ImmutableList<Parameter> parameters = convertParameters(parameterTypes);

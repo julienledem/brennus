@@ -19,4 +19,6 @@ public interface ExpressionVisitor {
 
   void visit(CallConstructorExpression callConstructorExpression);
 
+  void visit(InstantiationExpression instantiationExpression);
+
 }

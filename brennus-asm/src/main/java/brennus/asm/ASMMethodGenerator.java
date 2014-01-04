@@ -28,6 +28,7 @@ import brennus.model.GotoCaseStatement;
 import brennus.model.GotoStatement;
 import brennus.model.IfStatement;
 import brennus.model.InstanceOfExpression;
+import brennus.model.InstantiationExpression;
 import brennus.model.LabelStatement;
 import brennus.model.LiteralExpression;
 import brennus.model.LocalVariableAccessType;
@@ -204,11 +205,17 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
             "set param", setStatement.getTo());
       }
       public void visit(FieldAccessType fieldAccessType) {
-        methodByteCodeContext.loadThis("set", setStatement.getTo());
-        Type expressionType = evalExp();
         Field field = fieldAccessType.getField();
-        methodByteCodeContext.handleConversion(expressionType, field.getType());
-        methodByteCodeContext.addInstruction(new FieldInsnNode(PUTFIELD, methodContext.getClassIdentifier(), field.getName(), field.getSignature()), "set", setStatement.getTo());
+        if (field.isStatic()) {
+          Type expressionType = evalExp();
+          methodByteCodeContext.handleConversion(expressionType, field.getType());
+          methodByteCodeContext.addInstruction(new FieldInsnNode(PUTSTATIC, methodContext.getClassIdentifier(), field.getName(), field.getSignature()), "set static", setStatement.getTo());
+        } else {
+          methodByteCodeContext.loadThis("set", setStatement.getTo());
+          Type expressionType = evalExp();
+          methodByteCodeContext.handleConversion(expressionType, field.getType());
+          methodByteCodeContext.addInstruction(new FieldInsnNode(PUTFIELD, methodContext.getClassIdentifier(), field.getName(), field.getSignature()), "set", setStatement.getTo());
+        }
       }
       public void visit(LocalVariableAccessType localVariableAccessType) {
         Type expressionType = evalExp();
@@ -302,6 +309,11 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
       @Override
       public void visit(CallConstructorExpression callConstructorExpression) {
         throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public void visit(InstantiationExpression instantiationExpression) {
+        throw new UnsupportedOperationException("NYI");
       }
 
     });

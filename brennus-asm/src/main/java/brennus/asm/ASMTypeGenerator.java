@@ -47,6 +47,12 @@ public class ASMTypeGenerator {
           MethodByteCodeContext.getAccess(field.getFlags()), field.getName(), field.getSignature(), null, null));
     }
 
+    Iterable<Field> staticFields = futureType.getStaticFields();
+    for (Field field : staticFields) {
+      classNode.fields.add(new FieldNode(
+          MethodByteCodeContext.getAccess(field.getFlags()), field.getName(), field.getSignature(), null, null));
+    }
+
     ImmutableList<Method> constructors = futureType.getConstructors();
     if (constructors.isEmpty()) {
       // Add default constructor

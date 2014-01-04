@@ -24,6 +24,7 @@ import brennus.model.GotoCaseStatement;
 import brennus.model.GotoStatement;
 import brennus.model.IfStatement;
 import brennus.model.InstanceOfExpression;
+import brennus.model.InstantiationExpression;
 import brennus.model.LabelStatement;
 import brennus.model.LiteralExpression;
 import brennus.model.LocalVariableAccessType;
@@ -352,9 +353,11 @@ class ExpressionStringifierVisitor implements ExpressionVisitor {
 
   @Override
   public void visit(BinaryExpression binaryExpression) {
+    sb.append("(");
     binaryExpression.getLeftExpression().accept(this);
     sb.append(" "+binaryExpression.getOperator().getRepresentation()+" ");
     binaryExpression.getRightExpression().accept(this);
+    sb.append(")");
   }
 
   @Override
@@ -364,14 +367,18 @@ class ExpressionStringifierVisitor implements ExpressionVisitor {
 
   @Override
   public void visit(UnaryExpression unaryExpression) {
+    sb.append("(");
     sb.append(unaryExpression.getOperator().getRepresentation()).append(" ");
     unaryExpression.getExpression().accept(this);
+    sb.append(")");
   }
 
   @Override
   public void visit(InstanceOfExpression instanceOfExpression) {
+    sb.append("(");
     instanceOfExpression.getExpression().accept(this);
     sb.append(" instanceOf ").append(instanceOfExpression.getType().getName());
+    sb.append(")");
   }
 
   @Override
@@ -386,6 +393,22 @@ class ExpressionStringifierVisitor implements ExpressionVisitor {
     sb.append("super(");
     boolean first = true;
     Iterable<Expression> parameters = callConstructorExpression.getParameters();
+    for (Expression expression : parameters) {
+      if (first) {
+        first = false;
+      } else {
+        sb.append(", ");
+      }
+      expression.accept(this);
+    }
+    sb.append(")");
+  }
+
+  @Override
+  public void visit(InstantiationExpression instantiationExpression) {
+    sb.append("new ").append(instantiationExpression.getType().getName()).append("(");
+    boolean first = true;
+    Iterable<Expression> parameters = instantiationExpression.getParameters();
     for (Expression expression : parameters) {
       if (first) {
         first = false;

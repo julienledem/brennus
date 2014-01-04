@@ -415,4 +415,10 @@ class MethodByteCodeContext implements Opcodes {
     return paramIndexToBytecodeIndex.get(paramIndex);
   }
 
+  public void dup(Object... comments) {
+    addInstruction(new InsnNode(DUP), comments);
+    // TODO: better than this
+    stack++;
+  }
+
 }

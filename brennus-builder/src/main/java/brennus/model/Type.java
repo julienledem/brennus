@@ -15,6 +15,8 @@ abstract public class Type {
 
   abstract public Method getMethod(String methodName, int parameterCount);
 
+  abstract public Field getField(String varName);
+
   abstract public boolean isAssignableFrom(Type type);
 
   abstract public Method getConstructor(int parameterCount);

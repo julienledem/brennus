@@ -3,7 +3,9 @@ package brennus;
 import static brennus.model.UnaryOperator.NOT;
 import brennus.model.Expression;
 import brennus.model.GetExpression;
+import brennus.model.InstantiationExpression;
 import brennus.model.LiteralExpression;
+import brennus.model.Type;
 import brennus.model.UnaryExpression;
 import brennus.model.UnaryOperator;
 
@@ -95,4 +97,7 @@ abstract public class ExpressionBuilder<T, EB, VEB extends ValueExpressionBuilde
     return function.apply((EB)this);
   }
 
+  public VEB newInstanceNoParam(Type type) {
+    return newValueExpressionBuilder(expressionHandler, new InstantiationExpression(type, ImmutableList.<Expression>empty()));
+  }
 }

@@ -1,6 +1,8 @@
 package brennus.asm;
 
+import static brennus.model.ExistingType.BOOLEAN;
 import static brennus.model.Protection.PRIVATE;
+import static org.objectweb.asm.Opcodes.NEW;
 import brennus.ImmutableList;
 import brennus.MethodContext;
 import brennus.model.BinaryExpression;
@@ -14,6 +16,7 @@ import brennus.model.Field;
 import brennus.model.FieldAccessType;
 import brennus.model.GetExpression;
 import brennus.model.InstanceOfExpression;
+import brennus.model.InstantiationExpression;
 import brennus.model.LiteralExpression;
 import brennus.model.LocalVariableAccessType;
 import brennus.model.Method;
@@ -52,10 +55,16 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
     varAccessType.accept(new VarAccessTypeVisitor() {
       public void visit(FieldAccessType fieldAccessType) {
         Field field = fieldAccessType.getField();
-        methodByteCodeContext.loadThis("get field", getExpression.getFieldName(), "on this");
-        methodByteCodeContext.addInstruction(
-            new FieldInsnNode(GETFIELD, methodContext.getType().getClassIdentifier(), getExpression.getFieldName(), field.getSignature()),
-            "get field", getExpression.getFieldName());
+        if (field.isStatic()) {
+          methodByteCodeContext.addInstruction(
+              new FieldInsnNode(GETSTATIC, methodContext.getType().getClassIdentifier(), getExpression.getFieldName(), field.getSignature()),
+              "get static field", getExpression.getFieldName());
+        } else {
+          methodByteCodeContext.loadThis("get field", getExpression.getFieldName(), "on this");
+          methodByteCodeContext.addInstruction(
+              new FieldInsnNode(GETFIELD, methodContext.getType().getClassIdentifier(), getExpression.getFieldName(), field.getSignature()),
+              "get field", getExpression.getFieldName());
+        }
         lastExpressionType = field.getType();
       }
       public void visit(ParameterAccessType parameterAccessType) {
@@ -165,7 +174,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
         methodByteCodeContext.ldc((Integer)literalExpression.getValue(), "int literal", literalExpression.getValue());
       }
     } else if (literalExpression.getType().getExisting().equals(Long.TYPE)) {
-        methodByteCodeContext.ldc((Long)literalExpression.getValue(), "long literal", literalExpression.getValue());
+      methodByteCodeContext.ldc((Long)literalExpression.getValue(), "long literal", literalExpression.getValue());
     } else if (literalExpression.getType().getExisting().equals(Float.TYPE)) {
       methodByteCodeContext.ldc((Float)literalExpression.getValue(), "float literal", literalExpression.getValue());
     } else if (literalExpression.getType().getExisting().equals(Double.TYPE)) {
@@ -217,6 +226,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
       methodByteCodeContext.addLabel(falseLabel, "AND: false");
       new LiteralExpression(false).accept(this);
       methodByteCodeContext.addLabel(endLabel, "AND: end");
+      lastExpressionType = BOOLEAN;
       break;
     default:
       // TODO: other operators
@@ -232,21 +242,36 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
   @Override
   public void visit(UnaryExpression unaryExpression) {
     methodByteCodeContext.incIndent(unaryExpression.getOperator().getRepresentation());
-    methodByteCodeContext.incIndent("!exp");
+    methodByteCodeContext.incIndent("unary exp");
     unaryExpression.getExpression().accept(this);
     methodByteCodeContext.decIndent();
     switch (unaryExpression.getOperator()) {
-    case NOT:
+    case NOT: {
       // TODO: combine with parent
       LabelNode l1 = new LabelNode();
       LabelNode l2 = new LabelNode();
-      methodByteCodeContext.addInstruction(new JumpInsnNode(IFEQ, l1), "NOT: IF false => true");// if equal to 0 jump to L1
+      methodByteCodeContext.addInstruction(new JumpInsnNode(IFEQ, l1), "NOT: IF false => true"); // if equal to 0 jump to L1
       methodByteCodeContext.addIConst0("NOT: result false");
       methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, l2), "NOT: jump to end");
       methodByteCodeContext.addLabel(l1, "NOT: true label");
       methodByteCodeContext.addIConst1("NOT: result true");
       methodByteCodeContext.addLabel(l2, "NOT: end label");
+      lastExpressionType = BOOLEAN;
       break;
+    }
+    case ISNULL: {
+      // TODO: combine with parent
+      LabelNode l1 = new LabelNode();
+      LabelNode l2 = new LabelNode();
+      methodByteCodeContext.addInstruction(new JumpInsnNode(IFNULL, l1), "ISNULL: IF NULL => true"); // if null jump to L1
+      methodByteCodeContext.addIConst0("NOT NULL: result false");
+      methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, l2), "ISNULL: jump to end");
+      methodByteCodeContext.addLabel(l1, "NULL: true label");
+      methodByteCodeContext.addIConst1("NULL: result true");
+      methodByteCodeContext.addLabel(l2, "ISNULL: end label");
+      lastExpressionType = BOOLEAN;
+      break;
+    }
     default:
       // TODO: other operators
       throw new UnsupportedOperationException("op: "+unaryExpression.getOperator());
@@ -259,6 +284,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
     methodByteCodeContext.incIndent("instanceOF");
     instanceOfExpression.getExpression().accept(this);
     methodByteCodeContext.addInstruction(new TypeInsnNode(INSTANCEOF, instanceOfExpression.getType().getClassIdentifier()));
+    lastExpressionType = BOOLEAN;
     methodByteCodeContext.decIndent();
   }
 
@@ -268,6 +294,26 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
     castExpression.getExpression().accept(this);
     methodByteCodeContext.addInstruction(new TypeInsnNode(CHECKCAST, castExpression.getType().getClassIdentifier()), "cast to", castExpression.getType());
     lastExpressionType = castExpression.getType();
+    methodByteCodeContext.decIndent();
+  }
+
+  @Override
+  public void visit(InstantiationExpression instantiationExpression) {
+    // new instance involves creating a new object and then calling the constructor
+    Type type = instantiationExpression.getType();
+    methodByteCodeContext.incIndent("new ", type.getName(), "()");
+    methodByteCodeContext.addInstruction(new TypeInsnNode(NEW, type.getClassIdentifier()), "new ", type.getName(), "()");
+    methodByteCodeContext.dup("for constructor call"); // so that we still have a reference to the object after we call the constructor.
+    Method constructor = type.getConstructor(instantiationExpression.getParameters().size());
+    if (constructor == null) {
+      throw new RuntimeException(
+          "can't find constructor with "
+              + instantiationExpression.getParameters().size() + " parameters in "
+              + type);
+    }
+    loadParameters("<init>", constructor, instantiationExpression.getParameters());
+    methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKESPECIAL, type.getClassIdentifier(), "<init>", constructor.getSignature()), "new ", type.getName(), "(...)");
+    lastExpressionType = type;
     methodByteCodeContext.decIndent();
   }
 

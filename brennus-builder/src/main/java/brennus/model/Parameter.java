@@ -24,4 +24,8 @@ public final class Parameter {
     return index;
   }
 
+  @Override
+  public String toString() {
+   return "Parameter{" + type + " " + name + " " + index + "}";
+  }
 }

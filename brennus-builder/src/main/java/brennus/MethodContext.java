@@ -39,36 +39,19 @@ public final class MethodContext {
     return null;
   }
 
-  private Field getField(String varName) {
-    Field field = getField(type.getFields(), varName);
-    if (field == null) {
-      field = getField(type.getStaticFields(), varName);
-    }
-    return field;
-  }
-
-  private Field getField(ImmutableList<Field> fields, String varName) {
-    for (Field field : fields) {
-      if (field.getName().equals(varName)) {
-        return field;
-      }
-    }
-    return null;
-  }
-
   public VarAccessType getVarAccessType(String varName) {
 
     Parameter param = getParam(varName);
     if (param != null) {
       return new ParameterAccessType(param);
     } else {
-      Field field = getField(varName);
+      Field field = type.getField(varName);
       if (field!=null) {
         return new FieldAccessType(field);
       } else {
         LocalVarContext localVarContext;
         if (!localVars.containsKey(varName)) {
-          throw new RuntimeException("can not access local variable " + varName +": not defined");
+          throw new RuntimeException("can not access " + varName + " in parameters, local variables or fields");
         } else {
           localVarContext = localVars.get(varName);
         }

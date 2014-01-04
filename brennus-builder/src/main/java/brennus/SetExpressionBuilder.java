@@ -1,6 +1,5 @@
 package brennus;
 
-
 public final class SetExpressionBuilder<T> extends
     ExpressionBuilder<T, SetExpressionBuilder<T>, SetValueExpressionBuilder<T>> {
 
