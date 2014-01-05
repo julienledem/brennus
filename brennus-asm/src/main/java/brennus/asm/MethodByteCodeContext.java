@@ -421,4 +421,82 @@ class MethodByteCodeContext implements Opcodes {
     stack++;
   }
 
+  abstract public class ByteCodeBuilder<T> {
+
+    abstract T self();
+
+    public T addIConst0(Object... comment) {
+      MethodByteCodeContext.this.addIConst0(comment);
+      return self();
+    }
+
+    public T addIConst1(Object... comment) {
+      MethodByteCodeContext.this.addIConst1(comment);
+      return self();
+    }
+  }
+
+  public class Else extends ByteCodeBuilder<Else> {
+    private LabelNode thenCase;
+    private LabelNode endIf;
+
+    Else(int jumpInst, Object... comment) {
+      // TODO: combine with parent
+      thenCase = new LabelNode();
+      endIf = new LabelNode();
+      addInstruction(new JumpInsnNode(jumpInst, thenCase), comment);
+    }
+
+    @Override
+    Else self() {
+      return this;
+    }
+
+    /**
+     * @return object to add instructions in then case
+     */
+    public Then thenCase() {
+      addInstruction(new JumpInsnNode(GOTO, endIf), "end else, skip then");
+      addLabel(thenCase, "then label");
+      return new Then(endIf);
+    }
+
+  }
+
+  public class Then extends ByteCodeBuilder<Then>  {
+    private final LabelNode endIf;
+
+    Then(LabelNode endIf) {
+      this.endIf = endIf;
+    }
+
+    @Override
+    Then self() {
+      return this;
+    }
+
+    /**
+     * ends the if
+     */
+    public void endIf() {
+      addLabel(endIf, "endIf");
+    }
+  }
+
+  /**
+   * in bytecode if/then/else is laid out if/else/then:
+   * if (cond) jump to then
+   * {else}
+   * jump to endIf
+   * then:
+   * {then}
+   * endIf:
+   * @param jumpInst
+   * @param comment
+   * @return object to add instruction in else case
+   */
+  public Else ifCondElse(int jumpInst, Object... comment) {
+    return new Else(jumpInst, comment);
+  }
+
 }

@@ -95,4 +95,14 @@ public class TestClass extends BaseTestClass {
     }
     return false;
   }
+
+  @Override
+  public boolean isNull(Object o) {
+    return o == null;
+  }
+
+  @Override
+  public boolean isNotNull(Object o) {
+    return o != null;
+  }
 }

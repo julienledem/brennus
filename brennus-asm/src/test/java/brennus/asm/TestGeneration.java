@@ -64,9 +64,24 @@ public class TestGeneration {
           .endMethod()
 
           .startMethod(PUBLIC, BOOLEAN, "not").param(BOOLEAN, "b")
+            .exec().callOnThis("println").literal("not").endCall().endExec()
             .exec().callOnThis("println").get("b").endCall().endExec()
             .exec().callOnThis("println").not().get("b").endCall().endExec()
             .returnExp().not().get("b").endReturn()
+          .endMethod()
+
+          .startMethod(PUBLIC, BOOLEAN, "isNull").param(OBJECT, "o")
+            .exec().callOnThis("println").literal("isNull").endCall().endExec()
+            .exec().callOnThis("println").get("o").endCall().endExec()
+            .exec().callOnThis("println").get("o").isNull().endCall().endExec()
+            .returnExp().get("o").isNull().endReturn()
+          .endMethod()
+
+          .startMethod(PUBLIC, BOOLEAN, "isNotNull").param(OBJECT, "o")
+            .exec().callOnThis("println").literal("isNotNull").endCall().endExec()
+            .exec().callOnThis("println").get("o").endCall().endExec()
+            .exec().callOnThis("println").get("o").isNotNull().endCall().endExec()
+            .returnExp().get("o").isNotNull().endReturn()
           .endMethod()
 
           .startMethod(PUBLIC, INT, "plus6").param(INT, "i")
@@ -192,6 +207,12 @@ public class TestGeneration {
 
     assertFalse(tc.not(true));
     assertTrue(tc.not(false));
+
+    assertTrue(tc.isNull(null));
+    assertFalse(tc.isNull("null"));
+
+    assertFalse(tc.isNotNull(null));
+    assertTrue(tc.isNotNull("null"));
 
     TestClass other = new TestClass();
     other.set(0, "test");

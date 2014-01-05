@@ -2,7 +2,6 @@ package brennus.asm;
 
 import static brennus.model.ExistingType.BOOLEAN;
 import static brennus.model.Protection.PRIVATE;
-import static org.objectweb.asm.Opcodes.NEW;
 import brennus.ImmutableList;
 import brennus.MethodContext;
 import brennus.model.BinaryExpression;
@@ -248,27 +247,31 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
     switch (unaryExpression.getOperator()) {
     case NOT: {
       // TODO: combine with parent
-      LabelNode l1 = new LabelNode();
-      LabelNode l2 = new LabelNode();
-      methodByteCodeContext.addInstruction(new JumpInsnNode(IFEQ, l1), "NOT: IF false => true"); // if equal to 0 jump to L1
-      methodByteCodeContext.addIConst0("NOT: result false");
-      methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, l2), "NOT: jump to end");
-      methodByteCodeContext.addLabel(l1, "NOT: true label");
-      methodByteCodeContext.addIConst1("NOT: result true");
-      methodByteCodeContext.addLabel(l2, "NOT: end label");
+      methodByteCodeContext.ifCondElse(IFEQ, "NOT: IF true => false")
+        .addIConst0("NOT false: result true")
+      .thenCase()
+        .addIConst1("NOT true: result false")
+      .endIf();
       lastExpressionType = BOOLEAN;
       break;
     }
     case ISNULL: {
       // TODO: combine with parent
-      LabelNode l1 = new LabelNode();
-      LabelNode l2 = new LabelNode();
-      methodByteCodeContext.addInstruction(new JumpInsnNode(IFNULL, l1), "ISNULL: IF NULL => true"); // if null jump to L1
-      methodByteCodeContext.addIConst0("NOT NULL: result false");
-      methodByteCodeContext.addInstruction(new JumpInsnNode(GOTO, l2), "ISNULL: jump to end");
-      methodByteCodeContext.addLabel(l1, "NULL: true label");
-      methodByteCodeContext.addIConst1("NULL: result true");
-      methodByteCodeContext.addLabel(l2, "ISNULL: end label");
+      methodByteCodeContext.ifCondElse(IFNONNULL, "ISNULL: IF NULL => true")
+        .addIConst1("NOT NULL: result false")
+      .thenCase()
+        .addIConst0("NULL: result true")
+      .endIf();
+      lastExpressionType = BOOLEAN;
+      break;
+    }
+    case ISNOTNULL: {
+      // TODO: combine with parent
+      methodByteCodeContext.ifCondElse(IFNULL, "ISNONNULL: IF NON NULL => true")
+        .addIConst1("NULL: result false")
+      .thenCase()
+        .addIConst0("NOT NULL: result true")
+      .endIf();
       lastExpressionType = BOOLEAN;
       break;
     }

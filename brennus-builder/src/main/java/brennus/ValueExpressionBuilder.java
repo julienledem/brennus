@@ -4,6 +4,7 @@ import static brennus.model.BinaryOperator.AND;
 import static brennus.model.BinaryOperator.EQUALS;
 import static brennus.model.BinaryOperator.GREATER_THAN;
 import static brennus.model.BinaryOperator.PLUS;
+import static brennus.model.UnaryOperator.ISNOTNULL;
 import static brennus.model.UnaryOperator.ISNULL;
 import brennus.ExpressionBuilder.ExpressionHandler;
 import brennus.model.BinaryExpression;
@@ -59,6 +60,10 @@ abstract public class ValueExpressionBuilder<T, EB, VEB> {
 
   public VEB isNull() {
     return newValueExpressionBuilder(expressionHandler, new UnaryExpression(ISNULL, expression));
+  }
+
+  public VEB isNotNull() {
+    return newValueExpressionBuilder(expressionHandler, new UnaryExpression(ISNOTNULL, expression));
   }
 
   public VEB instanceOf(ExistingType existingType) {
