@@ -425,6 +425,11 @@ class MethodByteCodeContext implements Opcodes {
 
     abstract T self();
 
+    public T addBool(boolean b, Object... comment) {
+      MethodByteCodeContext.this.addBool(b, comment);
+      return self();
+    }
+
     public T addIConst0(Object... comment) {
       MethodByteCodeContext.this.addIConst0(comment);
       return self();
@@ -497,6 +502,14 @@ class MethodByteCodeContext implements Opcodes {
    */
   public Else ifCondElse(int jumpInst, Object... comment) {
     return new Else(jumpInst, comment);
+  }
+
+  public void addBool(boolean b, Object... comment) {
+    if (b) {
+      addIConst1("bool literal", b);
+    } else {
+      addIConst0("bool literal", b);
+    }
   }
 
 }

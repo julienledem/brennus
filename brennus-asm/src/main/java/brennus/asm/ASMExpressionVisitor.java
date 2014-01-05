@@ -182,11 +182,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
       methodByteCodeContext.ldc((String)literalExpression.getValue(), "String literal", literalExpression.getValue());
     } else if (literalExpression.getType().getExisting().equals(Boolean.TYPE)) {
       boolean b = (Boolean)literalExpression.getValue();
-      if (b) {
-        methodByteCodeContext.addIConst1("bool literal", literalExpression.getValue());
-      } else {
-        methodByteCodeContext.addIConst0("bool literal", literalExpression.getValue());
-      }
+      methodByteCodeContext.addBool(b, "bool literal");
     } else {
       throw new UnsupportedOperationException(literalExpression.toString());
     }
@@ -248,9 +244,9 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
     case NOT: {
       // TODO: combine with parent
       methodByteCodeContext.ifCondElse(IFEQ, "NOT: IF true => false")
-        .addIConst0("NOT false: result true")
+        .addBool(false, "NOT true: result false")
       .thenCase()
-        .addIConst1("NOT true: result false")
+        .addBool(true, "NOT false: result true")
       .endIf();
       lastExpressionType = BOOLEAN;
       break;
@@ -258,9 +254,9 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
     case ISNULL: {
       // TODO: combine with parent
       methodByteCodeContext.ifCondElse(IFNONNULL, "ISNULL: IF NULL => true")
-        .addIConst1("NOT NULL: result false")
+        .addBool(true, "NOT NULL: result true")
       .thenCase()
-        .addIConst0("NULL: result true")
+        .addBool(false, "NULL: result false")
       .endIf();
       lastExpressionType = BOOLEAN;
       break;
@@ -268,9 +264,9 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
     case ISNOTNULL: {
       // TODO: combine with parent
       methodByteCodeContext.ifCondElse(IFNULL, "ISNONNULL: IF NON NULL => true")
-        .addIConst1("NULL: result false")
+        .addBool(true, "NULL: result true")
       .thenCase()
-        .addIConst0("NOT NULL: result true")
+        .addBool(false, "NOT NULL: result false")
       .endIf();
       lastExpressionType = BOOLEAN;
       break;
