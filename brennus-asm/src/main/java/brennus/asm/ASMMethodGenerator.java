@@ -237,6 +237,8 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
     methodByteCodeContext.addLineNumber(statement.getLine());
     methodByteCodeContext.incIndent(statement.getClass().getSimpleName());
     statement.accept(this);
+    // TODO: statement that return nothing must pop the stack if needed
+    // TODO: statements that return something should check there is something on the stack
     methodByteCodeContext.decIndent();
   }
 
