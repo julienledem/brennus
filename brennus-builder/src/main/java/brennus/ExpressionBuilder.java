@@ -5,6 +5,7 @@ import brennus.model.Expression;
 import brennus.model.GetExpression;
 import brennus.model.InstantiationExpression;
 import brennus.model.LiteralExpression;
+import brennus.model.NewArrayExpression;
 import brennus.model.Type;
 import brennus.model.UnaryExpression;
 import brennus.model.UnaryOperator;
@@ -99,5 +100,13 @@ abstract public class ExpressionBuilder<T, EB, VEB extends ValueExpressionBuilde
 
   public VEB newInstanceNoParam(Type type) {
     return newValueExpressionBuilder(expressionHandler, new InstantiationExpression(type, ImmutableList.<Expression>empty()));
+  }
+
+  public NewArrayExpressionBuilder<VEB> newArrayOfSize(final Type type) {
+    return new NewArrayExpressionBuilder<VEB>(new ExpressionHandler<VEB>() {
+      public VEB handleExpression(Expression e) {
+        return factory.newValueExpressionBuilder(expressionHandler, new NewArrayExpression(type, e));
+      }
+    });
   }
 }

@@ -32,6 +32,7 @@ import brennus.model.InstantiationExpression;
 import brennus.model.LabelStatement;
 import brennus.model.LiteralExpression;
 import brennus.model.LocalVariableAccessType;
+import brennus.model.NewArrayExpression;
 import brennus.model.Parameter;
 import brennus.model.ParameterAccessType;
 import brennus.model.ReturnStatement;
@@ -315,6 +316,11 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
 
       @Override
       public void visit(InstantiationExpression instantiationExpression) {
+        throw new UnsupportedOperationException("NYI");
+      }
+
+      @Override
+      public void visit(NewArrayExpression e) {
         throw new UnsupportedOperationException("NYI");
       }
 

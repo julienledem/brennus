@@ -2,6 +2,7 @@ package brennus.model;
 
 import static brennus.model.ExceptionHandlingVisitor.wrap;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class ExistingType extends Type {
     String signature;
     if (existing.isArray()) {
       ExistingType component = existing(existing.getComponentType());
-      identifier = "[" + component.getClassIdentifier();
+      identifier = "[" + component.getSignature();
       signature = identifier;
     } else {
       identifier = existing.getName().replace(".", "/");
@@ -189,6 +190,20 @@ public class ExistingType extends Type {
     type.accept(typeVisitor);
 //    System.out.println(this+".isAssignableFrom."+type+"="+typeVisitor.isAssignableFrom);
     return typeVisitor.isAssignableFrom;
+  }
+
+  @Override
+  public Type unNestArray() {
+    if (existing.isArray()) {
+      return existing(existing.getComponentType());
+    } else {
+      throw new RuntimeException("not an array type: " + this);
+    }
+  }
+
+  @Override
+  public Type nestArray() {
+    return existing(Array.newInstance(existing, 0).getClass());
   }
 
 }

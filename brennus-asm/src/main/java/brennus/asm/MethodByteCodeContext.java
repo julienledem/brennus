@@ -152,11 +152,42 @@ class MethodByteCodeContext implements Opcodes {
     load(getLoad(type), i, comments);
   }
 
+  public void aload(Type type, Object... comments) {
+    // TODO: better than this
+    stack++;
+    addInstruction(new InsnNode(getALoad(type)), comments);
+  }
+
   private void load(int load, int i, Object... comments) {
     maxv = Math.max(maxv, i+1);
     // TODO: better than this
     stack++;
     addInstruction(new VarInsnNode(load, i), comments);
+  }
+
+  private int getALoad(Type type) {
+    if (type.isPrimitive()) {
+      // TODO: other primitive types
+      switch (type.getClassIdentifier().charAt(0)) {
+      case 'I': // int
+      case 'Z': // boolean
+        return IALOAD;
+      case 'J': // long
+        return LALOAD;
+      case 'F': // float
+        return FALOAD;
+      case 'D': // double
+        return DALOAD;
+      case 'C': // char
+      case 'V': // void
+      case 'B': // byte
+      case 'S': // short
+      default:
+        throw new RuntimeException("Unsupported "+type);
+      }
+    } else {
+      return AALOAD;
+    }
   }
 
   private int getLoad(Type type) {
@@ -509,6 +540,43 @@ class MethodByteCodeContext implements Opcodes {
       addIConst1("bool literal", b);
     } else {
       addIConst0("bool literal", b);
+    }
+  }
+
+  public void newArray(Type type, Object... comments) {
+    if (type.isPrimitive()) {
+      // TODO: other primitive types
+      switch (type.getClassIdentifier().charAt(0)) {
+      case 'I': // int
+        addInstruction(new IntInsnNode(NEWARRAY, T_INT), comments);
+        break;
+      case 'Z': // boolean
+        addInstruction(new IntInsnNode(NEWARRAY, T_BOOLEAN), comments);
+        break;
+      case 'J': // long
+        addInstruction(new IntInsnNode(NEWARRAY, T_LONG), comments);
+        break;
+      case 'F': // float
+        addInstruction(new IntInsnNode(NEWARRAY, T_FLOAT), comments);
+        break;
+      case 'D': // double
+        addInstruction(new IntInsnNode(NEWARRAY, T_DOUBLE), comments);
+        break;
+      case 'C': // char
+        addInstruction(new IntInsnNode(NEWARRAY, T_CHAR), comments);
+        break;
+      case 'B': // byte
+        addInstruction(new IntInsnNode(NEWARRAY, T_BYTE), comments);
+        break;
+      case 'S': // short
+        addInstruction(new IntInsnNode(NEWARRAY, T_SHORT), comments);
+        break;
+      case 'V': // void
+      default:
+        throw new RuntimeException("Unsupported "+type);
+      }
+    } else {
+      addInstruction(new TypeInsnNode(ANEWARRAY, type.getClassIdentifier()), comments);
     }
   }
 

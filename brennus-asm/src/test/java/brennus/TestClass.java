@@ -105,4 +105,5 @@ public class TestClass extends BaseTestClass {
   public boolean isNotNull(Object o) {
     return o != null;
   }
+
 }

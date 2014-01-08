@@ -4,7 +4,8 @@ public enum BinaryOperator implements Operator {
   PLUS("+"),
   EQUALS("=="),
   GREATER_THAN(">"),
-  AND("&&");
+  AND("&&"),
+  GETARRAYATINDEX("[]");
 
   private final String representation;
 

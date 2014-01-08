@@ -21,9 +21,14 @@ abstract public class Type {
 
   abstract public Method getConstructor(int parameterCount);
 
+  abstract public Type unNestArray();
+
+  abstract public Type nestArray();
+
   @Override
   public String toString() {
     return "["+getClass().getSimpleName()+" "+getName()+"]";
   }
+
 
 }

@@ -1,6 +1,7 @@
 package brennus.asm;
 
 import static brennus.model.ExistingType.BOOLEAN;
+import static brennus.model.ExistingType.INT;
 import static brennus.model.Protection.PRIVATE;
 import brennus.ImmutableList;
 import brennus.MethodContext;
@@ -19,6 +20,7 @@ import brennus.model.InstantiationExpression;
 import brennus.model.LiteralExpression;
 import brennus.model.LocalVariableAccessType;
 import brennus.model.Method;
+import brennus.model.NewArrayExpression;
 import brennus.model.Parameter;
 import brennus.model.ParameterAccessType;
 import brennus.model.Type;
@@ -29,6 +31,7 @@ import brennus.model.VarAccessTypeVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -223,6 +226,17 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
       methodByteCodeContext.addLabel(endLabel, "AND: end");
       lastExpressionType = BOOLEAN;
       break;
+    case GETARRAYATINDEX:
+      methodByteCodeContext.incIndent("array");
+      binaryExpression.getLeftExpression().accept(this);
+      Type arrayType = lastExpressionType;
+      methodByteCodeContext.decIndent();
+      methodByteCodeContext.incIndent("[");
+      binaryExpression.getRightExpression().accept(this);
+      methodByteCodeContext.decIndent();
+      lastExpressionType = arrayType.unNestArray();
+      methodByteCodeContext.aload(lastExpressionType, "[]");
+      break;
     default:
       // TODO: other operators
       throw new UnsupportedOperationException("op: "+binaryExpression.getOperator());
@@ -271,6 +285,10 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
       lastExpressionType = BOOLEAN;
       break;
     }
+    case ARRAYSIZE:
+      methodByteCodeContext.addInstruction(new InsnNode(ARRAYLENGTH), ".length");
+      lastExpressionType = INT;
+      break;
     default:
       // TODO: other operators
       throw new UnsupportedOperationException("op: "+unaryExpression.getOperator());
@@ -291,7 +309,7 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
   public void visit(CastExpression castExpression) {
     methodByteCodeContext.incIndent("cast (", castExpression.getType(), ")");
     castExpression.getExpression().accept(this);
-    methodByteCodeContext.addInstruction(new TypeInsnNode(CHECKCAST, castExpression.getType().getClassIdentifier()), "cast to", castExpression.getType());
+    methodByteCodeContext.cast(castExpression.getType(), "cast to", castExpression.getType());
     lastExpressionType = castExpression.getType();
     methodByteCodeContext.decIndent();
   }
@@ -314,6 +332,16 @@ class ASMExpressionVisitor implements Opcodes, ExpressionVisitor {
     methodByteCodeContext.addInstruction(new MethodInsnNode(INVOKESPECIAL, type.getClassIdentifier(), "<init>", constructor.getSignature()), "new ", type.getName(), "(...)");
     lastExpressionType = type;
     methodByteCodeContext.decIndent();
+  }
+
+  @Override
+  public void visit(NewArrayExpression e) {
+    methodByteCodeContext.incIndent("new ", e.getType(), "[]");
+    e.getSize().accept(this);
+    methodByteCodeContext.newArray(e.getType(), "new ", e.getType(), "[]");
+    lastExpressionType = e.getType().nestArray();
+    methodByteCodeContext.decIndent();
+
   }
 
 }

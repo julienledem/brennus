@@ -3,22 +3,24 @@ package brennus.model;
 
 public interface ExpressionVisitor {
 
-  void visit(GetExpression getFieldExpression);
+  void visit(GetExpression e);
 
-  void visit(CallMethodExpression callMethodExpression);
+  void visit(CallMethodExpression e);
 
-  void visit(LiteralExpression literalExpression);
+  void visit(LiteralExpression e);
 
-  void visit(BinaryExpression binaryExpression);
+  void visit(BinaryExpression e);
 
-  void visit(UnaryExpression unaryExpression);
+  void visit(UnaryExpression e);
 
-  void visit(InstanceOfExpression instanceOfExpression);
+  void visit(InstanceOfExpression e);
 
-  void visit(CastExpression castExpression);
+  void visit(CastExpression e);
 
-  void visit(CallConstructorExpression callConstructorExpression);
+  void visit(CallConstructorExpression e);
 
-  void visit(InstantiationExpression instantiationExpression);
+  void visit(InstantiationExpression e);
+
+  void visit(NewArrayExpression e);
 
 }

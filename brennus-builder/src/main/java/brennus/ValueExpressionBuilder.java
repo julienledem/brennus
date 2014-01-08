@@ -2,8 +2,10 @@ package brennus;
 
 import static brennus.model.BinaryOperator.AND;
 import static brennus.model.BinaryOperator.EQUALS;
+import static brennus.model.BinaryOperator.GETARRAYATINDEX;
 import static brennus.model.BinaryOperator.GREATER_THAN;
 import static brennus.model.BinaryOperator.PLUS;
+import static brennus.model.UnaryOperator.ARRAYSIZE;
 import static brennus.model.UnaryOperator.ISNOTNULL;
 import static brennus.model.UnaryOperator.ISNULL;
 import brennus.ExpressionBuilder.ExpressionHandler;
@@ -13,6 +15,7 @@ import brennus.model.CastExpression;
 import brennus.model.ExistingType;
 import brennus.model.Expression;
 import brennus.model.InstanceOfExpression;
+import brennus.model.NewArrayExpression;
 import brennus.model.Type;
 import brennus.model.UnaryExpression;
 
@@ -66,6 +69,10 @@ abstract public class ValueExpressionBuilder<T, EB, VEB> {
     return newValueExpressionBuilder(expressionHandler, new UnaryExpression(ISNOTNULL, expression));
   }
 
+  public VEB arraySize() {
+    return newValueExpressionBuilder(expressionHandler, new UnaryExpression(ARRAYSIZE, expression));
+  }
+
   public VEB instanceOf(ExistingType existingType) {
     return newValueExpressionBuilder(expressionHandler, new InstanceOfExpression(expression, existingType));
   }
@@ -100,6 +107,15 @@ abstract public class ValueExpressionBuilder<T, EB, VEB> {
 
   public VEB callNoParam(String methodName) {
     return new MethodCallBuilder<T, EB, VEB>(factory, expression, methodName, expressionHandler).endCall();
+  }
+
+
+  public ArrayIndexExpressionBuilder<VEB> getArrayValueAt() {
+    return new ArrayIndexExpressionBuilder<VEB>(new ExpressionHandler<VEB>() {
+          public VEB handleExpression(Expression e) {
+            return factory.newValueExpressionBuilder(expressionHandler, new BinaryExpression(expression, GETARRAYATINDEX, e));
+          }
+    });
   }
 
 }

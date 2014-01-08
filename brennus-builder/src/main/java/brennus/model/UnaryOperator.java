@@ -4,7 +4,8 @@ public enum UnaryOperator implements Operator {
 
   NOT("!"),
   ISNULL("null =="),
-  ISNOTNULL("null !=");
+  ISNOTNULL("null !="),
+  ARRAYSIZE("size of array ");
 
   private final String representation;
 

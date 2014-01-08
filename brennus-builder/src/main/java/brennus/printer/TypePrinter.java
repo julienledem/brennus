@@ -1,15 +1,12 @@
 package brennus.printer;
 
-import java.util.Collection;
-import java.util.List;
-
 import brennus.MethodContext;
-import brennus.model.CaseStatement;
 import brennus.model.BinaryExpression;
 import brennus.model.CallConstructorExpression;
 import brennus.model.CallConstructorStatement;
 import brennus.model.CallMethodExpression;
 import brennus.model.CaseBlockStatement;
+import brennus.model.CaseStatement;
 import brennus.model.CastExpression;
 import brennus.model.DefineVarStatement;
 import brennus.model.ExistingType;
@@ -30,6 +27,7 @@ import brennus.model.LiteralExpression;
 import brennus.model.LocalVariableAccessType;
 import brennus.model.MemberFlags;
 import brennus.model.Method;
+import brennus.model.NewArrayExpression;
 import brennus.model.Parameter;
 import brennus.model.ParameterAccessType;
 import brennus.model.ReturnStatement;
@@ -418,6 +416,13 @@ class ExpressionStringifierVisitor implements ExpressionVisitor {
       expression.accept(this);
     }
     sb.append(")");
+  }
+
+  @Override
+  public void visit(NewArrayExpression e) {
+    sb.append("new ").append(e.getType().getName()).append("[");
+    e.getSize().accept(this);
+    sb.append("]");
   }
 
 }

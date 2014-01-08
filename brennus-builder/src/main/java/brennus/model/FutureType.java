@@ -148,4 +148,13 @@ public final class FutureType extends Type {
     return null;
   }
 
+  @Override
+  public Type unNestArray() {
+    throw new RuntimeException("not an array type: " + this);
+  }
+
+  @Override
+  public Type nestArray() {
+    throw new UnsupportedOperationException("NYI");
+  }
 }
