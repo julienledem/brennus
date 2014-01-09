@@ -3,7 +3,7 @@
 
   <groupId>net.ledem</groupId>
   <artifactId>brennus</artifactId>
-  <version>0.3.0</version>
+  <version>0.3.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Brennus</name>
