@@ -51,7 +51,7 @@ public final class MethodContext {
       } else {
         LocalVarContext localVarContext;
         if (!localVars.containsKey(varName)) {
-          throw new RuntimeException("can not access " + varName + " in parameters, local variables or fields");
+          throw new RuntimeException("can not access " + varName + " in parameters, local variables or fields of " + type.getName() + "." + method.getName() + method.getSignature());
         } else {
           localVarContext = localVars.get(varName);
         }

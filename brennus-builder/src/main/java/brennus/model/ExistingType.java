@@ -72,6 +72,19 @@ public class ExistingType extends Type {
     wrap(typeVisitor).visit(this);
   }
 
+  @Override
+  public String getPrintableName() {
+    return getPrintableName(existing);
+  }
+
+  private String getPrintableName(Class<?> c) {
+    if (c.isArray()) {
+      return getPrintableName(c.getComponentType()) + "[]";
+    } else {
+      return c.getName();
+    }
+  }
+
   public Class<?> getExisting() {
     return existing;
   }
@@ -129,7 +142,7 @@ public class ExistingType extends Type {
     // TODO: add static
     java.lang.reflect.Field field;
     try {
-      field = existing.getField(name);
+      field = existing.getDeclaredField(name);
     } catch (NoSuchFieldException e) {
       return null;
     } catch (SecurityException e) {

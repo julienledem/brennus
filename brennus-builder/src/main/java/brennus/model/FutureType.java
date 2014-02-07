@@ -157,4 +157,9 @@ public final class FutureType extends Type {
   public Type nestArray() {
     throw new UnsupportedOperationException("NYI");
   }
+
+  @Override
+  public String getPrintableName() {
+    return getName();
+  }
 }

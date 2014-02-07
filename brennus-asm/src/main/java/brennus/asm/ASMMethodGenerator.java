@@ -238,7 +238,7 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
     methodByteCodeContext.addLineNumber(statement.getLine());
     methodByteCodeContext.incIndent(statement.getClass().getSimpleName());
     statement.accept(this);
-    // TODO: statement that return nothing must pop the stack if needed
+    // TODO: statements that return nothing must pop the stack if needed
     // TODO: statements that return something should check there is something on the stack
     methodByteCodeContext.decIndent();
   }
@@ -292,7 +292,26 @@ class ASMMethodGenerator implements Opcodes, StatementVisitor {
 
       @Override
       public void visit(UnaryExpression unaryExpression) {
-        throw new UnsupportedOperationException();
+        methodByteCodeContext.incIndent("if");
+        ASMMethodGenerator.this.visit(unaryExpression.getExpression());
+        methodByteCodeContext.decIndent();
+        methodByteCodeContext.incIndent(unaryExpression.getOperator().getRepresentation());
+        // TODO: combine expression ! and =  etc
+        switch (unaryExpression.getOperator()) {
+        case NOT:
+          generateThenElse(IFEQ, ifStatement.getThenStatements(), ifStatement.getElseStatements());
+          break;
+        case ISNULL:
+          generateThenElse(IFNULL, ifStatement.getThenStatements(), ifStatement.getElseStatements());
+          break;
+        case ISNOTNULL:
+          generateThenElse(IFNONNULL, ifStatement.getThenStatements(), ifStatement.getElseStatements());
+          break;
+        case ARRAYSIZE:
+        default:
+          throw new UnsupportedOperationException("op: "+unaryExpression.getOperator());
+        }
+        methodByteCodeContext.decIndent();
       }
 
       @Override

@@ -39,7 +39,7 @@ final class ExceptionHandlingVisitor {
         try {
           return method.invoke(visitor, args);
         } catch (InvocationTargetException e) {
-          throw new VisitorRuntimeException(method.getDeclaringClass().getSimpleName(), args[0], e.getTargetException());
+          throw new VisitorRuntimeException(visitor.getClass().getSimpleName(), args[0], e.getTargetException());
         }
       }
     });

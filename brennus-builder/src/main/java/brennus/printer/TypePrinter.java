@@ -82,7 +82,7 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
     for (Method m : methods) {
       context = new MethodContext(type, m);
       String methodName = m.getName();
-      String returnType = m.getReturnType().getName();
+      String returnType = m.getReturnType().getPrintableName();
       if (methodName.equals("<init>")) {
         // constructor
         println(
@@ -111,7 +111,7 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
       } else {
         result += ", ";
       }
-      result += parameter.getType().getName()+" "+parameter.getName();
+      result += parameter.getType().getPrintableName()+" "+parameter.getName();
     }
     return result == null ? "" : result;
   }
@@ -124,7 +124,7 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
   private void printFields(Iterable<Field> fields) {
     for (Field f : fields) {
       println(
-          getKeywords(f.getFlags()) + " " + f.getType().getName() + " " + f.getName() + ";"
+          getKeywords(f.getFlags()) + " " + f.getType().getPrintableName() + " " + f.getName() + ";"
           );
     }
   }
@@ -133,7 +133,8 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
 
   @Override
   public void visit(ExistingType existingType) {
-    println(existingType.getExisting());
+    printIndent();
+    println(existingType.getPrintableName());
   }
 
   @Override
@@ -141,13 +142,13 @@ class TypePrinterVisitor implements TypeVisitor, StatementVisitor {
     int lastDot = futureType.getName().lastIndexOf('.');
     String name;
     if (lastDot == -1) {
-      name = futureType.getName();
+      name = futureType.getPrintableName();
     } else {
-      name = futureType.getName().substring(lastDot + 1);
+      name = futureType.getPrintableName().substring(lastDot + 1);
       println("package "+futureType.getName().substring(0, lastDot)+";");
     }
     println("class " + name +
-        (futureType.getExtending() == null ? "" : " extends " + futureType.getExtending().getName())+
+        (futureType.getExtending() == null ? "" : " extends " + futureType.getExtending().getPrintableName())+
         " {");
     incIndent();
     println("// static fields");
@@ -351,11 +352,21 @@ class ExpressionStringifierVisitor implements ExpressionVisitor {
 
   @Override
   public void visit(BinaryExpression binaryExpression) {
-    sb.append("(");
-    binaryExpression.getLeftExpression().accept(this);
-    sb.append(" "+binaryExpression.getOperator().getRepresentation()+" ");
-    binaryExpression.getRightExpression().accept(this);
-    sb.append(")");
+    switch (binaryExpression.getOperator()) {
+    case GETARRAYATINDEX:
+      binaryExpression.getLeftExpression().accept(this);
+      sb.append("[");
+      binaryExpression.getRightExpression().accept(this);
+      sb.append("]");
+      break;
+    default:
+      sb.append("(");
+      binaryExpression.getLeftExpression().accept(this);
+      sb.append(" "+binaryExpression.getOperator().getRepresentation()+" ");
+      binaryExpression.getRightExpression().accept(this);
+      sb.append(")");
+      break;
+    }
   }
 
   @Override
@@ -365,10 +376,26 @@ class ExpressionStringifierVisitor implements ExpressionVisitor {
 
   @Override
   public void visit(UnaryExpression unaryExpression) {
-    sb.append("(");
-    sb.append(unaryExpression.getOperator().getRepresentation()).append(" ");
-    unaryExpression.getExpression().accept(this);
-    sb.append(")");
+    switch (unaryExpression.getOperator()) {
+    case ARRAYSIZE:
+      unaryExpression.getExpression().accept(this);
+      sb.append(".length");
+      break;
+    case ISNULL:
+      unaryExpression.getExpression().accept(this);
+      sb.append(" == null");
+      break;
+    case ISNOTNULL:
+      unaryExpression.getExpression().accept(this);
+      sb.append(" != null");
+      break;
+    default:
+      sb.append("(");
+      sb.append(unaryExpression.getOperator().getRepresentation()).append(" ");
+      unaryExpression.getExpression().accept(this);
+      sb.append(")");
+      break;
+    }
   }
 
   @Override

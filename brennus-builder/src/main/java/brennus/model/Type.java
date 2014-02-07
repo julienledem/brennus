@@ -7,6 +7,8 @@ abstract public class Type {
 
   abstract public String getName();
 
+  abstract public String getPrintableName();
+
   abstract public String getClassIdentifier();
 
   abstract public String getSignature();
