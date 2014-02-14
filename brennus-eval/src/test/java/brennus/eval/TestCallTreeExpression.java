@@ -34,13 +34,11 @@ public class TestCallTreeExpression {
 
   private static int id = 0;
 
-
   public FutureType compileToClass(final MethodCallExpression exp, Class<?> parent, Type returnType, String methodName, final Class<?>... parameters) {
     FutureType c = new Builder()
       .startClass("brennus.eval.CallTreeExpression$Expression" + (++id), existing(parent))
       .startMethod(PUBLIC, returnType, methodName)
         .map(new Function<MethodDeclarationBuilder, MethodDeclarationBuilder>() {
-          @Override
           public MethodDeclarationBuilder apply(MethodDeclarationBuilder input) {
             int paramNumber = 0;
             for (Class<?> p : parameters) {
@@ -49,15 +47,10 @@ public class TestCallTreeExpression {
             return input;
           }
         })
-          .returnExp()
-            .map(new Function<ReturnExpressionBuilder<MethodBuilder>, ReturnValueExpressionBuilder<MethodBuilder>>() {
-              @Override
-              public ReturnValueExpressionBuilder<MethodBuilder> apply(ReturnExpressionBuilder<MethodBuilder> input) {
-                return exp.compileToExpression(input);
-              }
-            })
-          .endReturn()
-        .endMethod()
+        .returnExp()
+          .map(exp.<ReturnExpressionBuilder<MethodBuilder>, ReturnValueExpressionBuilder<MethodBuilder>>toFunc())
+        .endReturn()
+      .endMethod()
       .endClass();
     return c;
 

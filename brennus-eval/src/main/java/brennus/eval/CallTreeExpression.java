@@ -1,23 +1,13 @@
 package brennus.eval;
 
-import static brennus.model.ExistingType.existing;
-import static brennus.model.Protection.PUBLIC;
-
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import brennus.Builder;
 import brennus.ExpressionBuilder;
 import brennus.Function;
-import brennus.MethodBuilder;
-import brennus.MethodDeclarationBuilder;
 import brennus.ParamValueExpressionBuilder;
-import brennus.ReturnExpressionBuilder;
-import brennus.ReturnValueExpressionBuilder;
 import brennus.ValueExpressionBuilder;
-import brennus.model.FutureType;
-import brennus.model.Type;
 
 abstract public class CallTreeExpression extends Expression {
 
@@ -48,7 +38,15 @@ abstract public class CallTreeExpression extends Expression {
     return new BooleanLiteralExpression(value);
   }
 
-  public abstract <T, EB, VEB extends ValueExpressionBuilder<T, EB, VEB>> VEB compileToExpression(final ExpressionBuilder<T, EB, VEB> builder);
+  public abstract <EB extends ExpressionBuilder<?, EB, VEB>, VEB extends ValueExpressionBuilder<?, EB, VEB>> VEB compileToExpression(final EB builder);
+
+  public <EB extends ExpressionBuilder<?, EB, VEB>, VEB extends ValueExpressionBuilder<?, EB, VEB>> Function<EB, VEB> toFunc() {
+    return new Function<EB, VEB>() {
+      public VEB apply(EB eb) {
+        return compileToExpression(eb);
+      }
+    };
+  }
 
   public static class MethodCallExpression extends CallTreeExpression {
     private final String methodName;
@@ -60,12 +58,12 @@ abstract public class CallTreeExpression extends Expression {
       this.children = Arrays.asList(children);
     }
 
-    public <T, EB, VEB extends ValueExpressionBuilder<T, EB, VEB>> VEB compileToExpression(final ExpressionBuilder<T, EB, VEB> builder) {
+    public <EB extends ExpressionBuilder<?, EB, VEB>, VEB extends ValueExpressionBuilder<?, EB, VEB>> VEB compileToExpression(final EB builder) {
       if (children.size() == 0) {
         return builder.callOnThisNoParam(methodName);
       } else {
         final Iterator<CallTreeExpression> it = children.iterator();
-        ParamValueExpressionBuilder<T, EB, VEB> veb = it.next().compileToExpression(builder.callOnThis(methodName));
+        ParamValueExpressionBuilder<?, EB, VEB> veb = it.next().compileToExpression(builder.callOnThis(methodName));
         while (it.hasNext()) {
           veb = it.next().compileToExpression(veb.nextParam());
         }
@@ -97,7 +95,7 @@ abstract public class CallTreeExpression extends Expression {
       this.value = value;
     }
 
-    public <T, EB, VEB extends ValueExpressionBuilder<T, EB, VEB>> VEB compileToExpression(final ExpressionBuilder<T, EB, VEB> builder) {
+    public <EB extends ExpressionBuilder<?, EB, VEB>, VEB extends ValueExpressionBuilder<?, EB, VEB>> VEB compileToExpression(final EB builder) {
       return builder.literal(value);
     }
 
@@ -114,7 +112,7 @@ abstract public class CallTreeExpression extends Expression {
       this.value = value;
     }
 
-    public <T, EB, VEB extends ValueExpressionBuilder<T, EB, VEB>> VEB compileToExpression(final ExpressionBuilder<T, EB, VEB> builder) {
+    public <EB extends ExpressionBuilder<?, EB, VEB>, VEB extends ValueExpressionBuilder<?, EB, VEB>> VEB compileToExpression(final EB builder) {
       return builder.literal(value);
     }
 
@@ -131,7 +129,7 @@ abstract public class CallTreeExpression extends Expression {
       this.value = value;
     }
 
-    public <T, EB, VEB extends ValueExpressionBuilder<T, EB, VEB>> VEB compileToExpression(final ExpressionBuilder<T, EB, VEB> builder) {
+    public <EB extends ExpressionBuilder<?, EB, VEB>, VEB extends ValueExpressionBuilder<?, EB, VEB>> VEB compileToExpression(final EB builder) {
       return builder.literal(value);
     }
 
@@ -148,7 +146,7 @@ abstract public class CallTreeExpression extends Expression {
       this.value = value;
     }
 
-    public <T, EB, VEB extends ValueExpressionBuilder<T, EB, VEB>> VEB compileToExpression(final ExpressionBuilder<T, EB, VEB> builder) {
+    public <EB extends ExpressionBuilder<?, EB, VEB>, VEB extends ValueExpressionBuilder<?, EB, VEB>> VEB compileToExpression(final EB builder) {
       return builder.literal(value);
     }
 
@@ -165,7 +163,7 @@ abstract public class CallTreeExpression extends Expression {
       this.value = value;
     }
 
-    public <T, EB, VEB extends ValueExpressionBuilder<T, EB, VEB>> VEB compileToExpression(final ExpressionBuilder<T, EB, VEB> builder) {
+    public <EB extends ExpressionBuilder<?, EB, VEB>, VEB extends ValueExpressionBuilder<?, EB, VEB>> VEB compileToExpression(final EB builder) {
       return builder.literal(value);
     }
 
@@ -182,7 +180,7 @@ abstract public class CallTreeExpression extends Expression {
       this.value = value;
     }
 
-    public <T, EB, VEB extends ValueExpressionBuilder<T, EB, VEB>> VEB compileToExpression(final ExpressionBuilder<T, EB, VEB> builder) {
+    public <EB extends ExpressionBuilder<?, EB, VEB>, VEB extends ValueExpressionBuilder<?, EB, VEB>> VEB compileToExpression(final EB builder) {
       return builder.literal(value);
     }
 
@@ -199,7 +197,7 @@ abstract public class CallTreeExpression extends Expression {
       this.name = name;
     }
 
-    public <T, EB, VEB extends ValueExpressionBuilder<T, EB, VEB>> VEB compileToExpression(final ExpressionBuilder<T, EB, VEB> builder) {
+    public <EB extends ExpressionBuilder<?, EB, VEB>, VEB extends ValueExpressionBuilder<?, EB, VEB>> VEB compileToExpression(final EB builder) {
       return builder.get(name);
     }
 
