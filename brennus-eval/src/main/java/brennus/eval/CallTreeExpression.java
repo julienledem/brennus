@@ -6,6 +6,7 @@ import java.util.List;
 
 import brennus.ExpressionBuilder;
 import brennus.Function;
+import brennus.ParamExpressionBuilder;
 import brennus.ParamValueExpressionBuilder;
 import brennus.ValueExpressionBuilder;
 
@@ -65,7 +66,9 @@ abstract public class CallTreeExpression extends Expression {
         final Iterator<CallTreeExpression> it = children.iterator();
         ParamValueExpressionBuilder<?, EB, VEB> veb = it.next().compileToExpression(builder.callOnThis(methodName));
         while (it.hasNext()) {
-          veb = it.next().compileToExpression(veb.nextParam());
+          ParamExpressionBuilder<?, EB, VEB> nextParam = veb.nextParam();
+          ParamValueExpressionBuilder<?, EB, VEB> compileToExpression = it.next().compileToExpression(nextParam);
+          veb = compileToExpression;
         }
         return veb.endCall();
       }
