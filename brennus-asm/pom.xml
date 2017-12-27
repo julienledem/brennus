@@ -13,7 +13,7 @@
 
   <name>Brennus ASM</name>
   <url>https://github.com/julienledem/brennus</url>
-  
+
   <properties>
     <asm-version>3.3.1</asm-version>
   </properties>

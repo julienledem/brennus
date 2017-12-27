@@ -48,7 +48,7 @@ public class TestCallTreeExpression {
           }
         })
         .returnExp()
-          .map(exp.<ReturnExpressionBuilder<MethodBuilder>, ReturnValueExpressionBuilder<MethodBuilder>>toFunc())
+          .map(exp.<MethodBuilder, ReturnExpressionBuilder<MethodBuilder>, ReturnValueExpressionBuilder<MethodBuilder>>toFunc())
         .endReturn()
       .endMethod()
       .endClass();
